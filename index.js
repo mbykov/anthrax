@@ -28,7 +28,11 @@ async function start (wf) {
     let pcwf = plain(cwf)
     let chains = []
     await dagging(chains, pcwf, [], flexes)
-    log('_chains', chains)
+    /* log('_chains', chains) */
+    chains.forEach(chain=> {
+        let sgms = chain.map(seg=> seg._id)
+        log('_sgms', sgms)
+    })
 }
 
 async function dagging(chains, pcwf, head, flexes) {
@@ -38,16 +42,16 @@ async function dagging(chains, pcwf, head, flexes) {
     /* if (pcwf == 'κρατια') log('_heads_KRAT', heads) */
     let segments = await getSegments(heads)
     /* if (pcwf == 'κρατια') log('_segments_KRAT', segments) */
-    segments.forEach(async seg=> {
+    for await (let seg of segments) {
         if (seg._id.length < 2) return
         let full = false
         /* let headsrt = head.map(seg=> seg._id).join('') || '' */
         flexes.forEach(flex=> {
             if (pcwf == seg._id + plain(flex._id)) {
                 let chain = [seg, flex]
-                if (head.length) chain.unshift(head)
+                if (head.length) chain.unshift(...head)
                 full = true
-                if (pcwf == 'κρατια') log('_SEGM_KRAT', chain)
+                /* if (pcwf == 'κρατια') log('_SEGM_KRAT', chain) */
                 chains.push(chain)
             }
         })
@@ -70,12 +74,11 @@ async function dagging(chains, pcwf, head, flexes) {
                 headseg_o.push({vowel: true, _id: 'ο'})
                 hstr = headseg_o.map(hs=> hs._id)
                 log('_xx-tail_o', hstr, pseg_o, tail_o)
+                /* headseg_o = _.flatten(headseg_o) */
                 await dagging(chains, tail_o, headseg_o, flexes)
             }
         }
-    })
-
-
-
-    return chains
+    }
+    /* segments.forEach(async seg=> {
+     * }) */
 }
