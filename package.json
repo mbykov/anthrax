@@ -12,6 +12,7 @@
   "type": "module",
   "dependencies": {
     "lodash": "^4.17.21",
+    "node-fetch": "^3.1.0",
     "orthos": "^0.7.2"
   }
 }

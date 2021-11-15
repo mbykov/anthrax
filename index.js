@@ -12,12 +12,12 @@ let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 
 start(wordform)
 
-function start (wf) {
+async function start (wf) {
     let cwf = comb(wf)
     log('_start', cwf)
     let flakes = scrape(cwf)
     let tails = flakes.map(flake=> flake.tail)
     log('_tails', tails)
-    let flexes = getFlexes(tails)
-    log('_flexes', flexes)
+    let flexes = await getFlexes(tails)
+    log('_start flexes', flexes)
 }
