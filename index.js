@@ -4,7 +4,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape } from './lib/utils.js'
+import { accents, scrape, vowels } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
@@ -15,16 +15,18 @@ let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
  *     return cwf.replace(retail, '')
  * }) */
 
+const dag = {}
+
 start(wordform)
 
 async function start (wf) {
     let cwf = comb(wf)
     let flakes = scrape(cwf)
     let tails = flakes.map(flake=> flake.tail)
-    log('_tails', wf, tails)
+    /* log('_tails', wf, tails) */
     let flexes = await getFlexes(tails)
     tails = flexes.map(flex=> flex._id)
-    log('_tails', tails)
+    /* log('_tails', tails) */
     let pcwf = plain(cwf)
     let chains = []
     await dagging(chains, pcwf, [], flexes)
@@ -52,33 +54,32 @@ async function dagging(chains, pcwf, head, flexes) {
                 if (head.length) chain.unshift(...head)
                 full = true
                 /* if (pcwf == 'κρατια') log('_SEGM_KRAT', chain) */
+                if (!dag[pcwf]) dag[pcwf] = [seg, flex]
                 chains.push(chain)
             }
         })
-        if (!full) {
-            let pseg = plain(seg._id)
-            let repseg = new RegExp('^'+pseg)
-            let tail = pcwf.replace(repseg, '')
-            let headseg = _.clone(head)
-            headseg.push(seg)
-            let hstr = headseg.map(hs=> hs._id)
-            log('_xx-tail', hstr, pseg, tail)
-            await dagging(chains, tail, headseg, flexes)
+        if (full) continue
+        let pseg = plain(seg._id)
+        let repseg = new RegExp('^'+pseg)
+        let tail = pcwf.replace(repseg, '')
 
-            let pseg_o = pseg + 'ο'
-            let repseg_o = new RegExp('^' + pseg_o)
-            let tail_o = pcwf.replace(repseg_o, '')
-            if (tail_o != pcwf) {
-                let headseg_o = _.clone(head)
-                headseg_o.push(seg)
-                headseg_o.push({vowel: true, _id: 'ο'})
-                hstr = headseg_o.map(hs=> hs._id)
-                log('_xx-tail_o', hstr, pseg_o, tail_o)
-                /* headseg_o = _.flatten(headseg_o) */
-                await dagging(chains, tail_o, headseg_o, flexes)
-            }
-        }
+        let headseg = _.clone(head)
+        headseg.push(seg)
+        log('_xx-tail', 'pseg:', pseg, tail)
+        if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
+        else await dagging(chains, tail, headseg, flexes)
+
+        let next = tail[0]
+        if (!vowels.includes(next)) continue
+        pseg = pseg + next
+        repseg = new RegExp('^' + pseg)
+        tail = pcwf.replace(repseg, '')
+        if (tail == pcwf) continue
+        headseg = _.clone(head)
+        headseg.push(seg)
+        headseg.push({vowel: true, _id: next})
+        if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
+        else await dagging(chains, tail, headseg, flexes)
+
     }
-    /* segments.forEach(async seg=> {
-     * }) */
 }
