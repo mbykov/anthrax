@@ -71,6 +71,7 @@ async function dagging(chains, pcwf, head, flexes) {
 
         let next = tail[0]
         if (!vowels.includes(next)) continue
+
         pseg = pseg + next
         repseg = new RegExp('^' + pseg)
         tail = pcwf.replace(repseg, '')
