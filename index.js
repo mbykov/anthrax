@@ -6,6 +6,7 @@ import {oxia, comb, plain, strip} from 'orthos'
 
 import { accents, scrape, vowels } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
+import { filters } from './lib/filters.js'
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 
@@ -31,11 +32,20 @@ async function start (wf) {
     let chains = []
     await dagging(chains, pcwf, [], flexes)
     /* log('_chains', chains) */
-    chains.forEach(chain=> {
-        let sgms = chain.map(seg=> seg._id)
-        log('_sgms', sgms)
+    // todo: filters
+    let min = _.min(chains.map(chain=> chain.length))
+    chains = chains.filter(chain=> chain.length < min + 2)
+
+    let cleans = _.compact(chains.map(chain=> filters(chain)))
+    log(cleans)
+
+    cleans.forEach(chain=> {
+        log('_sgms', chain)
     })
 }
+
+// вопросы: εἰσαγγέλλω - два одинаковых sgms, ἐξαγγέλλω - то же
+
 
 async function dagging(chains, pcwf, head, flexes) {
     /* if (pcwf == 'κρατια') log('_xx-head_KRAT', head) */
@@ -43,9 +53,9 @@ async function dagging(chains, pcwf, head, flexes) {
     let heads = flakes.map(flake=> flake.head)
     /* if (pcwf == 'κρατια') log('_heads_KRAT', heads) */
     let segments = await getSegments(heads)
-    /* if (pcwf == 'κρατια') log('_segments_KRAT', segments) */
+    /* if (pcwf == 'ἀγαπαω') log('_segments_KRAT', segments[0]) */
     for await (let seg of segments) {
-        if (seg._id.length < 2) return
+        /* if (seg._id.length < 2) return */
         let full = false
         /* let headsrt = head.map(seg=> seg._id).join('') || '' */
         flexes.forEach(flex=> {
@@ -62,12 +72,7 @@ async function dagging(chains, pcwf, head, flexes) {
         let pseg = plain(seg._id)
         let repseg = new RegExp('^'+pseg)
         let tail = pcwf.replace(repseg, '')
-
-        let headseg = _.clone(head)
-        headseg.push(seg)
-        log('_xx-tail', 'pseg:', pseg, tail)
-        if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
-        else await dagging(chains, tail, headseg, flexes)
+        await diveDag(chains, seg, tail, head, flexes)
 
         let next = tail[0]
         if (!vowels.includes(next)) continue
@@ -76,11 +81,24 @@ async function dagging(chains, pcwf, head, flexes) {
         repseg = new RegExp('^' + pseg)
         tail = pcwf.replace(repseg, '')
         if (tail == pcwf) continue
-        headseg = _.clone(head)
-        headseg.push(seg)
-        headseg.push({vowel: true, _id: next})
-        if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
-        else await dagging(chains, tail, headseg, flexes)
+        await diveVowel(chains, seg, tail, head, next, flexes)
 
+        // todo: -si- ??
     }
+}
+
+async function diveDag(chains, seg, tail, head, flexes) {
+    let headseg = _.clone(head)
+    headseg.push(seg)
+    /* log('_xx-tail', 'pseg:', pseg, tail) */
+    if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
+    else await dagging(chains, tail, headseg, flexes)
+}
+
+async function diveVowel(chains, seg, tail, head, next, flexes) {
+    let headseg = _.clone(head)
+    headseg.push(seg)
+    headseg.push({vowel: true, _id: next})
+    if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
+    else await dagging(chains, tail, headseg, flexes)
 }
