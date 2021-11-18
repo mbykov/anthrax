@@ -36,11 +36,19 @@ async function start (wf) {
     let min = _.min(chains.map(chain=> chain.length))
     chains = chains.filter(chain=> chain.length < min + 2)
 
-    let cleans = _.compact(chains.map(chain=> filters(chain)))
-    log(cleans)
+    chains.forEach(chain=> {
+        let prefs = chain[0].docs.filter(doc=> doc.pref)
+        /* log('_prefs', chain[0]) */
+        // gitlab.rd.aorti.ru
+        // pass - liana - cuf -
+        // паша беляков - кротовкуф, днмкинкуф
+        let ids = chain.map(seg=> seg._id)
+        log('_sgms', ids)
+    })
 
-    cleans.forEach(chain=> {
-        log('_sgms', chain)
+    let cleans = _.compact(chains.map(chain=> filters(chain)))
+    cleans.forEach(clean=> {
+        log('_clean', clean)
     })
 }
 
