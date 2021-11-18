@@ -34,7 +34,7 @@ async function start (wf) {
     /* log('_chains', chains) */
     // todo: filters
     let min = _.min(chains.map(chain=> chain.length))
-    chains = chains.filter(chain=> chain.length < min + 2)
+    chains = chains.filter(chain=> chain.length < min + 3)
 
     chains.forEach(chain=> {
         let prefs = chain[0].docs.filter(doc=> doc.pref)
