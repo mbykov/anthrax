@@ -46,7 +46,7 @@ async function start (wf) {
         log('_sgms', ids)
     })
 
-    let cleans = _.compact(chains.map(chain=> filters(chain)))
+    let cleans = chains.map(chain=> filters(chain)).filter(chain=> chain.length)
     cleans.forEach(clean=> {
         log('_clean', clean)
     })
