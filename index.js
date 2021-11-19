@@ -9,61 +9,51 @@ import {oxia, comb, plain, strip} from 'orthos'
 
 import { accents, scrape, vowels } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
-import { filters } from './lib/filters.js'
-
-let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-
+import { filters, simple } from './lib/filters.js'
+import Debug from 'debug'
 
 /* let heads = tails.map(tail=> {
  *     let retail = new RegExp(tail+'$')
  *     return cwf.replace(retail, '')
  * }) */
 
+let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 const dag = {}
 let chains = []
+const d = Debug('app')
+const h = Debug('dag:first')
 
 anthrax(wordform)
 
 async function anthrax (wf) {
     let cwf = comb(wf)
     let flakes = scrape(cwf)
-    log('_flakes', flakes)
+    d('_flakes', flakes)
     let tails = flakes.map(flake=> flake.tail)
-    // log('_tails', wf, tails)
     let flexes = await getFlexes(tails)
     let flexstrs = flexes.map(flex=> flex._id)
-    log('_flexstrs', flexstrs)
+    d('_flexstrs', flexstrs)
     let pcwf = plain(cwf)
-    log('_pcwf', pcwf)
+    d('_pcwf', pcwf)
+    d('___DEBUG___', pcwf)
 
     await dagging([], pcwf, flexes)
-    // log('_raw chains', chains)
-    // todo: filters
+
+    log('_raw chains', chains)
+
+    return
+
     let min = _.min(chains.map(chain=> chain.length))
-    chains = chains.filter(chain=> chain.length < min + 3)
+    /* chains = chains.filter(chain=> chain.length < min + 3) */
+    /* chains.forEach(chain=> {
+     *     let ids = chain.map(seg=> seg._id)
+     *     log('_sgms', ids)
+     * }) */
 
-    chains.forEach(chain=> {
-        let prefs = chain[0].docs.filter(doc=> doc.pref)
-        /* log('_prefs', chain[0]) */
-        let ids = chain.map(seg=> seg._id)
-        log('_sgms', ids)
+    /* let cleans = chains.map(chain=> filters(chain)).filter(chain=> chain.length) */
+    chains.forEach(clean=> {
+        d('_clean', clean)
     })
-
-    let cleans = chains.map(chain=> filters(chain)).filter(chain=> chain.length)
-    cleans.forEach(clean=> {
-        log('_clean', clean)
-    })
-}
-
-async function dagging(heads, tail, flexes) {
-    log('_dag', heads, tail)
-    let flakes = scrape(tail)
-    log('_dag_flakes_', flakes)
-    let headkeys = flakes.map(flake=> plain(flake.head))
-    log('_dag_headkeys_', headkeys)
-    let segments = await getSegments(headkeys)
-    log('_dag_segments_', segments)
-
 }
 
 // 1. вопросы: εἰσαγγέλλω - два одинаковых sgms, ἐξαγγέλλω - то же
@@ -72,20 +62,42 @@ async function dagging(heads, tail, flexes) {
 // или, для однообразия, вычислять aug-names как в verbs?
 // 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
 
-// то есть полная жопа. Думай
+async function dagging(heads, tail, flexes) {
+    h('_dag', heads, tail)
+    let flakes = scrape(tail)
+    h('_flakes_', flakes)
+    let headkeys = flakes.map(flake=> plain(flake.head))
+    h('_headkeys_', headkeys)
+    let segments = await getSegments(headkeys)
+    h('_segments_', segments)
 
+    for await (let seg of segments) {
+        let full = false
+        h('seg', seg._id)
+        flexes.forEach(flex=> {
+            seg.docs.forEach(doc=> {
+                let chain = simple(doc, flex)
+                if (!chain) return
+                full = true
+                if (!dag[tail]) dag[tail] = [seg, flex] // или [doc, flex]
+                chains.push(chain)
+            })
+        })
+        h('full', full)
+    }
 
+}
 
 async function dagging_(chains, pcwf, head, flexes) {
     let flakes = scrape(pcwf)
-    log('_flakes_', flakes)
+    d('_flakes_', flakes)
     let heads = flakes.map(flake=> flake.head)
-    if (pcwf == 'χος') log('_heads_HOS', heads)
-    log('_heads_', heads)
+    if (pcwf == 'χος') d('_heads_HOS', heads)
+    d('_heads_', heads)
     let segments = await getSegments(heads)
     // if (pcwf == 'χος')
     let ids = segments.map(seg=> seg._id)
-    log('_segments', ids)
+    d('_segments', ids)
 
   for await (let seg of segments) {
     /* if (seg._id.length < 2) return */
@@ -96,7 +108,7 @@ async function dagging_(chains, pcwf, head, flexes) {
         let chain = [seg, flex]
         if (head.length) chain.unshift(...head)
         full = true
-        /* if (pcwf == 'κρατια') log('_SEGM_KRAT', chain) */
+        /* if (pcwf == 'κρατια') d('_SEGM_KRAT', chain) */
         if (!dag[pcwf]) dag[pcwf] = [seg, flex]
         chains.push(chain)
       }
@@ -123,7 +135,7 @@ async function dagging_(chains, pcwf, head, flexes) {
 async function diveDag(chains, seg, tail, head, flexes) {
     let headseg = _.clone(head)
     headseg.push(seg)
-    // log('_xx-tail', 'tail:', tail)
+    // d('_xx-tail', 'tail:', tail)
     if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
     else await dagging(chains, tail, headseg, flexes)
 }
