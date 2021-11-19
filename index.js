@@ -1,4 +1,7 @@
 const log = console.log
+// gitlab.rd.aorti.ru
+// pass - liana - cuf -
+// паша беляков - кротовкуф, днмкинкуф
 
 import path  from 'path'
 import _  from 'lodash'
@@ -17,21 +20,24 @@ let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
  * }) */
 
 const dag = {}
+let chains = []
 
-start(wordform)
+anthrax(wordform)
 
-async function start (wf) {
+async function anthrax (wf) {
     let cwf = comb(wf)
     let flakes = scrape(cwf)
+    log('_flakes', flakes)
     let tails = flakes.map(flake=> flake.tail)
-    /* log('_tails', wf, tails) */
+    // log('_tails', wf, tails)
     let flexes = await getFlexes(tails)
-    tails = flexes.map(flex=> flex._id)
-    /* log('_tails', tails) */
+    let flexstrs = flexes.map(flex=> flex._id)
+    log('_flexstrs', flexstrs)
     let pcwf = plain(cwf)
-    let chains = []
-    await dagging(chains, pcwf, [], flexes)
-    /* log('_chains', chains) */
+    log('_pcwf', pcwf)
+
+    await dagging([], pcwf, flexes)
+    // log('_raw chains', chains)
     // todo: filters
     let min = _.min(chains.map(chain=> chain.length))
     chains = chains.filter(chain=> chain.length < min + 3)
@@ -39,9 +45,6 @@ async function start (wf) {
     chains.forEach(chain=> {
         let prefs = chain[0].docs.filter(doc=> doc.pref)
         /* log('_prefs', chain[0]) */
-        // gitlab.rd.aorti.ru
-        // pass - liana - cuf -
-        // паша беляков - кротовкуф, днмкинкуф
         let ids = chain.map(seg=> seg._id)
         log('_sgms', ids)
     })
@@ -52,15 +55,38 @@ async function start (wf) {
     })
 }
 
-// вопросы: εἰσαγγέλλω - два одинаковых sgms, ἐξαγγέλλω - то же
+async function dagging(heads, tail, flexes) {
+    log('_dag', heads, tail)
+    let flakes = scrape(tail)
+    log('_dag_flakes_', flakes)
+    let headkeys = flakes.map(flake=> plain(flake.head))
+    log('_dag_headkeys_', headkeys)
+    let segments = await getSegments(headkeys)
+    log('_dag_segments_', segments)
 
-async function dagging(chains, pcwf, head, flexes) {
-  /* if (pcwf == 'κρατια') log('_xx-head_KRAT', head) */
-  let flakes = scrape(pcwf)
-  let heads = flakes.map(flake=> flake.head)
-  if (pcwf == 'οχος') log('_heads_OHOS', heads)
-  let segments = await getSegments(heads)
-  // if (pcwf == 'οχος') log('_segments_OH', segments[0])
+}
+
+// 1. вопросы: εἰσαγγέλλω - два одинаковых sgms, ἐξαγγέλλω - то же
+// 2. wkt_names - чистый stripped, плюс aug, но не как в vebs, не отдельным сегментом, а для доп. проверки
+// а здесь нужен level, и проверять name aug только в начале chain - жуть
+// или, для однообразия, вычислять aug-names как в verbs?
+// 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
+
+// то есть полная жопа. Думай
+
+
+
+async function dagging_(chains, pcwf, head, flexes) {
+    let flakes = scrape(pcwf)
+    log('_flakes_', flakes)
+    let heads = flakes.map(flake=> flake.head)
+    if (pcwf == 'χος') log('_heads_HOS', heads)
+    log('_heads_', heads)
+    let segments = await getSegments(heads)
+    // if (pcwf == 'χος')
+    let ids = segments.map(seg=> seg._id)
+    log('_segments', ids)
+
   for await (let seg of segments) {
     /* if (seg._id.length < 2) return */
     let full = false
@@ -80,7 +106,7 @@ async function dagging(chains, pcwf, head, flexes) {
     let pseg = plain(seg._id)
     let repseg = new RegExp('^'+pseg)
     let tail = pcwf.replace(repseg, '')
-    await diveDag(chains, seg, tail, head, flexes)
+    // await diveDag(chains, seg, tail, head, flexes)
 
     let next = tail[0]
     if (!vowels.includes(next)) continue
@@ -89,16 +115,15 @@ async function dagging(chains, pcwf, head, flexes) {
     repseg = new RegExp('^' + pseg)
     tail = pcwf.replace(repseg, '')
     if (tail == pcwf) continue
-    await diveVowel(chains, seg, tail, head, next, flexes)
-
+    // await diveVowel(chains, seg, tail, head, next, flexes)
     // todo: -si- ??
-  }
+  } // seg of segments
 }
 
 async function diveDag(chains, seg, tail, head, flexes) {
     let headseg = _.clone(head)
     headseg.push(seg)
-    /* log('_xx-tail', 'pseg:', pseg, tail) */
+    // log('_xx-tail', 'tail:', tail)
     if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]]))
     else await dagging(chains, tail, headseg, flexes)
 }
