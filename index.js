@@ -39,29 +39,49 @@ async function anthrax (wf) {
     d('_flexstrs', flexstrs)
     pcwf = plain(cwf)
     d('_pcwf', pcwf)
-    await dagging([], cwf, flexes)
+    await dagging(pcwf, [], cwf, flexes)
 
     log('_raw chains_:', chains)
     return
     let min = _.min(chains.map(chain=> chain.length))
 }
 
-async function dagging(heads, tail, flexes) {
-    let chains = []
+async function dagging(pcwf, heads, tail, flexes) {
     let flakes = scrape(tail)
     let headkeys = flakes.map(flake=> plain(flake.head))
     h('_headkeys_', headkeys)
     let segments = await getSegments(headkeys)
+    if (!segments.length) return
     let segids = segments.map(seg=> seg._id)
     h('_segids_', segments.length, 'segments:', segids)
+    let headstr = heads.map(doc=> doc.plain).join('')
 
+    for await (let seg of segments) {
+        for (let doc of seg.docs) {
+            log('_D', doc.rdict)
+            for (let flex of flexes) {
+                if (pcwf != headstr + doc.plain + plain(flex._id)) continue
+                let cflexes = []
+                for (let flexdoc of flex.docs) {
+                    if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
+                    else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> cflexdoc.key == verbkey.key)) flexes.push(flexdoc)
+                }
+                // heads push doc, клонирование <<<===========
+                if (cflexes.length) chains.push([doc, cflexes])
+            }
+        }
 
+        // дальше здесь seg = segments[0]
+        // посчитать tail
+        // и цикл
+        // и никаких switch не нужно
+
+    }
 
 
 
     return chains
 
-    h('_dag', tail)
     if (!flakes.length) return
 
     for await (let seg of segments) {
