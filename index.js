@@ -20,8 +20,10 @@ import Debug from 'debug'
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 const dag = {}
 let chains = []
+let pcwf = ''
 const d = Debug('app')
-const h = Debug('dag:first')
+const h = Debug('dag:head')
+const f = Debug('dag:filter')
 
 anthrax(wordform)
 
@@ -33,21 +35,15 @@ async function anthrax (wf) {
     let flexes = await getFlexes(tails)
     let flexstrs = flexes.map(flex=> flex._id)
     d('_flexstrs', flexstrs)
-    let pcwf = plain(cwf)
+    pcwf = plain(cwf)
     d('_pcwf', pcwf)
-    d('___DEBUG___', pcwf)
 
     await dagging([], pcwf, flexes)
 
-    log('_raw chains', chains)
+    log('_raw chains_:', chains)
 
     return
     let min = _.min(chains.map(chain=> chain.length))
-    /* chains = chains.filter(chain=> chain.length < min + 3) */
-    /* chains.forEach(chain=> {
-     *     let ids = chain.map(seg=> seg._id)
-     *     log('_sgms', ids)
-     * }) */
 
     /* let cleans = chains.map(chain=> filters(chain)).filter(chain=> chain.length) */
     chains.forEach(clean=> {
@@ -62,14 +58,14 @@ async function anthrax (wf) {
 // 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
 
 async function dagging(heads, tail, flexes) {
-    h('_dag', heads, tail)
+    h('_dag', tail)
     let flakes = scrape(tail)
-    h('_flakes_', flakes)
+    if (!flakes.length) return
     let headkeys = flakes.map(flake=> plain(flake.head))
     h('_headkeys_', headkeys)
     let segments = await getSegments(headkeys)
     let segids = segments.map(seg=> seg._id)
-    h('_segids_', segids)
+    h('_segids_', segments.length, 'segments:', segids)
 
     for await (let seg of segments) {
         let full = false
@@ -77,10 +73,22 @@ async function dagging(heads, tail, flexes) {
             let chain = simple(tail, seg, flex)
             if (!chain) return
             full = true
+            /* if (heads.length) chain.unshift(...heads) */
             if (!dag[tail]) dag[tail] = chain
             chains.push(...chain)
         })
         h('full', seg._id, full)
+        if (full) continue
+
+        heads.push(seg)
+        let pseg = plain(seg._id)
+        let repseg = new RegExp('^'+pseg)
+        tail = pcwf.replace(repseg, '')
+        if (tail == pcwf) continue
+        h('_next_level_:', pseg, '+', tail)
+        /* if (tail != 'γαθοεργεω') continue */
+        await dagging(heads, tail, flexes)
+
     }
 }
 
