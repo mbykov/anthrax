@@ -9,13 +9,14 @@ import {oxia, comb, plain, strip} from 'orthos'
 
 import { accents, scrape, vowels } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
-import { filters, simple } from './lib/filters.js'
+import { filter, simple } from './lib/filters.js'
 import Debug from 'debug'
 
-/* let heads = tails.map(tail=> {
- *     let retail = new RegExp(tail+'$')
- *     return cwf.replace(retail, '')
- * }) */
+// 1. вопросы: εἰσαγγέλλω - два одинаковых sgms, ἐξαγγέλλω - то же
+// 2. wkt_names - чистый stripped, плюс aug, но не как в vebs, не отдельным сегментом, а для доп. проверки
+// а здесь нужен level, и проверять name aug только в начале chain - жуть
+// или, для однообразия, вычислять aug-names как в verbs?
+// 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 const dag = {}
@@ -31,41 +32,44 @@ async function anthrax (wf) {
     let cwf = comb(wf)
     let flakes = scrape(cwf)
     d('_flakes', flakes)
+    if (!flakes.length) return
     let tails = flakes.map(flake=> flake.tail)
     let flexes = await getFlexes(tails)
     let flexstrs = flexes.map(flex=> flex._id)
     d('_flexstrs', flexstrs)
     pcwf = plain(cwf)
     d('_pcwf', pcwf)
-
-    await dagging([], pcwf, flexes)
+    await dagging([], cwf, flexes)
 
     log('_raw chains_:', chains)
-
     return
     let min = _.min(chains.map(chain=> chain.length))
-
-    /* let cleans = chains.map(chain=> filters(chain)).filter(chain=> chain.length) */
-    chains.forEach(clean=> {
-        d('_clean', clean)
-    })
 }
 
-// 1. вопросы: εἰσαγγέλλω - два одинаковых sgms, ἐξαγγέλλω - то же
-// 2. wkt_names - чистый stripped, плюс aug, но не как в vebs, не отдельным сегментом, а для доп. проверки
-// а здесь нужен level, и проверять name aug только в начале chain - жуть
-// или, для однообразия, вычислять aug-names как в verbs?
-// 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
-
 async function dagging(heads, tail, flexes) {
-    h('_dag', tail)
+    let chains = []
     let flakes = scrape(tail)
-    if (!flakes.length) return
     let headkeys = flakes.map(flake=> plain(flake.head))
     h('_headkeys_', headkeys)
     let segments = await getSegments(headkeys)
     let segids = segments.map(seg=> seg._id)
     h('_segids_', segments.length, 'segments:', segids)
+
+
+
+
+
+    return chains
+
+    h('_dag', tail)
+    if (!flakes.length) return
+
+    for await (let seg of segments) {
+        h('_segid_', seg._id)
+        let cleans = filter(tail, seg, flexes)
+    }
+
+    return cleans
 
     for await (let seg of segments) {
         let full = false
