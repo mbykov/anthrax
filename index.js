@@ -42,7 +42,6 @@ async function anthrax (wf) {
     log('_raw chains', chains)
 
     return
-
     let min = _.min(chains.map(chain=> chain.length))
     /* chains = chains.filter(chain=> chain.length < min + 3) */
     /* chains.forEach(chain=> {
@@ -69,23 +68,20 @@ async function dagging(heads, tail, flexes) {
     let headkeys = flakes.map(flake=> plain(flake.head))
     h('_headkeys_', headkeys)
     let segments = await getSegments(headkeys)
-    h('_segments_', segments)
+    let segids = segments.map(seg=> seg._id)
+    h('_segids_', segids)
 
     for await (let seg of segments) {
         let full = false
-        h('seg', seg._id)
         flexes.forEach(flex=> {
-            seg.docs.forEach(doc=> {
-                let chain = simple(doc, flex)
-                if (!chain) return
-                full = true
-                if (!dag[tail]) dag[tail] = [seg, flex] // или [doc, flex]
-                chains.push(chain)
-            })
+            let chain = simple(tail, seg, flex)
+            if (!chain) return
+            full = true
+            if (!dag[tail]) dag[tail] = chain
+            chains.push(...chain)
         })
-        h('full', full)
+        h('full', seg._id, full)
     }
-
 }
 
 async function dagging_(chains, pcwf, head, flexes) {
