@@ -55,11 +55,12 @@ async function dagging(heads, tail, flexes) {
     if (!segments.length) return
     let segids = segments.map(seg=> seg._id)
     h('_segids_', segments.length, 'segments:', segids, 'tail:', tail)
-    let headstr = heads.map(doc=> doc.plain).join('')
+    let headstr = heads.map(doc=> doc._id).join('')
     h('_headstr_', heads.length, headstr)
 
     for await (let seg of segments) {
-        let segheads = []
+        let segheads = _.clone(heads)
+        let headdocs = []
         for (let doc of seg.docs) {
             /* log('_D', doc.rdict) */
             let cflexes = []
@@ -70,22 +71,37 @@ async function dagging(heads, tail, flexes) {
                     else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
                 }
             }
-            // flex end
             if (cflexes.length) {
                 let segchain = [doc, cflexes]
                 if (heads.length) segchain.unshift(...heads)
                 chains.push(segchain)
+                headdocs.push(doc)
             }
-            segheads.push(doc)
         }
+        let lasthead = {_id: seg._id, docs: seg.docs}
+        segheads.push(lasthead)
+
         // посчитать tail, и цикл и никаких switch не нужно
         let pseg = plain(seg._id)
         let repseg = new RegExp('^'+pseg)
         let segtail = pcwf.replace(repseg, '')
         if (segtail == pcwf) continue
-        if (pseg != 'παρα') continue
         log('_pseg', pseg, '_tail', segtail)
         await dagging(segheads, segtail, flexes)
+
+        // vowels
+        let vowel = segtail[0]
+        if (!vowels.includes(vowel)) continue
+        pseg = pseg + vowel
+        repseg = new RegExp('^' + pseg)
+        segtail = pcwf.replace(repseg, '')
+        log('_pseg_vow', pseg, '_tail', segtail)
+        if (segtail == pcwf) continue
+        /* if (pseg != 'παχυ') continue */
+        segheads.push({vowel: true, _id: vowel})
+        await dagging(segheads, segtail, flexes)
+
+
     }
 
     /* if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]])) */
