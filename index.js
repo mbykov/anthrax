@@ -22,6 +22,7 @@ let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 const dag = {}
 let chains = []
 let pcwf = ''
+
 const d = Debug('app')
 const h = Debug('dag:head')
 const f = Debug('dag:filter')
@@ -39,14 +40,14 @@ async function anthrax (wf) {
     d('_flexstrs', flexstrs)
     pcwf = plain(cwf)
     d('_pcwf', pcwf)
-    await dagging(pcwf, [], cwf, flexes)
+    await dagging([], cwf, flexes)
 
     log('_raw chains_:', chains)
     return
     let min = _.min(chains.map(chain=> chain.length))
 }
 
-async function dagging(pcwf, heads, tail, flexes) {
+async function dagging(heads, tail, flexes) {
     let flakes = scrape(tail)
     let headkeys = flakes.map(flake=> plain(flake.head))
     h('_headkeys_', headkeys)
@@ -55,28 +56,40 @@ async function dagging(pcwf, heads, tail, flexes) {
     let segids = segments.map(seg=> seg._id)
     h('_segids_', segments.length, 'segments:', segids)
     let headstr = heads.map(doc=> doc.plain).join('')
+    h('_headstr_', heads.length, headstr)
 
     for await (let seg of segments) {
+        let segheads = []
         for (let doc of seg.docs) {
-            log('_D', doc.rdict)
+            /* log('_D', doc.rdict) */
+            let cflexes = []
             for (let flex of flexes) {
                 if (pcwf != headstr + doc.plain + plain(flex._id)) continue
-                let cflexes = []
                 for (let flexdoc of flex.docs) {
                     if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
-                    else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> cflexdoc.key == verbkey.key)) flexes.push(flexdoc)
+                    else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
                 }
-                // heads push doc, клонирование <<<===========
-                if (cflexes.length) chains.push([doc, cflexes])
             }
+            // flex end
+            if (cflexes.length) {
+                let segchain = [doc, cflexes]
+                if (heads.length) segchain.unshift(...heads)
+                chains.push(segchain)
+            }
+            segheads.push(doc)
         }
-
-        // дальше здесь seg = segments[0]
-        // посчитать tail
-        // и цикл
-        // и никаких switch не нужно
-
+        // посчитать tail, и цикл и никаких switch не нужно
+        let pseg = plain(seg._id)
+        let repseg = new RegExp('^'+pseg)
+        let segtail = pcwf.replace(repseg, '')
+        if (segtail == pcwf) continue
+        log('_pseg', pseg, '_tail', tail)
+        if (pseg != 'παρα') continue
+        dagging(segheads, segtail, flexes)
     }
+
+    /* if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]])) */
+    /* else await dagging(chains, tail, headseg, flexes) */
 
 
 
