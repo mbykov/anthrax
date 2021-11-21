@@ -54,7 +54,7 @@ async function dagging(heads, tail, flexes) {
     let segments = await getSegments(headkeys)
     if (!segments.length) return
     let segids = segments.map(seg=> seg._id)
-    h('_segids_', segments.length, 'segments:', segids)
+    h('_segids_', segments.length, 'segments:', segids, 'tail:', tail)
     let headstr = heads.map(doc=> doc.plain).join('')
     h('_headstr_', heads.length, headstr)
 
@@ -83,9 +83,9 @@ async function dagging(heads, tail, flexes) {
         let repseg = new RegExp('^'+pseg)
         let segtail = pcwf.replace(repseg, '')
         if (segtail == pcwf) continue
-        log('_pseg', pseg, '_tail', tail)
         if (pseg != 'παρα') continue
-        dagging(segheads, segtail, flexes)
+        log('_pseg', pseg, '_tail', segtail)
+        await dagging(segheads, segtail, flexes)
     }
 
     /* if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]])) */
