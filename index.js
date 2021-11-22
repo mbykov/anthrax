@@ -19,7 +19,7 @@ import Debug from 'debug'
 // 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-const dag = {}
+let dag = {}
 let chains = []
 let pcwf = ''
 
@@ -47,6 +47,17 @@ async function anthrax (wf) {
     let min = _.min(chains.map(chain=> chain.length))
 }
 
+// dag = {level:0, heads: []}
+// dag.dive => dagging(tail) {
+// dag.level +=1
+// flakes = scrape(tail), etc =>
+// dag.heags = []
+// dag.starts
+// dag.doc2flex
+// }
+// if ... dag.dive(tail)
+
+
 async function dagging(heads, tail, flexes) {
     let flakes = scrape(tail)
     let headkeys = flakes.map(flake=> plain(flake.head))
@@ -60,26 +71,47 @@ async function dagging(heads, tail, flexes) {
 
     for await (let seg of segments) {
         let segheads = _.clone(heads)
-        let headdocs = []
+        /* let headdocs = [] */
+        // todo: cflexes нужно проверять только на первом этаже: i.d. segheads.length > 0
+        // нет, не на первом, а только если seg - предпоследний в chain, а chain здесь нет
+        // потому что есть aug как певый seg в chain
+        // то есть первый этаж, (heads.length ==0), либо = 1, но первый seg - aug
+
+        if (heads.length == 0) {
+            // ==> doc2flex
+            // unshift
+        } else if (heads.length == 1) {
+            let aug = seg.docs.find(doc=> doc.aug)
+            // ==> doc2flex
+            // if (aug) => doc2flex без unshift
+            // else => doc2plain
+        } else {
+            // heads - есть, > 1
+            // doc2plain
+            // unshift
+        }
+
         for (let doc of seg.docs) {
             /* log('_D', doc.rdict) */
             let cflexes = []
             for (let flex of flexes) {
-                if (pcwf != headstr + doc.plain + plain(flex._id)) continue
+                if (pcwf != headstr + seg._id + plain(flex._id)) continue
                 for (let flexdoc of flex.docs) {
                     if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
                     else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
                 }
             }
             if (cflexes.length) {
-                let segchain = [doc, cflexes]
-                if (heads.length) segchain.unshift(...heads)
+                let segchain = [{_id: doc.plain, doc, flexes: cflexes}]
+                if (segheads.length) segchain.unshift(...segheads) // unshift не для augs:
                 chains.push(segchain)
-                headdocs.push(doc)
+                /* headdocs.push(doc) */
             }
         }
-        let lasthead = {_id: seg._id, docs: seg.docs}
-        segheads.push(lasthead)
+        let newhead = {_id: seg._id, docs: seg.docs}
+        segheads.push(newhead)
+
+        // todo: if full
 
         // посчитать tail, и цикл и никаких switch не нужно
         let pseg = plain(seg._id)
@@ -100,6 +132,8 @@ async function dagging(heads, tail, flexes) {
         /* if (pseg != 'παχυ') continue */
         segheads.push({vowel: true, _id: vowel})
         await dagging(segheads, segtail, flexes)
+
+        // si
 
 
     }
