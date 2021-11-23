@@ -37,57 +37,76 @@ async function anthrax (wf) {
     let flexes = await getFlexes(tails)
     let flexstrs = flexes.map(flex=> flex._id)
     d('_flexstrs', flexstrs)
-    pcwf = plain(cwf)
+    let pcwf = plain(cwf)
     d('_pcwf', pcwf)
     await dagging([], cwf, flexes)
-
-    dag.flexes = flexes
     log('_raw chains_:', chains)
+
+    const dag = {
+        level: 0,
+        pcwf,
+        flexes,
+        dive (headdocs, tail) {return dive.apply(this, arguments)},
+        chains: [],
+    }
+
     let newchains = await dag.dive([], cwf)
     log('_start_dive()_', newchains)
 }
 
-async function dive(headdocs, tail) {
-    log('_dive_heads', headdocs)
+async function dive(heads, tail) {
+    log('_dive_heads', heads)
     this.level += 1
     f('_level_', this.level)
     f('_flexes_', this.flexes.length)
     f('_tail_', tail)
     let flakes = scrape(tail)
-    let headkeys = flakes.map(flake=> plain(flake.head))
-    f('_headkeys_', headkeys)
+    let dictkeys = flakes.map(flake=> plain(flake.head))
+    f('_dictkeys_', dictkeys)
+    f('_this.pcwf_', this.pcwf)
 
-    let heads = await getSegments(headkeys)
-    if (!heads.length) return
-    let headids = heads.map(seg=> seg._id)
-    f('_headids_', heads.length, 'heads:', headids, 'tail:', tail)
+    let ddicts = await getSegments(dictkeys)
+    if (!ddicts.length) return
+    let ddicts_ids = ddicts.map(ddict=> ddict._id)
+    f('_ddicts_ids_', ddicts.length, 'ddicts_ids:', ddicts_ids)
 
-    doc2flex.apply(this, heads)
+    doc2flex.apply(this, [heads, ddicts])
+    log('_chains_', this.chains)
 
     return tail + '_end'
 }
 
-function doc2flex(heads) {
-    log('_CYCLE', this.tail)
-    for (let head of []) {
-        let cflexes = []
-        for (let flex of flexes) {
-            if (pcwf != headstr + seg._id + plain(flex._id)) continue
-            for (let flexdoc of flex.docs) {
-                if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
-                else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
+function doc2flex(heads, ddicts) {
+    log('_CYCLE', this.pcwf)
+    log('_DDICTS', ddicts.length)
+    let headstr = heads.map(doc=> doc._id).join('')
+    log('_headstr_', heads.length, headstr)
+    for (let ddict of ddicts) {
+        for (let doc of ddict.docs) {
+            let cflexes = []
+            for (let flex of this.flexes) {
+                if (this.pcwf != headstr + ddict._id + plain(flex._id)) continue
+                for (let flexdoc of flex.docs) {
+                    if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
+                    else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
+                }
             }
+            if (cflexes.length) {
+                let chain = [{_id: doc.plain, doc, flexes: cflexes}]
+                log('____________HEADS_1', heads.length)
+                if (heads.length) chain.unshift(...heads) // unshift не для augs:
+                this.chains.push(chain)
+                log('____________HERE', ddict._id, cflexes.length, this.chains.length)
+            }
+            let newhead = {_id: ddict._id, docs: ddict.docs}
+            let newheads = _.clone(heads)
+            newheads.push(newhead)
         }
-        if (cflexes.length) {
-            let segchain = [{_id: doc.plain, doc, flexes: cflexes}]
-            if (segheads.length) segchain.unshift(...segheads) // unshift не для augs:
-            chains.push(segchain)
-            /* headdocs.push(doc) */
-        }
+
     }
 }
 
-const dag = {
+const dag__ = {
     tail: '=xx=',
     level: 0,
     dive (headdocs, tail) {return dive.apply(this, arguments)},
