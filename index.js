@@ -19,13 +19,12 @@ import Debug from 'debug'
 // 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-let dag = {}
 let chains = []
 let pcwf = ''
 
 const d = Debug('app')
-const h = Debug('dag:head')
-const f = Debug('dag:filter')
+const h = Debug('head')
+const f = Debug('dag')
 
 anthrax(wordform)
 
@@ -43,20 +42,35 @@ async function anthrax (wf) {
     await dagging([], cwf, flexes)
 
     log('_raw chains_:', chains)
-    return
-    let min = _.min(chains.map(chain=> chain.length))
+    log('_dag', dag)
+    log('_start_dive()_', dag.dive([], cwf))
 }
 
-// dag = {level:0, heads: []}
-// dag.dive => dagging(tail) {
-// dag.level +=1
-// flakes = scrape(tail), etc =>
-// dag.heags = []
-// dag.starts
-// dag.doc2flex
-// }
-// if ... dag.dive(tail)
+function dive(heads, tail) {
+    log('_dive_heads', heads)
+    let flakes = scrape(tail)
+    let headkeys = flakes.map(flake=> plain(flake.head))
+    f('_headkeys_', headkeys)
 
+    return this.tail + '_end'
+}
+
+const dag = {
+    tail: '=xx=',
+    level: 0,
+    sum:  (a, b) => a + b,
+    mult: (a, b) => a * b,
+    dive (heads) {return dive.apply(this, arguments)},
+}
+
+/* dag.dive => dagging(tail) {
+ *     dag.level +=1
+ *     flakes = scrape(tail), etc =>
+ *         dag.heags = []
+ *     dag.starts
+ *     dag.doc2flex
+ * } */
+/* if ... dag.dive(tail) */
 
 async function dagging(heads, tail, flexes) {
     let flakes = scrape(tail)
@@ -72,10 +86,6 @@ async function dagging(heads, tail, flexes) {
     for await (let seg of segments) {
         let segheads = _.clone(heads)
         /* let headdocs = [] */
-        // todo: cflexes нужно проверять только на первом этаже: i.d. segheads.length > 0
-        // нет, не на первом, а только если seg - предпоследний в chain, а chain здесь нет
-        // потому что есть aug как певый seg в chain
-        // то есть первый этаж, (heads.length ==0), либо = 1, но первый seg - aug
 
         if (heads.length == 0) {
             // ==> doc2flex
@@ -132,10 +142,7 @@ async function dagging(heads, tail, flexes) {
         /* if (pseg != 'παχυ') continue */
         segheads.push({vowel: true, _id: vowel})
         await dagging(segheads, segtail, flexes)
-
         // si
-
-
     }
 
     /* if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]])) */
@@ -144,6 +151,9 @@ async function dagging(heads, tail, flexes) {
 
 
     return chains
+
+    return
+    let min = _.min(chains.map(chain=> chain.length))
 
     if (!flakes.length) return
 
