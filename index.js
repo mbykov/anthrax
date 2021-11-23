@@ -46,12 +46,12 @@ async function anthrax (wf) {
         level: 0,
         pcwf,
         flexes,
-        dive (headdocs, tail) {return dive.apply(this, arguments)},
+        dive (headdocs, tail) { return dive.apply(this, arguments) },
         chains: [],
     }
 
-    let newchains = await dag.dive([], cwf)
-    log('_start_dive()_', newchains)
+    await dag.dive([], cwf)
+    log('_chains_', dag.chains)
 }
 
 async function dive(heads, tail) {
@@ -70,13 +70,12 @@ async function dive(heads, tail) {
     let ddicts_ids = ddicts.map(ddict=> ddict._id)
     f('_ddicts_ids_', ddicts.length, 'ddicts_ids:', ddicts_ids)
 
-    doc2flex.apply(this, [heads, ddicts])
-    log('_chains_', this.chains)
+    await doc2flex.apply(this, [heads, ddicts])
 
     return tail + '_end'
 }
 
-function doc2flex(heads, ddicts) {
+async function doc2flex(heads, ddicts) {
     log('_CYCLE', this.pcwf)
     log('_DDICTS', ddicts.length)
     let headstr = heads.map(doc=> doc._id).join('')
@@ -98,28 +97,21 @@ function doc2flex(heads, ddicts) {
                 this.chains.push(chain)
                 log('____________HERE', ddict._id, cflexes.length, this.chains.length)
             }
-            let newhead = {_id: ddict._id, docs: ddict.docs}
-            let newheads = _.clone(heads)
-            newheads.push(newhead)
         }
+
+        let newhead = {_id: ddict._id, docs: ddict.docs}
+        let newheads = _.clone(heads)
+        newheads.push(newhead)
+
+        let pddict = plain(ddict._id)
+        let repddict = new RegExp('^'+pddict)
+        let newtail = pcwf.replace(repddict, '')
+        if (newtail == pcwf) continue
+        log('_pdict', pdict, '_newtail', newtail)
+        await dag.dive.apply(this, newheads, newtail)
 
     }
 }
-
-const dag__ = {
-    tail: '=xx=',
-    level: 0,
-    dive (headdocs, tail) {return dive.apply(this, arguments)},
-}
-
-/* dag.dive => dagging(tail) {
- *     dag.level +=1
- *     flakes = scrape(tail), etc =>
- *         dag.heags = []
- *     dag.starts
- *     dag.doc2flex
- * } */
-/* if ... dag.dive(tail) */
 
 async function dagging(heads, tail, flexes) {
     let flakes = scrape(tail)
