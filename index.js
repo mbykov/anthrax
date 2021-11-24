@@ -21,6 +21,7 @@ import Debug from 'debug'
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 let chains = []
 let pcwf = ''
+let dag
 
 const d = Debug('app')
 const h = Debug('head')
@@ -37,80 +38,11 @@ async function anthrax (wf) {
     let flexes = await getFlexes(tails)
     let flexstrs = flexes.map(flex=> flex._id)
     d('_flexstrs', flexstrs)
-    let pcwf = plain(cwf)
+    pcwf = plain(cwf)
     d('_pcwf', pcwf)
     await dagging([], cwf, flexes)
     log('_raw chains_:', chains)
 
-    const dag = {
-        level: 0,
-        pcwf,
-        flexes,
-        dive (headdocs, tail) { return dive.apply(this, arguments) },
-        chains: [],
-    }
-
-    await dag.dive([], cwf)
-    log('_chains_', dag.chains)
-}
-
-async function dive(heads, tail) {
-    log('_dive_heads', heads)
-    this.level += 1
-    f('_level_', this.level)
-    f('_flexes_', this.flexes.length)
-    f('_tail_', tail)
-    let flakes = scrape(tail)
-    let dictkeys = flakes.map(flake=> plain(flake.head))
-    f('_dictkeys_', dictkeys)
-    f('_this.pcwf_', this.pcwf)
-
-    let ddicts = await getSegments(dictkeys)
-    if (!ddicts.length) return
-    let ddicts_ids = ddicts.map(ddict=> ddict._id)
-    f('_ddicts_ids_', ddicts.length, 'ddicts_ids:', ddicts_ids)
-
-    await doc2flex.apply(this, [heads, ddicts])
-
-    return tail + '_end'
-}
-
-async function doc2flex(heads, ddicts) {
-    log('_CYCLE', this.pcwf)
-    log('_DDICTS', ddicts.length)
-    let headstr = heads.map(doc=> doc._id).join('')
-    log('_headstr_', heads.length, headstr)
-    for (let ddict of ddicts) {
-        for (let doc of ddict.docs) {
-            let cflexes = []
-            for (let flex of this.flexes) {
-                if (this.pcwf != headstr + ddict._id + plain(flex._id)) continue
-                for (let flexdoc of flex.docs) {
-                    if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
-                    else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
-                }
-            }
-            if (cflexes.length) {
-                let chain = [{_id: doc.plain, doc, flexes: cflexes}]
-                log('____________HEADS_1', heads.length)
-                if (heads.length) chain.unshift(...heads) // unshift не для augs:
-                this.chains.push(chain)
-                log('____________HERE', ddict._id, cflexes.length, this.chains.length)
-            }
-        }
-
-        let newhead = {_id: ddict._id, docs: ddict.docs}
-        let newheads = _.clone(heads)
-        newheads.push(newhead)
-
-        let pddict = plain(ddict._id)
-        let repddict = new RegExp('^'+pddict)
-        let newtail = pcwf.replace(repddict, '')
-        if (newtail == pcwf) continue
-        log('_pdict', pdict, '_newtail', newtail)
-        await dag.dive.apply(this, newheads, newtail)
-
-    }
 }
 
 async function dagging(heads, tail, flexes) {
@@ -143,7 +75,6 @@ async function dagging(heads, tail, flexes) {
         }
 
         for (let doc of seg.docs) {
-            /* log('_D', doc.rdict) */
             let cflexes = []
             for (let flex of flexes) {
                 if (pcwf != headstr + seg._id + plain(flex._id)) continue
@@ -188,46 +119,6 @@ async function dagging(heads, tail, flexes) {
 
     /* if (dag[tail]) chains.push(_.flatten([headseg, dag[tail]])) */
     /* else await dagging(chains, tail, headseg, flexes) */
-
-
-
-    return chains
-
-    return
-    let min = _.min(chains.map(chain=> chain.length))
-
-    if (!flakes.length) return
-
-    for await (let seg of segments) {
-        h('_segid_', seg._id)
-        let cleans = filter(tail, seg, flexes)
-    }
-
-    return cleans
-
-    for await (let seg of segments) {
-        let full = false
-        flexes.forEach(flex=> {
-            let chain = simple(tail, seg, flex)
-            if (!chain) return
-            full = true
-            /* if (heads.length) chain.unshift(...heads) */
-            if (!dag[tail]) dag[tail] = chain
-            chains.push(...chain)
-        })
-        h('full', seg._id, full)
-        if (full) continue
-
-        heads.push(seg)
-        let pseg = plain(seg._id)
-        let repseg = new RegExp('^'+pseg)
-        tail = pcwf.replace(repseg, '')
-        if (tail == pcwf) continue
-        h('_next_level_:', pseg, '+', tail)
-        /* if (tail != 'γαθοεργεω') continue */
-        await dagging(heads, tail, flexes)
-
-    }
 }
 
 async function dagging_(chains, pcwf, head, flexes) {
