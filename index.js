@@ -80,21 +80,36 @@ async function dagging(oldheads, tail) {
             }
         }  else if (heads.length == 1) {
             let aug = heads.find(doc=> doc.aug)
-            log('___after-aug:', aug._id, ddict._id, tail)
-            let chain = dict2flex(tail, ddict, dag.flexes)
-            log('___chain___:', !!chain)
+            /* log('___after-aug:', aug._id, ddict._id, tail) */
+            let chain = dict2flex(headstr, ddict, dag.flexes)
+            /* log('___chain___:', !!chain) */
             /* if (!aug) chain.unshift(...heads) */
             heads.push({_id: ddict._id, docs: ddict.docs})
         } else {
+            log('__ELSE', ddict._id, headstr)
+            let dicts = dict2plain(heads, ddict, dag.flexes)
 
         }
-
         if (stop) continue
 
         let pdict = plain(ddict._id)
+        if (pdict != 'γαθ') continue
         let repdict = new RegExp('^'+pdict)
         let nexttail = tail.replace(repdict, '')
         if (dag.flexids.includes(nexttail)) continue
+
+        let vowel = nexttail[0]
+        if (!vowels.includes(vowel)) continue
+        pdict = pdict + vowel
+        repdict = new RegExp('^' + pdict)
+        nexttail = tail.replace(repdict, '')
+        /* g('_pdict_vow', pdict, '_nexttail', nexttail) */
+        if (nexttail == tail) continue
+        /* if (pdict != 'παχυ') continue */
+        heads.push({_id: vowel, vowel: true})
+        log('_========pdict_2', pdict, vowel, '_nexttail:', nexttail, heads)
+        await dagging(heads, nexttail)
+
 
     } // ddicts
 }
@@ -182,11 +197,11 @@ async function dagging_(oldheads, tail) {
     /* else await dagging(chains, tail, headdict, flexes) */
 }
 
-function dict2flex(tail, ddict, flexes) {
+function dict2flex(headstr, ddict, flexes) {
     for (let doc of ddict.docs) {
         let cflexes = []
         for (let flex of flexes) {
-            if (tail != ddict._id + plain(flex._id)) continue
+            if (dag.pcwf != headstr + ddict._id + plain(flex._id)) continue
             for (let flexdoc of flex.docs) {
                 if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
                 else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
@@ -201,15 +216,18 @@ function dict2flex(tail, ddict, flexes) {
     }
 }
 
-function dict2plain(headstr, ddict, flexes) {
+function dict2plain(heads, ddict, flexes) {
+    let headstr = heads.map(doc=> doc._id).join('')
     let dicts = []
     for (let doc of ddict.docs) {
         let cflexes = []
         for (let flex of flexes) {
-            if (pcwf == headstr + ddict._id + plain(flex._id)) dicts.push(doc)
+            if (dag.pcwf == headstr + ddict._id + plain(flex._id)) dicts.push(doc)
+            log('___else pushed', doc.plain)
         }
-        let chain = [{_id: doc.plain, doc, flexes}]
-        chains.push(chain)
     }
+    let chain = [{_id: ddict._id, dicts, flexes}]
+    chain.unshift(heads)
+    chains.push(chain)
     return dicts
 }
