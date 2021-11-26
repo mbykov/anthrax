@@ -49,55 +49,46 @@ async function anthrax (wf) {
 // ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, καθαρισμός, ἀγαθός
 
 async function getDicts(tail) {
+    let aug = parseAug(tail)
+    if (aug) tail = tail.substr(aug.length)
     let flakes = scrape(tail)
     let headkeys = flakes.map(flake=> plain(flake.head))
     h('_headkeys_', headkeys)
     let ddicts = await getSegments(headkeys)
     // todo: return ddicts
     let dictids = ddicts.map(dict=> dict._id)
-    log('_dictids_', dictids, 'tail:', tail)
-    return ddicts
+    log('_dictids_', dictids, 'aug:', aug, 'tail:', tail)
+    return {ddicts, aug}
 }
 
 async function dagging(oldheads, tail) {
-    let ddicts = await getDicts(tail)
+    let {ddicts, aug} = await getDicts(tail)
     if (!ddicts.length) return
     let headstr = oldheads.map(doc=> doc._id).join('')
     g('_headstr_', oldheads.length, headstr, '_tail_', tail)
 
     for (let ddict of ddicts) {
+        let nexttail = tailBySyze(ddict, tail)
         g('___ddict_start:', ddict._id)
-        let stop = false
         let heads = _.clone(oldheads)
         if (heads.length == 0) {
-            let aug = parseAug(tail)
-            if (aug) {
-                heads.push({_id: aug, aug: true})
-                let reaug = new RegExp('^'+aug)
-                let newtail = tail.replace(reaug, '')
-                await dagging(heads, newtail)
-                stop = true
-            }
+            let chain
+            if (aug) chain = dict2flex(aug, ddict, dag.flexes)
+            else chain = dict2flex('', ddict, dag.flexes)
+            if (chain) chains.push(chain)
+            if (nexttail) heads.push({_id: ddict._id, docs: ddict.docs})
         }  else if (heads.length == 1) {
-            let aug = heads.find(doc=> doc.aug)
-            /* log('___after-aug:', aug._id, ddict._id, tail) */
             let chain = dict2flex(headstr, ddict, dag.flexes)
-            /* log('___chain___:', !!chain) */
-            /* if (!aug) chain.unshift(...heads) */
-            heads.push({_id: ddict._id, docs: ddict.docs})
+            chain.unshift(...heads)
+            if (chain) chains.push(chain)
+            if (nexttail) heads.push({_id: ddict._id, docs: ddict.docs})
         } else {
             log('__ELSE', headstr, ddict._id)
             let dicts = dict2plain(heads, ddict, dag.flexes)
 
         }
-        if (stop) continue
 
-        let pdict = plain(ddict._id)
-        if (pdict != 'γαθ') continue
-        let repdict = new RegExp('^'+pdict)
-        let nexttail = tail.replace(repdict, '')
-        if (dag.flexids.includes(nexttail)) continue
-
+        if (!nexttail) continue
         let vowel = nexttail[0]
         if (!vowels.includes(vowel)) continue
         pdict = pdict + vowel
@@ -113,10 +104,20 @@ async function dagging(oldheads, tail) {
     } // ddicts
 }
 
+function tailBySyze(ddict, tail) {
+    let pdict = plain(ddict._id)
+    let repdict = new RegExp('^'+pdict)
+    let nexttail = tail.replace(repdict, '')
+    if (nexttail == tail) nexttail = null
+    else if (dag.flexids.includes(nexttail)) nexttail = null
+    return nexttail
+}
+
 function dict2flex(headstr, ddict, flexes) {
     for (let doc of ddict.docs) {
         let cflexes = []
         for (let flex of flexes) {
+            /* g(111, dag.pcwf, headstr, ddict._id, plain(flex._id)) */
             if (dag.pcwf != headstr + ddict._id + plain(flex._id)) continue
             for (let flexdoc of flex.docs) {
                 if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
@@ -126,7 +127,6 @@ function dict2flex(headstr, ddict, flexes) {
         if (cflexes.length) {
             /* let chain = [{_id: doc.plain, doc, flexes: cflexes}] */
             let chain = [{dict: doc.dict, doc, flexes: cflexes}]
-            chains.push(chain)
             return chain
         }
     }
