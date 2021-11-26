@@ -89,7 +89,6 @@ async function dagging(oldheads, tail) {
 
         }
 
-        if (nexttail != 'οποιεω') continue
         if (!nexttail) continue
         let pdict = plain(ddict._id)
 
