@@ -58,7 +58,7 @@ async function getDicts(tail) {
     // todo: return ddicts
     let dictids = ddicts.map(dict=> dict._id)
     log('_dictids_', dictids, 'aug:', aug, 'tail:', tail)
-    return {ddicts, aug}
+    return { ddicts, aug }
 }
 
 async function dagging(oldheads, tail) {
@@ -68,7 +68,7 @@ async function dagging(oldheads, tail) {
     g('_headstr_', oldheads.length, headstr, '_tail_', tail)
 
     for (let ddict of ddicts) {
-        let nexttail = tailBySyze(ddict, tail)
+        let nexttail = tailBySyze(aug, ddict, tail)
         g('___ddict_start:', ddict._id)
         let heads = _.clone(oldheads)
         if (heads.length == 0) {
@@ -89,27 +89,32 @@ async function dagging(oldheads, tail) {
         }
 
         if (!nexttail) continue
+        let pdict = plain(ddict._id)
+
         let vowel = nexttail[0]
+        log('_========pdict_1', pdict, 'vow:', vowel, '_nexttail:', nexttail)
         if (!vowels.includes(vowel)) continue
         pdict = pdict + vowel
-        repdict = new RegExp('^' + pdict)
-        nexttail = tail.replace(repdict, '')
+        nexttail = nexttail.substr(vowel.length)
         /* g('_pdict_vow', pdict, '_nexttail', nexttail) */
         if (nexttail == tail) continue
         /* if (pdict != 'παχυ') continue */
         heads.push({_id: vowel, vowel: true})
-        log('_========pdict_2', pdict, vowel, '_nexttail:', nexttail, heads)
+        let xxx = heads.map(doc=> doc._id).join('-')
+        log('_========pdict_2', pdict, 'vow:', vowel, '_nexttail:', nexttail, 'headstr:', xxx)
         await dagging(heads, nexttail)
 
     } // ddicts
 }
 
-function tailBySyze(ddict, tail) {
+function tailBySyze(aug, ddict, tail) {
+    let nexttail = tail
+    if (aug) nexttail = tail.substr(aug.length)
     let pdict = plain(ddict._id)
-    let repdict = new RegExp('^'+pdict)
-    let nexttail = tail.replace(repdict, '')
+    nexttail = nexttail.substr(pdict.length)
     if (nexttail == tail) nexttail = null
     else if (dag.flexids.includes(nexttail)) nexttail = null
+    log('_nexttail_', tail, aug, pdict, nexttail)
     return nexttail
 }
 
