@@ -55,7 +55,7 @@ async function testNames() {
         rtests.push(res)
         log('_R', res)
     }
-    log('_RTS', rtests[1])
+    log('_RTS', rtests.length)
 
     let tests = []
     for  (let rtest of rtests) {
@@ -71,14 +71,27 @@ async function testNames() {
                     if (rtest.pl) number = 'pl'
                     if (rtest.restrict) number = rtest.restrict.split(' ')[idx]
                     let numcase = [number, kase].join('.')
-                    let test = [rtest.dict, form, rtest.gend, numcase]
+                    /* let test = [rtest.dict, form, rtest.gend, numcase] */
+                    let test = {dict: rtest.dict, form, gend: rtest.gend, numcase}
                     tests.push(test)
                 }
             })
         }
     }
-    log('_TESTS', tests[1])
+    log('_TESTS', tests.length, tests[0])
+    tests = tests.slice(0, 20)
+    /* log('T', tests) */
+    /* tests = [] */
+
+    for await (let test of tests) {
+        let res = await anthrax(test.form)
+        log('_RES', res)
+    }
+
+
 }
+
+
 
 function parseGend(res) {
     let head = res.formstr
