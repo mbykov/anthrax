@@ -86,7 +86,7 @@ async function dagging(oldheads, tail) {
             /* if (!aug) chain.unshift(...heads) */
             heads.push({_id: ddict._id, docs: ddict.docs})
         } else {
-            log('__ELSE', ddict._id, headstr)
+            log('__ELSE', headstr, ddict._id)
             let dicts = dict2plain(heads, ddict, dag.flexes)
 
         }
@@ -110,91 +110,7 @@ async function dagging(oldheads, tail) {
         log('_========pdict_2', pdict, vowel, '_nexttail:', nexttail, heads)
         await dagging(heads, nexttail)
 
-
     } // ddicts
-}
-
-async function dagging_(oldheads, tail) {
-    let ddicts = await getDicts(tail)
-    if (!ddicts.length) return
-
-    if (oldheads.length) ddicts = ddicts.filter(ddict => ddict._id.length > 2)
-
-    let headstr = oldheads.map(doc=> doc._id).join('')
-    log('_headstr_', oldheads.length, headstr, '_tail_', tail)
-
-    for (let ddict of ddicts) {
-        log('___ddict_start:', ddict._id)
-        let heads = _.clone(oldheads)
-
-        if (heads.length == 0) {
-            let chain = dict2flex(headstr, ddict, flexes)
-            let newhead = {_id: ddict._id, docs: ddict.docs}
-            heads.push(newhead)
-            log('_____N-0', tail, 'ddict._id:', ddict._id, 'chains:', chains.length)
-            /* if (chain) chain.unshift(...dictheads) */
-        } else if (heads.length == 1) {
-            log('_____N-1', tail, 'ddict._id:', ddict._id, 'chains', chains.length)
-            let aug = ddict.docs.find(doc=> doc.aug)
-            if (aug) {
-                let chain = dict2flex(headstr, ddict, flexes)
-                let newhead = {_id: ddict._id, docs: ddict.docs}
-                heads.push(newhead)
-                log('_____N-1-aug', tail, 'ddict._id:', ddict._id, 'chains', chains.length)
-                log('_____N-1-aug', heads.length)
-            } else {
-                let dicts = dict2plain(headstr, ddict, flexes)
-            }
-            // ==> doc2flex
-            // if (aug) => doc2flex без unshift
-            // else => doc2plain
-        } else {
-            /* let dicts = dict2plain(headstr, ddict, flexes) */
-            log('_____N-N', tail, '=', headstr, 'ddict._id:', ddict._id, 'chains', chains.length)
-            let chain = dict2flex(headstr, ddict, flexes)
-            if (chain) chain.unshift(...heads)
-            log('_____N-N_', tail, '=', headstr, 'ddict._id:', ddict._id, 'chains', chains.length)
-            log('_____N-N_chain', chain)
-            /* let newhead = {_id: ddict._id, docs: ddict.docs} */
-            /* heads.push(newhead) */
-            log('_____N-N-0', tail, 'ddict._id:', ddict._id, 'chains', chains.length)
-            /* if (dicts) chain.unshift(...heads) */
-            // heads - есть, > 1
-            // doc2plain
-            // unshift
-        }
-        log('_____HEADS__', heads, 'oldtail:', tail, 'chains:', chains)
-
-
-        // посчитать tail, и цикл и никаких switch не нужно
-        let pdict = plain(ddict._id)
-        /* if (pdict.length < 4) continue */
-        let repdict = new RegExp('^'+pdict)
-        let nexttail = tail.replace(repdict, '')
-        log('_========pdict_1', pdict, '_nexttail:', nexttail, 'tail:', tail, heads.length)
-        if (nexttail == tail) continue
-        if (nexttail == 'οποιέω') nexttail = 'ποιέω'
-        log('_========pdict_1_1', pdict, '_nexttail:', nexttail, 'tail:', tail, heads.length)
-        await dagging(heads, nexttail)
-
-        // vowels
-        let vowel = nexttail[0]
-        if (!vowels.includes(vowel)) continue
-        pdict = pdict + vowel
-        /* if (pdict.length < 4) continue */
-        repdict = new RegExp('^' + pdict)
-        nexttail = pcwf.replace(repdict, '')
-        /* g('_pdict_vow', pdict, '_nexttail', nexttail) */
-        log('_========pdict_2', pdict, '_nexttail:', nexttail, 'tail:', tail, heads.length)
-        if (nexttail == pcwf) continue
-        /* if (pdict != 'παχυ') continue */
-        heads.push({vowel: true, _id: vowel})
-        /* await dagging(heads, nexttail) */
-        // si
-    }
-
-    /* if (dag[tail]) chains.push(_.flatten([headdict, dag[tail]])) */
-    /* else await dagging(chains, tail, headdict, flexes) */
 }
 
 function dict2flex(headstr, ddict, flexes) {
@@ -219,15 +135,24 @@ function dict2flex(headstr, ddict, flexes) {
 function dict2plain(heads, ddict, flexes) {
     let headstr = heads.map(doc=> doc._id).join('')
     let dicts = []
+    let vowel = (heads.slice(-1)[0].vowel) ? heads.slice(-1)[0]._id : null
     for (let doc of ddict.docs) {
-        let cflexes = []
+        let corr = false
         for (let flex of flexes) {
-            if (dag.pcwf == headstr + ddict._id + plain(flex._id)) dicts.push(doc)
-            log('___else pushed', doc.plain)
+            // length correct:
+            if (dag.pcwf == headstr + ddict._id + plain(flex._id)) corr = true
+            // doc.aug corresponds connecting vowel:
+            if (doc.aug && doc.aug != vowel) corr = false
+            // todo: считать dict отдельно - verb+flex.verb, name+flex.name
+            // todo: flex.name могут соответствовать и doc.verb также, но flex.verb должны соответствовать только doc.verb only
+            // todo: если соответствия есть, то dict протустить
+            // на омеге облом - пройдут name
         }
+        if (corr) dicts.push(doc)
+        if (corr) log('___else pushed', doc.rdict, '_vow:', vowel, '_aug:', doc.aug)
     }
     let chain = [{_id: ddict._id, dicts, flexes}]
-    chain.unshift(heads)
+    chain.unshift(...heads)
     chains.push(chain)
     return dicts
 }
