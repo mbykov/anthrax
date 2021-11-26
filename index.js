@@ -157,6 +157,6 @@ function dict2plain(heads, ddict, flexes) {
     }
     let chain = [{_id: ddict._id, dicts, flexes}]
     chain.unshift(...heads)
-    if (dicts.length) chains.push(chain)
+    if (dicts.length) dag.chains.push(chain)
     return dicts
 }
