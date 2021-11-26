@@ -19,18 +19,19 @@ import Debug from 'debug'
 // 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-let chains = []
-let pcwf = ''
-let flexes
+/* let chains = [] */
+/* let pcwf = '' */
+/* let flexes */
 let dag = new Map();
+dag.chains = []
 
 const d = Debug('app')
 const h = Debug('head')
 const g = Debug('dag')
 
-anthrax(wordform)
+/* anthrax(wordform) */
 
-async function anthrax (wf) {
+export async function anthrax (wf) {
     let cwf = comb(wf)
     let flakes = scrape(cwf)
     d('_flakes', flakes)
@@ -47,7 +48,7 @@ async function anthrax (wf) {
         dag.pcwf = dag.pcwf.substr(aug.length)
     }
     await dagging([], dag.pcwf)
-    log('_raw chains_:', chains)
+    log('_raw chains_:', dag.chains)
 }
 
 // ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, καθαρισμός, ἀγαθός
@@ -75,12 +76,12 @@ async function dagging(oldheads, tail) {
         let heads = _.clone(oldheads)
         if (heads.length == 0) {
             let chain = dict2flex('', ddict, dag.flexes)
-            if (chain) chains.push(chain)
+            if (chain) dag.chains.push(chain)
             if (nexttail) heads.push({_id: ddict._id, docs: ddict.docs})
         }  else if (heads.length == 1) {
             let chain = dict2flex(headstr, ddict, dag.flexes)
             chain.unshift(...heads)
-            if (chain) chains.push(chain)
+            if (chain) dag.chains.push(chain)
             if (nexttail) heads.push({_id: ddict._id, docs: ddict.docs})
         } else {
             log('__ELSE', headstr, ddict._id)
