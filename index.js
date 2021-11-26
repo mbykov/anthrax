@@ -41,40 +41,40 @@ async function anthrax (wf) {
     d('_flexids', dag.flexids)
     dag.pcwf = plain(cwf)
     d('_pcwf', dag.pcwf)
+    let aug = parseAug(dag.pcwf)
+    if (aug) {
+        dag.aug = aug
+        dag.pcwf = dag.pcwf.substr(aug.length)
+    }
     await dagging([], dag.pcwf)
-
     log('_raw chains_:', chains)
 }
 
 // ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, καθαρισμός, ἀγαθός
 
 async function getDicts(tail) {
-    let aug = parseAug(tail)
-    if (aug) tail = tail.substr(aug.length)
     let flakes = scrape(tail)
     let headkeys = flakes.map(flake=> plain(flake.head))
     h('_headkeys_', headkeys)
     let ddicts = await getSegments(headkeys)
     // todo: return ddicts
     let dictids = ddicts.map(dict=> dict._id)
-    log('_dictids_', dictids, 'aug:', aug, 'tail:', tail)
-    return { ddicts, aug }
+    log('_dictids_', dictids, 'aug:', dag.aug, 'tail:', tail)
+    return ddicts
 }
 
 async function dagging(oldheads, tail) {
-    let {ddicts, aug} = await getDicts(tail)
+    let ddicts = await getDicts(tail)
     if (!ddicts.length) return
     let headstr = oldheads.map(doc=> doc._id).join('')
     g('_headstr_', oldheads.length, headstr, '_tail_', tail)
 
     for (let ddict of ddicts) {
-        let nexttail = tailBySyze(aug, ddict, tail)
+        let nexttail = tailBySyze(ddict, tail)
         g('___ddict_start:', ddict._id)
         let heads = _.clone(oldheads)
         if (heads.length == 0) {
-            let chain
-            if (aug) chain = dict2flex(aug, ddict, dag.flexes)
-            else chain = dict2flex('', ddict, dag.flexes)
+            let chain = dict2flex('', ddict, dag.flexes)
             if (chain) chains.push(chain)
             if (nexttail) heads.push({_id: ddict._id, docs: ddict.docs})
         }  else if (heads.length == 1) {
@@ -88,6 +88,7 @@ async function dagging(oldheads, tail) {
 
         }
 
+        if (nexttail != 'οποιεω') continue
         if (!nexttail) continue
         let pdict = plain(ddict._id)
 
@@ -107,14 +108,11 @@ async function dagging(oldheads, tail) {
     } // ddicts
 }
 
-function tailBySyze(aug, ddict, tail) {
-    let nexttail = tail
-    if (aug) nexttail = tail.substr(aug.length)
+function tailBySyze(ddict, tail) {
     let pdict = plain(ddict._id)
-    nexttail = nexttail.substr(pdict.length)
+    let nexttail = tail.substr(pdict.length)
     if (nexttail == tail) nexttail = null
     else if (dag.flexids.includes(nexttail)) nexttail = null
-    log('_nexttail_', tail, aug, pdict, nexttail)
     return nexttail
 }
 
@@ -122,7 +120,6 @@ function dict2flex(headstr, ddict, flexes) {
     for (let doc of ddict.docs) {
         let cflexes = []
         for (let flex of flexes) {
-            /* g(111, dag.pcwf, headstr, ddict._id, plain(flex._id)) */
             if (dag.pcwf != headstr + ddict._id + plain(flex._id)) continue
             for (let flexdoc of flex.docs) {
                 if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
@@ -139,6 +136,7 @@ function dict2flex(headstr, ddict, flexes) {
 
 function dict2plain(heads, ddict, flexes) {
     let headstr = heads.map(doc=> doc._id).join('')
+    log('____________inner headstr', headstr)
     let dicts = []
     let vowel = (heads.slice(-1)[0].vowel) ? heads.slice(-1)[0]._id : null
     for (let doc of ddict.docs) {
@@ -147,7 +145,7 @@ function dict2plain(heads, ddict, flexes) {
             // length correct:
             if (dag.pcwf == headstr + ddict._id + plain(flex._id)) corr = true
             // doc.aug corresponds connecting vowel:
-            if (doc.aug && doc.aug != vowel) corr = false
+            // if (doc.aug && doc.aug != vowel) corr = false
             // todo: считать dict отдельно - verb+flex.verb, name+flex.name
             // todo: flex.name могут соответствовать и doc.verb также, но flex.verb должны соответствовать только doc.verb only
             // todo: если соответствия есть, то dict протустить
@@ -158,6 +156,6 @@ function dict2plain(heads, ddict, flexes) {
     }
     let chain = [{_id: ddict._id, dicts, flexes}]
     chain.unshift(...heads)
-    chains.push(chain)
+    if (dicts.length) chains.push(chain)
     return dicts
 }
