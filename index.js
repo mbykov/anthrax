@@ -7,7 +7,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape, vowels, parseAug, vnTerms } from './lib/utils.js'
+import { accents, scrape, vowels, parseAug, vnTerms, aug2vow } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
 import { filter, simple } from './lib/filters.js'
 import Debug from 'debug'
@@ -150,6 +150,7 @@ function dict2plain(heads, ddict, flexes) {
     let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
         /* if (!!vowel && !!dict.aug && vowel != dict.aug) continue */
+        if (!!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) continue
         // todo: соответсвие
         for (let cflex of cflexes) {
             for (let flex of cflex.docs) {
