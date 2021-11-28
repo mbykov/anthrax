@@ -50,6 +50,7 @@ export async function anthrax (wf) {
     }
     await dagging([], dag.pcwf)
     log('_raw chains_:', dag.chains)
+    /* log('_LAST_:', _.last(_.last(dag.chains))) */
 }
 
 // ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, καθαρισμός, ἀγαθός
@@ -81,7 +82,7 @@ async function dagging(oldheads, tail) {
             let chain = dict2plain(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
             if (nexttail) heads.push({plain: ddict._id, docs: ddict.docs, l:0})
-        }  else if (heads.length == 1) {
+        }  else if (heads.length == 11) {
             /* let chain = dict2flex(headstr, ddict, dag.flexes) */
             let chain = dict2plain(heads, ddict, dag.flexes)
             chain.unshift(...heads)
@@ -144,9 +145,10 @@ function dict2plain(heads, ddict, flexes) {
     m('____________inner headstr', headstr)
     let chain
     let dicts = []
-    let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0]._id : null
+    let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0].plain : undefined
     let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
+        if (!!vowel && !!dict.aug && vowel != dict.aug) continue
         for (let cflex of cflexes) {
             for (let flex of cflex.docs) {
                 let ok = false
