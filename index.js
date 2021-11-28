@@ -53,8 +53,8 @@ export async function anthrax (wf) {
     /* log('_LAST_:', _.last(_.last(dag.chains))) */
 }
 
-// ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, καθαρισμός, ἀγαθός
-// βούκερας
+// ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, ἀγαθός, βούκερας, καθαρισμός (non-comp),
+// στρατηγός
 
 async function getDicts(tail) {
     let flakes = scrape(tail)
@@ -140,6 +140,7 @@ function dict2flex(headstr, ddict, flexes) {
     }
 }
 
+// στρατός, στρατηγός
 function dict2plain(heads, ddict, flexes) {
     let headstr = heads.map(doc=> doc.plain).join('')
     m('____________inner headstr', headstr)
@@ -148,13 +149,15 @@ function dict2plain(heads, ddict, flexes) {
     let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0].plain : undefined
     let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
-        if (!!vowel && !!dict.aug && vowel != dict.aug) continue
+        /* if (!!vowel && !!dict.aug && vowel != dict.aug) continue */
+        // todo: соответсвие
         for (let cflex of cflexes) {
             for (let flex of cflex.docs) {
                 let ok = false
+                let key = plain(flex.key.split('-')[0])
                 if (dict.name && flex.name && dict.key == flex.key) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
-                else if (heads.length && dict.verb && flex.verb && vnTerms.includes(flex.key)) ok = true // heads.length - compounds
+                else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
                 if (ok) {
                     if (!dict.flexes) dict.flexes = []
                     dict.flexes.push(flex)
