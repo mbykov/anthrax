@@ -49,8 +49,9 @@ export async function anthrax (wf) {
         dag.pcwf = dag.pcwf.substr(aug.length)
     }
     await dagging([], dag.pcwf)
-    log('_raw chains_:', dag.chains)
+    /* log('_raw chains_:', dag.chains) */
     /* log('_LAST_:', _.last(_.last(dag.chains))) */
+    return dag.chains
 }
 
 // ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, ἀγαθός, βούκερας, καθαρισμός (non-comp),
@@ -81,13 +82,13 @@ async function dagging(oldheads, tail) {
             /* let chain = dict2flex('', ddict, dag.flexes) */
             let chain = dict2plain(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
-            if (nexttail) heads.push({plain: ddict._id, docs: ddict.docs, l:0})
+            if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:0})
         }  else if (heads.length == 11) {
             /* let chain = dict2flex(headstr, ddict, dag.flexes) */
             let chain = dict2plain(heads, ddict, dag.flexes)
             chain.unshift(...heads)
             if (chain) dag.chains.push(chain)
-            if (nexttail) heads.push({plain: ddict._id, docs: ddict.docs, l:1})
+            if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:1})
         } else {
             m('__ELSE', headstr, ddict._id)
             let chain = dict2plain(heads, ddict, dag.flexes)

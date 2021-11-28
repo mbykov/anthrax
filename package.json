@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node run.js",
     "names": "node test/wkt_name.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/wkt_name.js"
   },
   "author": "mbykov <m.bykov@gmail.com>",
   "license": "ISC",
