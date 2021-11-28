@@ -7,7 +7,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape, vowels, parseAug } from './lib/utils.js'
+import { accents, scrape, vowels, parseAug, vnTerms } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
 import { filter, simple } from './lib/filters.js'
 import Debug from 'debug'
@@ -28,6 +28,7 @@ dag.chains = []
 const d = Debug('app')
 const h = Debug('head')
 const g = Debug('dag')
+const m = Debug('more')
 
 /* anthrax(wordform) */
 
@@ -52,6 +53,7 @@ export async function anthrax (wf) {
 }
 
 // ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, καθαρισμός, ἀγαθός
+// βούκερας
 
 async function getDicts(tail) {
     let flakes = scrape(tail)
@@ -60,7 +62,7 @@ async function getDicts(tail) {
     let ddicts = await getSegments(headkeys)
     // todo: return ddicts
     let dictids = ddicts.map(dict=> dict._id)
-    log('_dictids_', dictids, 'aug:', dag.aug, 'tail:', tail)
+    m('_dictids_', dictids, 'aug:', dag.aug, 'tail:', tail)
     return ddicts
 }
 
@@ -84,16 +86,15 @@ async function dagging(oldheads, tail) {
             if (chain) dag.chains.push(chain)
             if (nexttail) heads.push({_id: ddict._id, docs: ddict.docs})
         } else {
-            log('__ELSE', headstr, ddict._id)
+            m('__ELSE', headstr, ddict._id)
             let dicts = dict2plain(heads, ddict, dag.flexes)
-
         }
 
         if (!nexttail) continue
         let pdict = plain(ddict._id)
 
         let vowel = nexttail[0]
-        log('_========pdict_1', pdict, 'vow:', vowel, '_nexttail:', nexttail)
+        g('_========pdict_1', pdict, 'vow:', vowel, '_nexttail:', nexttail)
         if (!vowels.includes(vowel)) continue
         pdict = pdict + vowel
         nexttail = nexttail.substr(vowel.length)
@@ -102,7 +103,7 @@ async function dagging(oldheads, tail) {
         /* if (pdict != 'παχυ') continue */
         heads.push({_id: vowel, vowel: true})
         let xxx = heads.map(doc=> doc._id).join('-')
-        log('_========pdict_2', pdict, 'vow:', vowel, '_nexttail:', nexttail, 'headstr:', xxx)
+        g('_========pdict_2', pdict, 'vow:', vowel, '_nexttail:', nexttail, 'headstr:', xxx)
         await dagging(heads, nexttail)
 
     } // ddicts
@@ -119,43 +120,51 @@ function tailBySyze(ddict, tail) {
 function dict2flex(headstr, ddict, flexes) {
     for (let doc of ddict.docs) {
         let cflexes = []
+        let flexid
         for (let flex of flexes) {
             if (dag.pcwf != headstr + ddict._id + plain(flex._id)) continue
+            flexid = flex._id
             for (let flexdoc of flex.docs) {
                 if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
                 else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
             }
         }
         if (cflexes.length) {
-            /* let chain = [{_id: doc.plain, doc, flexes: cflexes}] */
-            let chain = [{dict: doc.dict, doc, flexes: cflexes}]
+            let chain = [{dict: doc.plain, doc, flex: flexid, flexes: cflexes}]
             return chain
         }
     }
 }
 
+
+
 function dict2plain(heads, ddict, flexes) {
     let headstr = heads.map(doc=> doc._id).join('')
-    log('____________inner headstr', headstr)
+    m('____________inner headstr', headstr)
     let dicts = []
     let vowel = (heads.slice(-1)[0].vowel) ? heads.slice(-1)[0]._id : null
-    for (let doc of ddict.docs) {
-        let corr = false
-        for (let flex of flexes) {
-            // length correct:
-            if (dag.pcwf == headstr + ddict._id + plain(flex._id)) corr = true
-            // doc.aug corresponds connecting vowel:
-            // if (doc.aug && doc.aug != vowel) corr = false
-            // todo: считать dict отдельно - verb+flex.verb, name+flex.name
-            // todo: flex.name могут соответствовать и doc.verb также, но flex.verb должны соответствовать только doc.verb only
-            // todo: если соответствия есть, то dict протустить
-            // на омеге облом - пройдут name
+    let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
+    for (let dict of ddict.docs) {
+        for (let cflex of cflexes) {
+            for (let flex of cflex.docs) {
+                let ok = false
+                if (dict.name && flex.name && dict.key == flex.key) ok = true
+                else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
+                else if (heads.length && dict.verb && flex.verb && vnTerms.includes(flex.key)) ok = true // heads.length - compounds
+                if (ok) {
+                    if (!dict.flexes) dict.flexes = []
+                    dict.flexes.push(flex)
+                }
+            }
         }
-        if (corr) dicts.push(doc)
-        if (corr) log('___else pushed', doc.rdict, '_vow:', vowel, '_aug:', doc.aug)
+        if (dict.flexes) dicts.push(dict)
     }
-    let chain = [{_id: ddict._id, dicts, flexes}]
-    chain.unshift(...heads)
-    if (dicts.length) dag.chains.push(chain)
+    if (dicts.length) {
+        /* m('___else pushed', ddict._id, '_vow:', vowel, '_aug:', dict.aug) */
+        m('___else pushed', ddict._id, '_vow:', vowel)
+        let chain = [{dict: ddict._id, dicts}]
+        if (heads.length) chain.unshift(...heads)
+        dag.chains.push(chain)
+    }
     return dicts
 }
