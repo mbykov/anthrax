@@ -82,7 +82,9 @@ async function dagging(oldheads, tail) {
             if (dag.aug) ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
             let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
-            if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:0})
+            // fc cannot be short: // todo: проверить, что с префиксами
+            /* if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs}) */
+            if (nexttail && ddict._id.length > 1) heads.push({plain: ddict._id, dicts: ddict.docs})
         }  else if (heads.length == 11) {
             /* let chain = dict2flex(heads, ddict, dag.flexes) */
             /* chain.unshift(...heads) */
@@ -92,6 +94,7 @@ async function dagging(oldheads, tail) {
             m('__ELSE', headstr, ddict._id)
             let vowel = heads.slice(-1)[0].plain
             ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
+            /* if (ddict._id == 'ρ') log('_DDICT', ddict.docs.map(dict=> dict.aug), vowel) */
             let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
         }
@@ -131,8 +134,7 @@ function dict2flex(heads, ddict, flexes) {
     /* let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0].plain : undefined */
     let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
-        /* if (!!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) continue */
-        /* log('_AUG', dict.rdict, dict.plain, '_vow:', vowel,  !!vowel, !!dict.aug, !aug2vow(vowel, dict.aug), '=', !!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) */
+        /* if (dict.rdict == 'εὐρύς') log('_DICT', dict.aug, dict.rdict, '_VOW-TODO-DEL', vowel) */
         for (let cflex of cflexes) {
             for (let flex of cflex.docs) {
                 let ok = false

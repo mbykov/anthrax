@@ -21,6 +21,7 @@ for (let chain of res) {
             /* if (dict.flexes) log('_cmpfls:', compactNameFls(dict.flexes)) */
         }
     }
+    /* log('_Z', chain[chain.length -1]) */
 }
 
 /* log('_R:', res[0][0].dicts[0]) */
