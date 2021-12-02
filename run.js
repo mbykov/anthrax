@@ -16,7 +16,7 @@ for (let chain of res) {
         /* log('_seg:', seg) */
         if (!seg.dicts) continue
         for (let dict of seg.dicts) {
-            log('_dict:', dict.rdict)
+            log('_dict:', dict.rdict, '_plain:', dict.plain)
             if (dict.flexes) log('_flexes:', dict.flexes.length)
             if (dict.flexes) log('_cmpfls:', compactNameFls(dict.flexes))
         }

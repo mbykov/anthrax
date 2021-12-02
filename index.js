@@ -75,23 +75,22 @@ async function dagging(oldheads, tail) {
     g('_headstr_', oldheads.length, headstr, '_tail_', tail)
 
     for (let ddict of ddicts) {
-        let nexttail = tailBySyze(ddict, tail)
+        let nexttail = tailBySize(ddict, tail)
         g('___ddict_start:', ddict._id)
         let heads = _.clone(oldheads)
         if (heads.length == 0) {
-            /* let chain = dict2flex('', ddict, dag.flexes) */
-            let chain = dict2plain(heads, ddict, dag.flexes)
+            if (dag.aug) ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
+            let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
             if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:0})
         }  else if (heads.length == 11) {
-            /* let chain = dict2flex(headstr, ddict, dag.flexes) */
-            let chain = dict2plain(heads, ddict, dag.flexes)
+            let chain = dict2flex(heads, ddict, dag.flexes)
             chain.unshift(...heads)
             if (chain) dag.chains.push(chain)
             if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:1})
         } else {
             m('__ELSE', headstr, ddict._id)
-            let chain = dict2plain(heads, ddict, dag.flexes)
+            let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
         }
 
@@ -114,35 +113,15 @@ async function dagging(oldheads, tail) {
     } // ddicts
 }
 
-function tailBySyze(ddict, tail) {
+function tailBySize(ddict, tail) {
     let pdict = plain(ddict._id)
     let nexttail = tail.substr(pdict.length)
-    if (nexttail == tail) nexttail = null
-    else if (dag.flexids.includes(nexttail)) nexttail = null
+    if (dag.flexids.includes(nexttail)) nexttail = null
     return nexttail
 }
 
-function dict2flex(headstr, ddict, flexes) {
-    for (let doc of ddict.docs) {
-        let cflexes = []
-        let flexid
-        for (let flex of flexes) {
-            if (dag.pcwf != headstr + ddict._id + plain(flex._id)) continue
-            flexid = flex._id
-            for (let flexdoc of flex.docs) {
-                if (doc.name && flexdoc.name && doc.key == flexdoc.key) cflexes.push(flexdoc)
-                else if (doc.verb && flexdoc.verb && doc.keys.find(verbkey=> flexdoc.key == verbkey.key)) cflexes.push(flexdoc)
-            }
-        }
-        if (cflexes.length) {
-            let chain = [{plain: doc.plain, doc, flex: flexid, flexes: cflexes}]
-            return chain
-        }
-    }
-}
-
 // στρατός, στρατηγός
-function dict2plain(heads, ddict, flexes) {
+function dict2flex(heads, ddict, flexes) {
     let headstr = heads.map(doc=> doc.plain).join('')
     m('____________inner headstr', headstr)
     let chain
@@ -150,16 +129,22 @@ function dict2plain(heads, ddict, flexes) {
     let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0].plain : undefined
     let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
-        /* if (!!vowel && !!dict.aug && vowel != dict.aug) continue */
         if (!!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) continue
-        // todo: соответсвие
+        /* log('_AUG', dict.rdict, dict.plain, '_vow:', vowel,  !!vowel, !!dict.aug, !aug2vow(vowel, dict.aug), '=', !!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) */
         for (let cflex of cflexes) {
             for (let flex of cflex.docs) {
                 let ok = false
                 let key = plain(flex.key.split('-')[0])
+
+                if (dict.name && flex.name && dict.key == flex.key) log('_XXX', dict.rdict, dict.key, '_F:', flex.key)
+                else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_YYY', dict.rdict, dict.key, '_F:', flex.key)
+                else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) log('_ZZZ', dict.rdict, dict.key, '_F:', key)
+
                 if (dict.name && flex.name && dict.key == flex.key) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
                 else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+                // && dict.plain.length > 1 // нельзя, отвалится στρατηγός - ἄγω
+
                 if (ok) {
                     if (!dict.flexes) dict.flexes = []
                     dict.flexes.push(flex)
