@@ -7,10 +7,9 @@ let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 
 const log = console.log
 
-let res = await anthrax(wordform)
+let chains = await anthrax(wordform)
 
-
-for (let chain of res) {
+for (let chain of chains) {
     log('_chain:', chain)
     for (let seg of chain) {
         /* log('_seg:', seg) */

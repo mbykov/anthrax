@@ -18,12 +18,7 @@ import Debug from 'debug'
 // или, для однообразия, вычислять aug-names как в verbs?
 // 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
 
-let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-/* let chains = [] */
-/* let pcwf = '' */
-/* let flexes */
-let dag = new Map();
-dag.chains = []
+let dag
 
 const d = Debug('app')
 const h = Debug('head')
@@ -33,6 +28,8 @@ const m = Debug('more')
 /* anthrax(wordform) */
 
 export async function anthrax (wf) {
+    dag = new Map();
+    dag.chains = []
     let cwf = comb(wf)
     let flakes = scrape(cwf)
     d('_flakes', flakes)
@@ -94,7 +91,7 @@ async function dagging(oldheads, tail) {
             }
             // fc cannot be short: // todo: проверить, как с prefix
             /* if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs}) */
-            /* if (nexttail && ddict._id.length > 1) heads.push({plain: ddict._id, dicts: ddict.docs}) */
+            /* if (nexttail && ddict._id.length > 1) heads.push({plain: ddict._id, dicts: ddict.docs}) // отрезать ago */
         }  else if (heads.length == 11) {
             /* let chain = dict2flex(heads, ddict, dag.flexes) */
             /* chain.unshift(...heads) */
@@ -103,7 +100,7 @@ async function dagging(oldheads, tail) {
         } else {
             m('__ELSE', headstr, ddict._id)
             let vowel = heads.slice(-1)[0].plain
-            ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
+            /* ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug)) */
             /* if (ddict._id == 'ρ') log('_DDICT', ddict.docs.map(dict=> dict.aug), vowel) */
             let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)

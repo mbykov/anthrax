@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node run.js",
     "names": "node test/wkt_name.js",
+    "simple": "node test/simple_test.js",
     "test": "node test/wkt_name.js"
   },
   "author": "mbykov <m.bykov@gmail.com>",
