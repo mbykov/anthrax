@@ -81,10 +81,20 @@ async function dagging(oldheads, tail) {
         if (heads.length == 0) {
             if (dag.aug) ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
             let chain = dict2flex(heads, ddict, dag.flexes)
-            if (chain) dag.chains.push(chain)
-            // fc cannot be short: // todo: проверить, что с префиксами
+            if (chain) dag.chains.push(chain) // или просто ELSE ? или chain, или не chain !!!!
+            else {
+                let head
+                let prefixes = ddict.docs.filter(dict=> dict.prefix)
+                if (prefixes.length) {
+                    head = {plain: ddict._id, dicts: prefixes}
+                } else if (ddict._id.length > 1) {
+                    head = {plain: ddict._id, dicts: ddict.docs}
+                }
+                if (head) heads.push(head)
+            }
+            // fc cannot be short: // todo: проверить, как с prefix
             /* if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs}) */
-            if (nexttail && ddict._id.length > 1) heads.push({plain: ddict._id, dicts: ddict.docs})
+            /* if (nexttail && ddict._id.length > 1) heads.push({plain: ddict._id, dicts: ddict.docs}) */
         }  else if (heads.length == 11) {
             /* let chain = dict2flex(heads, ddict, dag.flexes) */
             /* chain.unshift(...heads) */
@@ -147,7 +157,6 @@ function dict2flex(heads, ddict, flexes) {
                 if (dict.name && flex.name && dict.key == flex.key) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
                 else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
-                // && dict.plain.length > 1 // нельзя, отвалится στρατηγός - ἄγω
 
                 if (ok) {
                     if (!dict.flexes) dict.flexes = []
