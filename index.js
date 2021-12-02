@@ -84,12 +84,14 @@ async function dagging(oldheads, tail) {
             if (chain) dag.chains.push(chain)
             if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:0})
         }  else if (heads.length == 11) {
-            let chain = dict2flex(heads, ddict, dag.flexes)
-            chain.unshift(...heads)
-            if (chain) dag.chains.push(chain)
-            if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:1})
+            /* let chain = dict2flex(heads, ddict, dag.flexes) */
+            /* chain.unshift(...heads) */
+            /* if (chain) dag.chains.push(chain) */
+            /* if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:1}) */
         } else {
             m('__ELSE', headstr, ddict._id)
+            let vowel = heads.slice(-1)[0].plain
+            ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
             let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
         }
@@ -126,19 +128,19 @@ function dict2flex(heads, ddict, flexes) {
     m('____________inner headstr', headstr)
     let chain
     let dicts = []
-    let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0].plain : undefined
+    /* let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0].plain : undefined */
     let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
-        if (!!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) continue
+        /* if (!!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) continue */
         /* log('_AUG', dict.rdict, dict.plain, '_vow:', vowel,  !!vowel, !!dict.aug, !aug2vow(vowel, dict.aug), '=', !!vowel && !!dict.aug && !aug2vow(vowel, dict.aug)) */
         for (let cflex of cflexes) {
             for (let flex of cflex.docs) {
                 let ok = false
                 let key = plain(flex.key.split('-')[0])
 
-                if (dict.name && flex.name && dict.key == flex.key) log('_XXX', dict.rdict, dict.key, '_F:', flex.key)
-                else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_YYY', dict.rdict, dict.key, '_F:', flex.key)
-                else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) log('_ZZZ', dict.rdict, dict.key, '_F:', key)
+                /* if (dict.name && flex.name && dict.key == flex.key) log('_XXX', dict.rdict, dict.key, '_F:', flex.key) */
+                /* else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_YYY', dict.rdict, dict.key, '_F:', flex.key) */
+                /* else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) log('_ZZZ', dict.rdict, dict.key, '_F:', key) */
 
                 if (dict.name && flex.name && dict.key == flex.key) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
@@ -155,7 +157,7 @@ function dict2flex(heads, ddict, flexes) {
     }
     if (dicts.length) {
         /* m('___else pushed', ddict._id, '_vow:', vowel, '_aug:', dict.aug) */
-        m('___else pushed', ddict._id, '_vow:', vowel)
+        m('___else pushed', ddict._id)
         chain = [{plain: ddict._id, dicts}]
         if (heads.length) chain.unshift(...heads)
         /* dag.chains.push(chain) */
