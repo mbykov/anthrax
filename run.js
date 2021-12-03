@@ -23,8 +23,7 @@ for (let chain of chains) {
     /* log('_Z', chain[chain.length -1]) */
 }
 
-/* log('_R:', chains[0][0].dicts) */
-
+/* log('_R:', chains[1][0].dicts) */
 
 function compactNameFls(flexes) {
     return _.uniq(flexes.map(flex=> [flex.gend, flex.numcase].join('.')))
