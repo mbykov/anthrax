@@ -30,6 +30,7 @@ const m = Debug('more')
 export async function anthrax (wf) {
     dag = new Map();
     dag.chains = []
+    dag.cache = {}
     let cwf = comb(wf)
     let flakes = scrape(cwf)
     d('_flakes', flakes)
@@ -72,14 +73,14 @@ async function dagging(oldheads, tail) {
         let heads = _.clone(oldheads)
         if (heads.length == 0) {
             ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
-            let chain = dict2flex(heads, ddict, dag.flexes)
-            if (chain) dag.chains.push(chain)
-            else {
+            let chain = dict2flex(heads, ddict)
+            /* if (chain) dag.chains.push(chain) */
+            if (!chain)  {
                 let head
                 let prefixes = ddict.docs.filter(dict=> dict.prefix)
                 if (prefixes.length) {
                     head = {plain: ddict._id, dicts: prefixes}
-                } else if (ddict._id.length > 1) {
+                } else if (ddict._id.length > 1 && ddict.docs.length) {
                     head = {plain: ddict._id, dicts: ddict.docs}
                 }
                 if (head) heads.push(head)
@@ -88,15 +89,15 @@ async function dagging(oldheads, tail) {
             g('__ELSE', headstr, ddict._id)
             let vowel = heads.slice(-1)[0].plain
             ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
-            let chain = dict2flex(heads, ddict, dag.flexes)
+            let chain = dict2flex(heads, ddict)
             /* if (ddict._id == 'τον') log('_CHAIN', ddict._id, chain) */
-            if (chain) dag.chains.push(chain)
+            /* if (chain) dag.chains.push(chain) */
         }
 
-        /* await dagging(heads, nexttail) */
+        if (!nexttail) continue
+        await dagging(heads, nexttail)
 
         let pdict = plain(ddict._id)
-        if (!nexttail) continue
         let vowel = nexttail[0]
         g('_========pdict_1', pdict, 'vow:', vowel, '_nexttail:', nexttail)
         if (!vowels.includes(vowel)) continue
@@ -116,43 +117,63 @@ function tailBySize(ddict, tail) {
     return nexttail
 }
 
-// στρατός, στρατηγός
-function dict2flex(heads, ddict, flexes) {
+function dict2flex(heads, ddict) {
     let headstr = heads.map(doc=> doc.plain).join('')
-    m('____________inner headstr', headstr)
+    /* let chain */
+    /* let cdicts */
+    /* if (dag.cache[ddict._id]) cdicts = dag.cache[ddict._id] */
+    /* else cdicts = parseCDicts(headstr, ddict) */
+    let cdicts = parseCDicts(headstr, ddict)
+    /* log('____________inner headstr', headstr, '_ddict:', ddict._id, '_cdicts:', cdicts.length) */
+
+    /* let dicts = []
+     * let cflexes = dag.flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
+     * for (let dict of ddict.docs) {
+     *     for (let cflex of cflexes) {
+     *         for (let flex of cflex.docs) {
+     *             let ok = false
+     *             let key = plain(flex.key.split('-')[0])
+     *             if (dict.name && flex.name && dict.key == flex.key) ok = true
+     *             else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
+     *             else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+     *             if (ok) {
+     *                 if (!dict.flexes) dict.flexes = []
+     *                 dict.flexes.push(flex)
+     *             }
+     *         }
+     *     }
+     *     if (dict.flexes) dicts.push(dict)
+     * } */
+
     let chain
-    let dicts = []
-    /* let vowel = (heads.length && heads.slice(-1)[0].vowel) ? heads.slice(-1)[0].plain : undefined */
-    let cflexes = flexes = flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
+    if (cdicts.length) {
+        m('___else pushed', ddict._id)
+        chain = [{plain: ddict._id, cdicts}]
+        if (heads.length) chain.unshift(...heads)
+        dag.chains.push(chain)
+    }
+    return chain
+}
+
+function parseCDicts(headstr, ddict) {
+    let cdicts = []
+    let cflexes = dag.flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
-        /* if (dict.rdict == 'εὐρύς') log('_DICT', dict.aug, dict.rdict, '_VOW-TODO-DEL', vowel) */
         for (let cflex of cflexes) {
             for (let flex of cflex.docs) {
                 let ok = false
                 let key = plain(flex.key.split('-')[0])
-
-                /* if (dict.name && flex.name && dict.key == flex.key) log('_XXX', dict.rdict, dict.key, '_F:', flex.key) */
-                /* else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_YYY', dict.rdict, dict.key, '_F:', flex.key) */
-                /* else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) log('_ZZZ', dict.rdict, dict.key, '_F:', key) */
-
                 if (dict.name && flex.name && dict.key == flex.key) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
-                else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
-
+                else if (headstr && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
                 if (ok) {
                     if (!dict.flexes) dict.flexes = []
                     dict.flexes.push(flex)
                 }
             }
         }
-        if (dict.flexes) dicts.push(dict)
+        if (dict.flexes) cdicts.push(dict)
     }
-    if (dicts.length) {
-        /* m('___else pushed', ddict._id, '_vow:', vowel, '_aug:', dict.aug) */
-        m('___else pushed', ddict._id)
-        chain = [{plain: ddict._id, dicts}]
-        if (heads.length) chain.unshift(...heads)
-        /* dag.chains.push(chain) */
-    }
-    return chain
+    dag.cache[ddict._id] = cdicts
+    return cdicts
 }
