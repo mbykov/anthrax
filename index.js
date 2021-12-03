@@ -61,6 +61,17 @@ async function getDicts(tail) {
     return ddicts
 }
 
+function addHead(heads, ddict) {
+    let head
+    let prefixes = ddict.docs.filter(dict=> dict.pref)
+    if (prefixes.length) {
+        head = {plain: ddict._id, dicts: prefixes}
+    } else if (ddict._id.length > 1 && ddict.docs.length) {
+        head = {plain: ddict._id, dicts: ddict.docs}
+    }
+    if (head) heads.push(head)
+}
+
 async function dagging(oldheads, tail) {
     let ddicts = await getDicts(tail)
     if (!ddicts.length) return
@@ -74,24 +85,13 @@ async function dagging(oldheads, tail) {
         if (heads.length == 0) {
             ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
             let chain = dict2flex(heads, ddict)
-            /* if (chain) dag.chains.push(chain) */
-            if (!chain)  {
-                let head
-                let prefixes = ddict.docs.filter(dict=> dict.prefix)
-                if (prefixes.length) {
-                    head = {plain: ddict._id, dicts: prefixes}
-                } else if (ddict._id.length > 1 && ddict.docs.length) {
-                    head = {plain: ddict._id, dicts: ddict.docs}
-                }
-                if (head) heads.push(head)
-            }
+            if (!chain) addHead(heads, ddict)
         } else {
             g('__ELSE', headstr, ddict._id)
             let vowel = heads.slice(-1)[0].plain
             ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
             let chain = dict2flex(heads, ddict)
-            /* if (ddict._id == 'τον') log('_CHAIN', ddict._id, chain) */
-            /* if (chain) dag.chains.push(chain) */
+            if (!chain) addHead(heads, ddict)
         }
 
         if (!nexttail) continue

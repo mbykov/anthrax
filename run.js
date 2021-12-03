@@ -23,7 +23,7 @@ for (let chain of chains) {
     /* log('_Z', chain[chain.length -1]) */
 }
 
-/* log('_R:', res[0][0].dicts[0]) */
+/* log('_R:', chains[0][0].dicts) */
 
 
 function compactNameFls(flexes) {
