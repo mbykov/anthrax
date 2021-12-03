@@ -7,7 +7,7 @@
     "start": "node run.js",
     "names": "node test/wkt_name.js",
     "simple": "node test/simple_test.js",
-    "test": "node test/wkt_name.js"
+    "test": "mocha test/simple_test.js"
   },
   "author": "mbykov <m.bykov@gmail.com>",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "debug": "^4.3.2",
     "fs-extra": "^10.0.0",
     "lodash": "^4.17.21",
+    "mocha": "^9.1.3",
     "node-fetch": "^3.1.0",
     "orthos": "^0.7.2"
   }
