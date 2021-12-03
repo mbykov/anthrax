@@ -46,13 +46,8 @@ export async function anthrax (wf) {
         dag.pcwf = dag.pcwf.substr(aug.length)
     }
     await dagging([], dag.pcwf)
-    /* log('_raw chains_:', dag.chains) */
-    /* log('_LAST_:', _.last(_.last(dag.chains))) */
     return dag.chains
 }
-
-// ἀγαθοποιέω, βαρύτονος, ἄβακος, βαρύς, τόνος, ἀγαθός, βούκερας, καθαρισμός (non-comp),
-// στρατηγός
 
 async function getDicts(tail) {
     let flakes = scrape(tail)
@@ -78,7 +73,7 @@ async function dagging(oldheads, tail) {
         if (heads.length == 0) {
             ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
             let chain = dict2flex(heads, ddict, dag.flexes)
-            if (chain) dag.chains.push(chain) // или просто ELSE ? или chain, или не chain !!!!
+            if (chain) dag.chains.push(chain)
             else {
                 let head
                 let prefixes = ddict.docs.filter(dict=> dict.prefix)
@@ -89,37 +84,26 @@ async function dagging(oldheads, tail) {
                 }
                 if (head) heads.push(head)
             }
-            // fc cannot be short: // todo: проверить, как с prefix
-            /* if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs}) */
-            /* if (nexttail && ddict._id.length > 1) heads.push({plain: ddict._id, dicts: ddict.docs}) // отрезать ago */
-        }  else if (heads.length == 11) {
-            /* let chain = dict2flex(heads, ddict, dag.flexes) */
-            /* chain.unshift(...heads) */
-            /* if (chain) dag.chains.push(chain) */
-            /* if (nexttail) heads.push({plain: ddict._id, dicts: ddict.docs, l:1}) */
         } else {
-            m('__ELSE', headstr, ddict._id)
+            g('__ELSE', headstr, ddict._id)
             let vowel = heads.slice(-1)[0].plain
             ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
-            /* if (ddict._id == 'ρ') log('_DDICT', ddict.docs.map(dict=> dict.aug), vowel) */
             let chain = dict2flex(heads, ddict, dag.flexes)
+            /* if (ddict._id == 'τον') log('_CHAIN', ddict._id, chain) */
             if (chain) dag.chains.push(chain)
         }
 
-        if (!nexttail) continue
-        let pdict = plain(ddict._id)
+        /* await dagging(heads, nexttail) */
 
+        let pdict = plain(ddict._id)
+        if (!nexttail) continue
         let vowel = nexttail[0]
         g('_========pdict_1', pdict, 'vow:', vowel, '_nexttail:', nexttail)
         if (!vowels.includes(vowel)) continue
         pdict = pdict + vowel
         nexttail = nexttail.substr(vowel.length)
-        /* g('_pdict_vow', pdict, '_nexttail', nexttail) */
-        if (nexttail == tail) continue
-        /* if (pdict != 'παχυ') continue */
         heads.push({plain: vowel, vowel: true})
-        let xxx = heads.map(doc=> doc._id).join('-')
-        g('_========pdict_2', pdict, 'vow:', vowel, '_nexttail:', nexttail, 'headstr:', xxx)
+        g('_========pdict_2', pdict, 'vow:', vowel, '_nexttail:', nexttail, 'headstr:', heads.length)
         await dagging(heads, nexttail)
 
     } // ddicts
