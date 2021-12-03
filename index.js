@@ -73,10 +73,10 @@ async function dagging(oldheads, tail) {
 
     for (let ddict of ddicts) {
         let nexttail = tailBySize(ddict, tail)
-        g('___ddict_start:', ddict._id)
+        g('___ddict_start:', ddict._id, '_aug:', dag.aug)
         let heads = _.clone(oldheads)
         if (heads.length == 0) {
-            if (dag.aug) ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
+            ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
             let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain) // или просто ELSE ? или chain, или не chain !!!!
             else {
@@ -100,7 +100,7 @@ async function dagging(oldheads, tail) {
         } else {
             m('__ELSE', headstr, ddict._id)
             let vowel = heads.slice(-1)[0].plain
-            /* ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug)) */
+            ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
             /* if (ddict._id == 'ρ') log('_DDICT', ddict.docs.map(dict=> dict.aug), vowel) */
             let chain = dict2flex(heads, ddict, dag.flexes)
             if (chain) dag.chains.push(chain)
