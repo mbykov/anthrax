@@ -57,7 +57,7 @@ async function getDicts(tail) {
     let ddicts = await getSegments(headkeys)
     // todo: return ddicts
     let dictids = ddicts.map(dict=> dict._id)
-    m('_dictids_', dictids, 'aug:', dag.aug, 'tail:', tail)
+    g('_dictids_', dictids, 'aug:', dag.aug, 'tail:', tail)
     return ddicts
 }
 
@@ -119,39 +119,17 @@ function tailBySize(ddict, tail) {
 
 function dict2flex(heads, ddict) {
     let headstr = heads.map(doc=> doc.plain).join('')
-    /* let chain */
     /* let cdicts */
     /* if (dag.cache[ddict._id]) cdicts = dag.cache[ddict._id] */
     /* else cdicts = parseCDicts(headstr, ddict) */
     let cdicts = parseCDicts(headstr, ddict)
-    /* log('____________inner headstr', headstr, '_ddict:', ddict._id, '_cdicts:', cdicts.length) */
+    if (!cdicts.length) return
+    /* if (cdicts.length) log('____________inner headstr', headstr, '_ddict:', ddict._id, '_cdicts:', cdicts.length) */
 
-    /* let dicts = []
-     * let cflexes = dag.flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
-     * for (let dict of ddict.docs) {
-     *     for (let cflex of cflexes) {
-     *         for (let flex of cflex.docs) {
-     *             let ok = false
-     *             let key = plain(flex.key.split('-')[0])
-     *             if (dict.name && flex.name && dict.key == flex.key) ok = true
-     *             else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
-     *             else if (heads.length && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
-     *             if (ok) {
-     *                 if (!dict.flexes) dict.flexes = []
-     *                 dict.flexes.push(flex)
-     *             }
-     *         }
-     *     }
-     *     if (dict.flexes) dicts.push(dict)
-     * } */
-
-    let chain
-    if (cdicts.length) {
-        m('___else pushed', ddict._id)
-        chain = [{plain: ddict._id, cdicts}]
-        if (heads.length) chain.unshift(...heads)
-        dag.chains.push(chain)
-    }
+    m('___else pushed', ddict._id)
+    let chain = [{plain: ddict._id, cdicts}]
+    if (heads.length) chain.unshift(...heads)
+    dag.chains.push(chain)
     return chain
 }
 
@@ -174,6 +152,6 @@ function parseCDicts(headstr, ddict) {
         }
         if (dict.flexes) cdicts.push(dict)
     }
-    dag.cache[ddict._id] = cdicts
+    /* dag.cache[ddict._id] = cdicts */
     return cdicts
 }
