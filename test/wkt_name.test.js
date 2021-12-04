@@ -1,5 +1,6 @@
 //
 
+const log = console.log
 import _ from 'lodash'
 import assert from 'assert'
 import fse from 'fs-extra'
@@ -7,12 +8,13 @@ import path from 'path'
 import { dirname } from 'path';
 
 import { anthrax } from '../index.js'
+import Debug from 'debug'
 
-let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-/* wordform = 'ἄβακος' */
+const d = Debug('test')
+
+/* let wordform = 'ἄβακος' */
 /* anthrax(wordform) */
 
-const log = console.log
 let skip = true
 let dict, formstr, restrict
 let numbers = ['sg', 'du', 'pl']
@@ -21,27 +23,24 @@ const text = fse.readFileSync('../morph-data/wkt_name.txt','utf8')
 const rows = text.split('\n')
 
 let res ={}
-if (wordform) anthrax(wordform)
-else testNames()
+let tests = testNames()
 
-async function testNames() {
-    log('_ROWS', rows.length)
-
+function testNames() {
+    let tests = []
     let rtests = []
     for  (let row of rows) {
         if (/MA/.test(row)) skip = false
         if (/END/.test(row)) skip = true
         if (skip) continue
         if (!row || row.slice(0,2) == '# ') continue
-        /* log('_R', row) */
         let descr = row.split(':')[0].trim()
         if (descr == 'dict') {
             res ={}
             let txt = row.split(':')[1].trim()
             dict = txt.split('•')[0].trim()
-            log('_D', dict)
+            d('_D', dict)
             formstr = txt.split('•')[1].trim()
-            if (!/genitive /.test(formstr)) dict = null // todo: ??? зачем ???
+            if (!/genitive /.test(formstr)) dict = null // todo: ??? wtf ???
             res =  {dict: dict, formstr: formstr, lines: []}
             parseGend(res)
         } else if (descr == 'restrict') {
@@ -53,11 +52,10 @@ async function testNames() {
             res.lines.push(line)
         }
         rtests.push(res)
-        log('_R', res)
+        d('_R', res)
     }
-    log('_RTS', rtests.length)
+    d('_RTS', rtests.length)
 
-    let tests = []
     for  (let rtest of rtests) {
         if (!rtest.lines) continue
         for  (let line of rtest.lines) {
@@ -78,20 +76,24 @@ async function testNames() {
             })
         }
     }
-    log('_TESTS', tests.length, tests[0])
-    tests = tests.slice(0, 20)
-    /* log('T', tests) */
-    /* tests = [] */
-
-    for await (let test of tests) {
-        let res = await anthrax(test.form)
-        log('_RES', res)
-    }
-
-
+    return tests
 }
 
+log('_TESTS', tests.length)
+tests = tests.slice(0, 2)
+/* tests = [] */
 
+describe("names test", function() {
+    for (let tst of tests) {
+        test('the data is peanut butter', async () => {
+            let res = await anthrax(tst.form)
+            /* log('_RES', res) */
+            /* const data = await fetchData(); */
+            expect(true).toBe(true);
+        });
+    }
+
+});
 
 function parseGend(res) {
     let head = res.formstr

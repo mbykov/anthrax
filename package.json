@@ -3,21 +3,33 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node run.js",
-    "names": "node test/wkt_name.js",
+    "names_": "cross-env NODE_ENV=test mocha -g $FILTER -c -R dot -b --timeout 5000 'test/wkt_name.test.js' --check-leaks --no-deprecation",
+    "names": "jest test/wkt_name.test.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/wkt_name.test.js",
     "simple": "node test/simple_test.js",
-    "test": "mocha test/simple_test.js"
+    "test_": "jest"
   },
+    "jest": {
+      "verbose": true,
+      "testPathIgnorePatterns": ["/node_modules/"],
+      "reporters": ["jest-progress-bar-reporter"]
+    },
   "author": "mbykov <m.bykov@gmail.com>",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
-    "debug": "^4.3.2",
     "fs-extra": "^10.0.0",
     "lodash": "^4.17.21",
     "mocha": "^9.1.3",
     "node-fetch": "^3.1.0",
     "orthos": "^0.7.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "debug": "^4.3.2",
+    "jest": "^27.4.3",
+    "jest-progress-bar-reporter": "^1.0.21"
   }
 }

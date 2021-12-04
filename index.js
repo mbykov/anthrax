@@ -9,14 +9,10 @@ import {oxia, comb, plain, strip} from 'orthos'
 
 import { accents, scrape, vowels, parseAug, vnTerms, aug2vow } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
-import { filter, simple } from './lib/filters.js'
+/* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
 
-// 1. вопросы: εἰσαγγέλλω - два одинаковых sgms, ἐξαγγέλλω - то же
-// 2. wkt_names - чистый stripped, плюс aug, но не как в vebs, не отдельным сегментом, а для доп. проверки
-// а здесь нужен level, и проверять name aug только в начале chain - жуть
-// или, для однообразия, вычислять aug-names как в verbs?
-// 3. почему я здесь получаю eimi, все варианты, если eimi есть в terms?
+// 1. вопросы: εἰσαγγέλλω
 
 let dag
 
