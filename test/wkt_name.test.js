@@ -23,11 +23,11 @@ const text = fse.readFileSync('../morph-data/wkt_name.txt','utf8')
 const rows = text.split('\n')
 
 let res ={}
-let tests = testNames()
+let wfs = testNames()
 
 function testNames() {
-    let tests = []
-    let rtests = []
+    let wfs = []
+    let rwfs = []
     for  (let row of rows) {
         if (/MA/.test(row)) skip = false
         if (/END/.test(row)) skip = true
@@ -51,12 +51,12 @@ function testNames() {
             let line = {descr: descr, forms: str.trim().split(', ')}
             res.lines.push(line)
         }
-        rtests.push(res)
+        rwfs.push(res)
         d('_R', res)
     }
-    d('_RTS', rtests.length)
+    d('_RTS', rwfs.length)
 
-    for  (let rtest of rtests) {
+    for  (let rtest of rwfs) {
         if (!rtest.lines) continue
         for  (let line of rtest.lines) {
             let kase = line.descr
@@ -71,25 +71,37 @@ function testNames() {
                     let numcase = [number, kase].join('.')
                     /* let test = [rtest.dict, form, rtest.gend, numcase] */
                     let test = {dict: rtest.dict, form, gend: rtest.gend, numcase}
-                    tests.push(test)
+                    wfs.push(test)
                 }
             })
         }
     }
-    return tests
+    return wfs
 }
 
-log('_TESTS', tests.length)
-tests = tests.slice(0, 2)
-/* tests = [] */
+log('_WFS', wfs.length)
+wfs = wfs.slice(0, 2)
+/* wfs = [] */
 
 describe("names test", function() {
-    for (let tst of tests) {
+    for (let wf of wfs) {
         test('the data is peanut butter', async () => {
-            let res = await anthrax(tst.form)
-            /* log('_RES', res) */
-            /* const data = await fetchData(); */
-            expect(true).toBe(true);
+            let chains = await anthrax(wf.form)
+            let chain = chains[0] // first chain
+            let dictseg = _.last(chain)
+            let cdicts = dictseg.cdicts
+            let names = cdicts.filter(dict=> dict.name)
+            log('_WF', wf)
+            log('_RES', names)
+            let gendnames = names.filter(dict=> dict.gends.includes(wf.gend))
+            expect(gendnames.length).toBeGreaterThan(0)
+            gendnames.forEach(dict => {
+                let fls = dict.fls
+                let numcases = dict.flexes.map(flex => { return flex.numcase })
+                /* log('_NK', numcases) */
+                expect(numcases.includes(wf.numcase)).toBe(true);
+            })
+
         });
     }
 
