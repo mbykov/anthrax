@@ -7,6 +7,8 @@ let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 
 const log = console.log
 
+let fls = process.argv[3]
+
 let chains = await anthrax(wordform)
 
 for (let chain of chains) {
@@ -24,7 +26,7 @@ for (let chain of chains) {
     /* log('_Z', chain[chain.length -1]) */
 }
 
-/* log('_R:', chains[0][0].cdicts[0].fls) */
+if (fls) log('_FLS:', chains[0][0].cdicts[0].fls)
 
 function compactNameFls(flexes) {
     return _.uniq(flexes.map(flex=> [flex.gend, flex.numcase].join('.')))

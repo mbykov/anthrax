@@ -137,7 +137,7 @@ function parseCDicts(headstr, ddict) {
             for (let flex of cflex.docs) {
                 let ok = false
                 let key = plain(flex.key.split('-')[0])
-                if (dict.name && dict.gends.includes(flex.gend) && flex.name && dict.key == flex.key) ok = true
+                if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
                 else if (headstr && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
                 if (ok) {
@@ -146,8 +146,8 @@ function parseCDicts(headstr, ddict) {
                 }
             }
         }
-        dict.fls = _.uniq(dict.fls) // TODO: ???? почему много в одном dict?
-        if (dict.fls.length) cdicts.push(dict)
+        /* dict.fls = _.uniq(dict.fls) // TODO: ???? почему много в одном dict? */
+        if (dict.fls && dict.fls.length) cdicts.push(dict)
     }
     /* dag.cache[ddict._id] = cdicts */
     return cdicts
