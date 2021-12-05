@@ -11,7 +11,6 @@ import { anthrax } from '../index.js'
 import Debug from 'debug'
 
 const d = Debug('test')
-
 /* let wordform = 'ἄβακος' */
 /* anthrax(wordform) */
 
@@ -22,6 +21,7 @@ let numbers = ['sg', 'du', 'pl']
 const text = fse.readFileSync('../morph-data/wkt_name.txt','utf8')
 const rows = text.split('\n')
 
+let cache =  new Map();
 let res ={}
 let wfs = testNames()
 
@@ -35,7 +35,6 @@ function testNames() {
         if (!row || row.slice(0,2) == '# ') continue
         let descr = row.split(':')[0].trim()
         if (descr == 'dict') {
-            res ={}
             let txt = row.split(':')[1].trim()
             dict = txt.split('•')[0].trim()
             d('_D', dict)
@@ -43,6 +42,7 @@ function testNames() {
             if (!/genitive /.test(formstr)) dict = null // todo: ??? wtf ???
             res =  {dict: dict, formstr: formstr, lines: []}
             parseGend(res)
+            rwfs.push(res)
         } else if (descr == 'restrict') {
             res.restrict =  row.split(':')[1].trim()
         } else if (['nom', 'gen', 'dat', 'acc', 'voc'].includes(descr)) {
@@ -51,10 +51,8 @@ function testNames() {
             let line = {descr: descr, forms: str.trim().split(', ')}
             res.lines.push(line)
         }
-        rwfs.push(res)
-        d('_R', res)
     }
-    d('_RTS', rwfs.length)
+    d('_RTS', rwfs)
 
     for  (let rtest of rwfs) {
         if (!rtest.lines) continue
@@ -79,27 +77,33 @@ function testNames() {
     return wfs
 }
 
-log('_WFS', wfs.length)
-wfs = wfs.slice(0, 2)
-/* wfs = [] */
+/* log('_WFS', wfs.length) */
+wfs = wfs.slice(0, 20)
+
+for (let wf of wfs) {
+    if (!cache[wf.form]) cache[wf.form] = []
+    cache[wf.form].push([wf.gend, wf.numcase].join('.'))
+}
+
+/* log('_CACHE', cache) */
+wfs = wfs.slice(0, 3)
 
 describe("names test", function() {
     for (let wf of wfs) {
-        test('the data is peanut butter', async () => {
+        test(`wf: ${wf.dict} ${wf.form}`, async () => {
             let chains = await anthrax(wf.form)
             let chain = chains[0] // first chain
             let dictseg = _.last(chain)
             let cdicts = dictseg.cdicts
             let names = cdicts.filter(dict=> dict.name)
-            log('_WF', wf)
-            log('_RES', names)
+            /* log('_WF', wf) */
+            /* log('_RES', names) */
             let gendnames = names.filter(dict=> dict.gends.includes(wf.gend))
             expect(gendnames.length).toBeGreaterThan(0)
             gendnames.forEach(dict => {
-                let fls = dict.fls
-                let numcases = dict.flexes.map(flex => { return flex.numcase })
-                /* log('_NK', numcases) */
-                expect(numcases.includes(wf.numcase)).toBe(true);
+                let fls = dict.fls.map(flex => { return [flex.gend, flex.numcase].join('.') })
+                /* log('_CACHE', wf.dict, fls, cache[wf.form]) */
+                expect(fls).toEqual(cache[wf.form]);
             })
 
         });

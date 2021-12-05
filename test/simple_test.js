@@ -23,7 +23,7 @@ let tests = {
     '': [''],
 }
 
-/* simpleTest(tests) */
+simpleTest(tests)
 
 async function simpleTest(tests) {
     for  (let wf in tests) {
@@ -40,8 +40,8 @@ async function simpleTest(tests) {
     }
 }
 
-describe("integration test", function() {
-    it("should be able to add and complete TODOs", function() {
-        assert.equal(true, true)
-    });
-});
+/* describe("integration test", function() {
+ *     it("should be able to add and complete TODOs", function() {
+ *         assert.equal(true, true)
+ *     });
+ * }); */

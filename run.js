@@ -13,8 +13,9 @@ for (let chain of chains) {
     log('_chain:', chain)
     for (let seg of chain) {
         /* log('_seg:', seg) */
-        if (!seg.dicts) continue
-        for (let dict of seg.dicts) {
+        if (!seg.cdicts) continue
+        for (let dict of seg.cdicts) {
+            continue
             log('_dict:', dict.rdict, '_plain:', dict.plain)
             if (dict.flexes) log('_flexes:', dict.flexes.length)
             /* if (dict.flexes) log('_cmpfls:', compactNameFls(dict.flexes)) */
@@ -23,7 +24,7 @@ for (let chain of chains) {
     /* log('_Z', chain[chain.length -1]) */
 }
 
-/* log('_R:', chains[1][0].dicts) */
+/* log('_R:', chains[0][0].cdicts[0].fls) */
 
 function compactNameFls(flexes) {
     return _.uniq(flexes.map(flex=> [flex.gend, flex.numcase].join('.')))

@@ -1,15 +1,15 @@
 {
   "name": "anthrax",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node run.js",
     "names_": "cross-env NODE_ENV=test mocha -g $FILTER -c -R dot -b --timeout 5000 'test/wkt_name.test.js' --check-leaks --no-deprecation",
-    "names": "jest test/wkt_name.test.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/wkt_name.test.js",
-    "simple": "node test/simple_test.js",
+    "names": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/wkt_name.test.js  --noStackTrace",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/wkt_name.test.js  --noStackTrace",
+    "simple": "mocha test/simple_test.js",
     "test_": "jest"
   },
     "jest": {
