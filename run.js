@@ -27,7 +27,7 @@ for (let chain of chains) {
 }
 
 if (fls) log('_FLS:', chains[0][0].cdicts[0].fls)
-if (fls) log('_FLS:', JSON.stringify(chains[0][0].cdicts[0].fls[0]))
+/* if (fls) log('_FLS:', JSON.stringify(chains[0][0].cdicts[0].fls[0])) */
 
 function compactNameFls(flexes) {
     return _.uniq(flexes.map(flex=> [flex.gend, flex.numcase].join('.')))

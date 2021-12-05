@@ -79,14 +79,14 @@ function testNames() {
 
 /* log('_WFS', wfs.length) */
 wfs = wfs.slice(0, 20)
+/* wfs = wfs.slice(0, 3) */
 
 for (let wf of wfs) {
     if (!cache[wf.form]) cache[wf.form] = []
     cache[wf.form].push([wf.gend, wf.numcase].join('.'))
 }
 
-/* log('_CACHE', cache) */
-wfs = wfs.slice(0, 3)
+log('_CACHE', cache)
 
 describe("names test", function() {
     for (let wf of wfs) {
