@@ -18,7 +18,7 @@ let skip = true
 let dict, formstr, restrict
 let numbers = ['sg', 'du', 'pl']
 
-const text = fse.readFileSync('../morph-data/wkt_name.txt','utf8')
+const text = fse.readFileSync('./test/morph-data/wkt_name.txt','utf8')
 const rows = text.split('\n')
 
 let cache =  new Map();
@@ -30,7 +30,7 @@ function testNames() {
     let rwfs = []
     for  (let row of rows) {
         if (/MA/.test(row)) skip = false
-        if (/END/.test(row)) skip = true
+        /* if (/END/.test(row)) skip = true */
         if (skip) continue
         if (!row || row.slice(0,2) == '# ') continue
         let descr = row.split(':')[0].trim()
@@ -52,7 +52,8 @@ function testNames() {
             res.lines.push(line)
         }
     }
-    d('_RTS', rwfs)
+    log('_RTS', rwfs.length)
+    rwfs = rwfs.slice(0, 50)
 
     for  (let rtest of rwfs) {
         if (!rtest.lines) continue
@@ -77,16 +78,15 @@ function testNames() {
     return wfs
 }
 
-/* log('_WFS', wfs.length) */
-wfs = wfs.slice(0, 20)
+log('_WFS', wfs.length)
+/* wfs = wfs.slice(0, 40) */
 /* wfs = wfs.slice(0, 3) */
 
 for (let wf of wfs) {
     if (!cache[wf.form]) cache[wf.form] = []
     cache[wf.form].push([wf.gend, wf.numcase].join('.'))
 }
-
-log('_CACHE', cache)
+/* log('_CACHE', cache) */
 
 describe("names test", function() {
     for (let wf of wfs) {
