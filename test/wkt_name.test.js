@@ -80,36 +80,41 @@ function testNames() {
 
 log('_WFS', wfs.length)
 /* wfs = wfs.slice(0, 40) */
-/* wfs = wfs.slice(0, 3) */
+wfs = wfs.slice(0, 3)
+log('_WFS', wfs)
 
 for (let wf of wfs) {
     if (!cache[wf.form]) cache[wf.form] = []
     cache[wf.form].push([wf.gend, wf.numcase].join('.'))
 }
+
 /* log('_CACHE', cache) */
 
-describe("names test", function() {
-    for (let wf of wfs) {
-        test(`wf: ${wf.dict} ${wf.form}`, async () => {
-            let chains = await anthrax(wf.form)
-            let chain = chains[0] // first chain
-            let dictseg = _.last(chain)
-            let cdicts = dictseg.cdicts
-            let names = cdicts.filter(dict=> dict.name)
-            /* log('_WF', wf) */
-            /* log('_RES', names) */
-            let gendnames = names.filter(dict=> dict.gends.includes(wf.gend))
-            expect(gendnames.length).toBeGreaterThan(0)
-            gendnames.forEach(dict => {
-                let fls = dict.fls.map(flex => { return [flex.gend, flex.numcase].join('.') })
-                /* log('_CACHE', wf.dict, fls, cache[wf.form]) */
-                expect(fls).toEqual(cache[wf.form]);
-            })
 
-        });
-    }
+describe.each(wfs)('test %s', (a, expected) => {
+    test(`returns ${expected}`, () => {
+        log('_A', a)
+        expect(a).toBe(expected);
+    });
+})
 
-});
+/* describe("names test", function() {
+ *     for (let wf of wfs) {
+ *         test(`wf: ${wf.dict} ${wf.form}`, async () => {
+ *             let chains = await anthrax(wf.form)
+ *             let chain = chains[0] // first chain
+ *             let dictseg = _.last(chain)
+ *             let cdicts = dictseg.cdicts
+ *             let names = cdicts.filter(dict=> dict.name)
+ *             let gendnames = names.filter(dict=> dict.gends.includes(wf.gend))
+ *             expect(gendnames.length).toBeGreaterThan(0)
+ *             gendnames.forEach(dict => {
+ *                 let fls = dict.fls.map(flex => { return [flex.gend, flex.numcase].join('.') })
+ *                 expect(fls).toEqual(cache[wf.form]);
+ *             })
+ *         });
+ *     }
+ * }); */
 
 function parseGend(res) {
     let head = res.formstr
@@ -122,3 +127,21 @@ function parseGend(res) {
     if (head.split(' pl ').length > 1) res.pl = true
     res.gend = gend
 }
+
+/* describe("names test", function() {
+ *     for (let wf of wfs) {
+ *         test(`wf: ${wf.dict} ${wf.form}`, async () => {
+ *             let chains = await anthrax(wf.form)
+ *             let chain = chains[0] // first chain
+ *             let dictseg = _.last(chain)
+ *             let cdicts = dictseg.cdicts
+ *             let names = cdicts.filter(dict=> dict.name)
+ *             let gendnames = names.filter(dict=> dict.gends.includes(wf.gend))
+ *             expect(gendnames.length).toBeGreaterThan(0)
+ *             gendnames.forEach(dict => {
+ *                 let fls = dict.fls.map(flex => { return [flex.gend, flex.numcase].join('.') })
+ *                 expect(fls).toEqual(cache[wf.form]);
+ *             })
+ *         });
+ *     }
+ * }); */

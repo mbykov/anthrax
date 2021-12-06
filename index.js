@@ -137,7 +137,8 @@ function parseCDicts(headstr, ddict) {
             for (let flex of cflex.docs) {
                 let ok = false
                 let key = plain(flex.key.split('-')[0])
-                if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
+                if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
+                else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
                 else if (headstr && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
                 if (ok) {

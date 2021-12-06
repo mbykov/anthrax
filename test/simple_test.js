@@ -23,8 +23,29 @@ let tests = {
     '': [''],
 }
 
-simpleTest(tests)
+async function testWF(wf, exp) {
+    it('returns foo', async () => {
+        let result = await anthrax(wf)
+        assert.equal(result.length, exp.length)
+        exp.forEach((plain, idx)=> {
+            if (!plain) return
+            let exstr = result[idx].map(chain=> chain.plain).join('-')
+            assert.equal(plain, exstr)
+        })
+    })
+}
 
+describe('#getFoo', () => {
+    for (let test in tests) {
+        if (!test) continue
+        let expected = tests[test]
+        log('_R', expected)
+        testWF(test, expected)
+    }
+})
+
+
+/* simpleTest(tests) */
 async function simpleTest(tests) {
     for  (let wf in tests) {
         if (!wf) continue
@@ -39,9 +60,3 @@ async function simpleTest(tests) {
         })
     }
 }
-
-/* describe("integration test", function() {
- *     it("should be able to add and complete TODOs", function() {
- *         assert.equal(true, true)
- *     });
- * }); */
