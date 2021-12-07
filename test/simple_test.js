@@ -45,17 +45,17 @@ describe('simple test', () => {
 
 
 /* simpleTest(tests) */
-async function simpleTest(tests) {
-    for  (let wf in tests) {
-        if (!wf) continue
-        let exp = tests[wf]
-        let res = await anthrax(wf)
-        assert.equal(exp.length, res.length)
-        exp.forEach((plain, idx)=> {
-            if (!plain) return
-            log('_test:', wf, '=', plain)
-            let exstr = res[idx].map(chain=> chain.plain).join('-')
-            assert.equal(plain, exstr)
-        })
-    }
-}
+/* async function simpleTest(tests) {
+ *     for  (let wf in tests) {
+ *         if (!wf) continue
+ *         let exp = tests[wf]
+ *         let res = await anthrax(wf)
+ *         assert.equal(exp.length, res.length)
+ *         exp.forEach((plain, idx)=> {
+ *             if (!plain) return
+ *             log('_test:', wf, '=', plain)
+ *             let exstr = res[idx].map(chain=> chain.plain).join('-')
+ *             assert.equal(plain, exstr)
+ *         })
+ *     }
+ * } */
