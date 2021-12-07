@@ -24,7 +24,7 @@ let tests = {
 }
 
 async function testWF(wf, exp) {
-    it('returns foo', async () => {
+    it(`wf ${wf} - ${wf.form}`, async () => {
         let result = await anthrax(wf)
         assert.equal(result.length, exp.length)
         exp.forEach((plain, idx)=> {
@@ -35,7 +35,7 @@ async function testWF(wf, exp) {
     })
 }
 
-describe('#getFoo', () => {
+describe('simple test', () => {
     for (let test in tests) {
         if (!test) continue
         let expected = tests[test]

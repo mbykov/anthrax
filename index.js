@@ -61,9 +61,9 @@ function addHead(heads, ddict) {
     let head
     let prefixes = ddict.docs.filter(dict=> dict.pref)
     if (prefixes.length) {
-        head = {plain: ddict._id, dicts: prefixes}
+        head = {plain: ddict._id, cdicts: prefixes, pref: true}
     } else if (ddict._id.length > 1 && ddict.docs.length) {
-        head = {plain: ddict._id, dicts: ddict.docs}
+        head = {plain: ddict._id, cdicts: ddict.docs}
     }
     if (head) heads.push(head)
 }
@@ -91,7 +91,9 @@ async function dagging(oldheads, tail) {
         }
 
         if (!nexttail) continue
-        /* await dagging(heads, nexttail) */
+        await dagging(heads, nexttail)
+
+        /* if (!heads.length || heads[0].pref) continue // пока что отключаю aug после префиксов */
 
         let pdict = plain(ddict._id)
         let vowel = nexttail[0]

@@ -1,0 +1,246 @@
+# https://dcc.dickinson.edu/grammar/goodell/composition
+
+# In a few words the first member is a noun in some case-form.
+
+νεώσοικος = ναῦς + οἶκος - ship-houses
+
+ναυσίπορος = ναῦς + πορος - passable by ships
+
+ὁδοιπόρος = ὁδός + πόρος - traveler (ὁδοι- locative, § 228)
+
+ὀρειβάτης = ὄρος + βάτης - walking on the mountain
+
+Ἑλλήσ-ποντος = Ἕλλης + πόντος - Helle's sea, Hellespont
+
+# verbs
+
+συναναβαίνω = σύν + ἀνά + βαίνω - go up with
+
+ὑποπτεύω = ὕπ + ὀπτός - suspect
+
+ναυμαχέω = ναῦς + μάχομαι - fight by sea
+
+ναυ-μάχος = ναῦς + μάχομαι - fight by sea
+
+εὐτυχέω = εὗ + τύχη
+
+εὐτυχής  = εὗ + τύχη
+
+# Compound Nouns and Adjectives
+
+ἄν-οδος = ἀνά + ὁδός - way or march up
+
+ἀπό-στασις = ἀπό + στάσις - standing off, revolt
+
+ἐπι-βουλή = ἐπί + βουλή - a plan against
+
+σύμ-πᾱς = σύν +πᾶς - all together
+
+συν-αίτιος = σύν +αἴτιος - jointly causing
+
+# nouns derived from compound verbs and adjectives
+
+σύνθημα = συν + τίθημι - watchword
+
+προθῡμίᾱ = πρό +θῡμος - eagerness
+
+ἀποικίᾱ = ἄπ +οικος - colony
+
+# adverbs πᾶν, εὖ, ἀ(ν),  δυσ ... + -τος
+
+πάνσοφος = πάν + σοφός - exceedingly wise
+
+παν-τλήμων = πάν + τλήμων -  all-enduring, wretched
+
+εὐ-δόκιμος = εὖ + δόκιμος - well-approved, glorious
+
+ἀ-δόκιμος = ἀ + δόκιμος - un-approved, in-glorious
+
+ἀ-δύνατος = ἀ + δύνατος - un-able, im-possible
+
+δυσ-τάλᾱς = δυσ + τάλᾱς - in hard misery
+
+εὔ-τακτος = εὖ + τακτός - well-arranged
+
+ἄ-τακτος = ἀ + τακτός = un-arranged
+
+δυσ-πόρευτος = δυσ + πορευτός - hardly passable
+
+# The second member is thought of as object
+
+ἀρχιτέκτων = ἄρχω + τέκτων - master-builder
+
+φερέγγυος = φέρω + ἐγγύη - bringing surety, capable
+
+λιποταξίᾱ = λείπω (λιπ-) + τάξις = desertion (leaving the ranks)
+
+λῡσιτελής = λῡ́ω + σι + τέλος - paying charges, profitable
+
+πείθαρχος = πείθομαι + ἀρχή - obedient to command
+
+μῑσόδημος = μῑσέω + δῆμος - hating the people
+
+φιλάνθρωπος = φιλέω + ἄνθρωπος
+
+# 443
+
+φῡ́λαρχος = φῡλή + ἀρχή - tribe-leader
+
+τριήραρχος = τριήρης + ἀρχή - captain of a trireme
+
+στρατ-ηγός = στρατός + ἄγω - army-leader
+
+ῥᾱ́ͅ-θῡμος = ῥᾱ́ͅ-διος + θῦμός = of easy spirit, lazy
+
+# ο- stems
+
+λυρ-ο-ποιός = λύρᾱ + ποιός - lyre-maker
+
+σκευ-ο-φόρος = σκεῦος + φόρος - baggage carrying
+
+μητρ-ό-πολις = μήτηρ + πόλις - mother-city
+
+# Contractions may occur
+
+κακοῦργος = κακός + ἔργον  - evil-doer
+
+παν-οῦργος = παν + ἔργον - doing anything and everything
+
+τῑμωρός = τιμάω + οὖρος - upholding honor
+
+#
+
+ἀ-κόλουθος = ἀ + κέλευθος - accompanying, following
+
+ἅ-θροος = ἀ + θρόος - thronging, together
+
+# a. Dependent Compounds:
+
+στρατ-ηγός = στρατός + ἄγω - leader of an army
+
+λοχ-ᾱγός = λόχος + ᾱγός-ἄγω -leader of a company
+
+λογο-γράφος = λόγος + γράφος-γράφω - speech-writer
+
+ναυ-μάχος = ναῦς + μάχος-μάχομαι - fighting with ships
+
+στρατό-πεδον = στρατός + πέδον - camp
+
+λογο-ποιός = λόγος + ποιῶν - speech-maker, inventor of tales
+
+χειρ-ο-ποίητος = χείρ + ποιητός - handmade
+
+ὑδρ-ο-φόρος = ὕδωρ + φόρος-φέρω - watercarrier
+
+αὐτό-ματος = αὐτός + [root μα-] - self-impelled ???
+
+τριήρης = τρεῖς + ἀραρίσκω - triply-fitted
+
+# b. Descriptive Compounds
+
+μόν-αρχος = μόνος+ ἀρχός - sole ruler
+
+ἀκρ-ό-πολις = ἄκρᾱ πόλις - upper city, citadel
+
+ψευδ-ο-μαρτυρίᾱ = ψευδὴς μαρτυρίᾱ - false witness
+
+ἡμί-ονος = ἡμι- + ὄνος - half-ass, mule
+
+ἡμί-βρωτος = ἡμι- + βιβρώσκω - half-eaten
+
+εὔ-δηλος = εὖ + δῆλος - quite clear
+
+περί-εργος = περί + ἔργον - overactive
+
+# 447. Possessive Compounds
+
+τρί-πους = τρί + πούς having three feet, three-footed
+
+πολυ-άνθρωπος = πολύ + ἄνθρωπος having many men, populous
+
+δύσ-πορος = δύσ + πόρος - having a hard passage
+
+εὔνους = εὔ + νοῦς - well-minded, kindly
+
+εὐ-τυχής = εὔ + τυχής having good fortune, fortunate
+
+ὁμο-τράπεζος = ὁμός + τράπεζα - having the same table, table-companion
+
+ὁμό-λογος = ὁμός + λόγος - having common speech
+
+# adverb ὁμοῦ, adjective ὅμοιος
+
+θεο-ειδης = θεός + εἶδος
+
+ἄ-πορος = ἄ + πόρος not having a passage
+
+ἄ-τῑμος = ἄ + τιμή - without hοnor, disfranchised
+
+# b. Prepositions often have an adjectival force
+
+πρό-θῡμος = πρό + θυμός - having a forward spirit, eager
+
+ἀμφί-θυρος = ἀμφί + θυρος-θύρᾱ having a door on both sides, double-doored
+
+μέτ-οικος = μέτ + οἶκος having oneʼs dwelling with, resident alien
+
+ἔν-θεος = ἔν + θεός - having a god within, inspired
+
+ἔφεδρος = ἔφ + ἕδος - having a by-seat (one who has drawn a ''bye") ???
+
+πάρ-εδρος = πάρ + ἕδος - having a seat beside, assessor
+
+# 448. Prepositional-Phrase Compounds
+
+παρά-δοξος = παρὰ + δόξαν - contrary to opinion, unexpected
+
+παρά-νομος = παρὰ + νόμος - against the law, illegal
+
+παρα-θαλάττιος = παρὰ + θάλασσα-θάλαττα - beside the sea
+
+ἔμ-πορος = ἐν + πόρος - on a journey, traveler, importer
+
+ἐν-θῡ́μιος = ἐν + θυμός - in the heart or mind 	ἐν θῡμῷ
+
+ἐφ-όδιος = ἐφʼ + ὁδῷ-ὁδός - for a journey
+
+ἐφ-ήμερος = ἐφʼ + ἡμέρᾱ - lasting for a day
+
+ἐπί-χειρον = ἐπὶ + χείρ - something on the hand, wages
+
+προ-άστιος = πρὸ + ἄστυ - suburban
+
+ἐμ-μελής = ἐν + μέλος - in tune
+
+πλημ-μελής = πλήν + μέλος - out of tune
+
+ἔκ-τοπος = ἐκ + τόπος - out of place, strange
+
+ἀπό-δημος = ἀπὸ + δῆμος - out of the country
+
+ὑπ-εύθυνος = ὑπʼ + εὔθυνος - subject to accounting
+
+# 449 verbal adjective governing a noun as the second member
+
+ἀξιό-λογος = ἄξιος + λόγος - worth mentioning
+
+ἀξιό-χρεωs = ἄξιος + χρέος-χρεώ - good for the obligation, sufficient
+
+ἰσό-θεος = ἴσος + θεός - equal to a god, godlike
+
+φιλο-κίνδῡνος = φίλος + κίνδυνος - fond of danger
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
