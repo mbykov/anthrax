@@ -29,7 +29,7 @@ for (let chain of chains) {
 if (fls) log('_FLS:', chains[0][0].cdicts[0].fls)
 /* if (fls) log('_FLS:', JSON.stringify(chains[0][0].cdicts[0].fls[0])) */
 
-/* log('_DICTS:', chains[1][0].cdicts) */
+/* log('_DICTS:', chains[2][1].cdicts) */
 
 
 function compactNameFls(flexes) {

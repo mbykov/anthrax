@@ -84,8 +84,10 @@ async function dagging(oldheads, tail) {
             if (!chain) addHead(heads, ddict)
         } else {
             g('__ELSE', headstr, ddict._id)
-            let vowel = heads.slice(-1)[0].plain
-            ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
+            let prefix = heads.slice(-1)[0].pref ? heads.slice(-1)[0].plain : null
+            let vowel = heads.slice(-1)[0].vowel ? heads.slice(-1)[0].plain : null
+            if (!prefix) ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
+            /* if (!vowel && headstr == 'δια' && ddict._id == 'γγελ') log('__DIA', headstr, '_vow:', vowel, ddict.docs.length) */
             let chain = dict2flex(heads, ddict)
             if (!chain) addHead(heads, ddict)
         }
@@ -93,7 +95,7 @@ async function dagging(oldheads, tail) {
         if (!nexttail) continue
         await dagging(heads, nexttail)
 
-        /* if (!heads.length || heads[0].pref) continue // пока что отключаю aug после префиксов */
+        if (!heads.length || heads[0].pref) continue // пока что отключаю aug после префиксов
 
         let pdict = plain(ddict._id)
         let vowel = nexttail[0]
