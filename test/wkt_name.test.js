@@ -53,7 +53,7 @@ function testNames() {
         }
     }
     log('_RTS', rwfs.length)
-    rwfs = rwfs.slice(0, 3)
+    rwfs = rwfs.slice(0, 50)
 
     for  (let rtest of rwfs) {
         if (!rtest.lines) continue
@@ -85,7 +85,7 @@ for (let wf of wfs) {
     cache[wf.form].push([wf.gend, wf.numcase].join('.'))
 }
 
-log('_CACHE', cache)
+/* log('_CACHE', cache) */
 
 async function testWF(wf, exp) {
     it(`wf: ${wf} `, async () => {
