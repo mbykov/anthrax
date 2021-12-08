@@ -33,6 +33,7 @@ function testNames() {
         /* if (/END/.test(row)) skip = true */
         if (skip) continue
         if (!row || row.slice(0,2) == '# ') continue
+        row = row.split('#')[0]
         let descr = row.split(':')[0].trim()
         if (descr == 'dict') {
             let txt = row.split(':')[1].trim()
@@ -81,26 +82,28 @@ function testNames() {
 log('_WFS', wfs.length)
 
 for (let wf of wfs) {
-    if (!cache[wf.form]) cache[wf.form] = []
-    cache[wf.form].push([wf.gend, wf.numcase].join('.'))
+    let wfkey = [wf.dict, wf.form].join('-')
+    if (!cache[wfkey]) cache[wfkey] = []
+    cache[wfkey].push([wf.gend, wf.numcase].join('.'))
 }
 
 /* log('_CACHE', cache) */
 
 async function testWF(wf, exp) {
-    it(`wf: ${wf} `, async () => {
-        let chains = await anthrax(wf)
+    it(`wf: ${wf.dict} - ${wf.form} `, async () => {
+        let chains = await anthrax(wf.form)
         let chain = chains[0][0] // names
-        let dict = chain.cdicts.find(dict=> dict.name)
+        let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend))
         let fls = compactNameFls(dict.fls)
         assert.deepEqual(fls, exp)
     })
 }
 
-describe('simple test', () => {
+describe('test names:', () => {
     for (let wf of wfs) {
-        let expected = cache[wf.form]
-        testWF(wf.form, expected)
+        let wfkey = [wf.dict, wf.form].join('-')
+        let expected = cache[wfkey]
+        testWF(wf, expected)
     }
 })
 
