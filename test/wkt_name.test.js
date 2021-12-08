@@ -126,7 +126,7 @@ function compactNamesFls(dicts) {
     let fls = dicts.map(dict=> {
         return dict.fls.map(flex=> [flex.gend, flex.numcase].join('.'))
     })
-    return _.flatten(fls).sort()
+    return _.uniq(_.flatten(fls).sort())
 }
 
 function parseGend(res) {
