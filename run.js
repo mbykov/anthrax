@@ -29,11 +29,13 @@ for (let chain of chains) {
 
 if (fls) {
     let chain = chains[0][0]
+    /* log('_CHAIN:', chain) */
     let dicts = chain.cdicts.filter(dict=> dict.name && dict.gends)
     let fls = compactNamesFls(dicts)
     log('_FLS:', chain.cdicts[0].fls)
     log('_FLS:', fls)
     log('_DICTS:', dicts)
+    /* log('_CDICTS:', chain.cdicts) */
 }
 
 

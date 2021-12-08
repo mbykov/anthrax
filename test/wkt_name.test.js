@@ -6,6 +6,7 @@ import assert from 'assert'
 import fse from 'fs-extra'
 import path from 'path'
 import { dirname } from 'path';
+import {oxia, comb, plain, strip} from 'orthos'
 
 import { anthrax } from '../index.js'
 import Debug from 'debug'
@@ -39,6 +40,7 @@ function testNames() {
             let txt = row.split(':')[1].trim()
             dict = txt.split('•')[0].trim()
             d('_D', dict)
+            dict = comb(dict)
             formstr = txt.split('•')[1].trim()
             if (!/genitive /.test(formstr)) dict = null // todo: ??? wtf ???
             res =  {dict: dict, formstr: formstr, lines: []}
@@ -95,9 +97,9 @@ for (let wf of wfs) {
 async function testWF(wf, exp) {
     it(`wf: ${wf.dict} - ${wf.form} - ${wf.gend}`, async () => {
         let chains = await anthrax(wf.form)
-        let chain = chains[0][0] // names
+        let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names
         /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
-        let dicts = chain.cdicts.filter(dict=> dict.name && dict.gends)
+        let dicts = _.last(chain).cdicts.filter(dict=> dict.name && dict.gends)
         let fls = compactNamesFls(dicts)
         assert.deepEqual(fls, exp)
     })
