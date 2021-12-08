@@ -611,7 +611,6 @@ dat: ἀδάμαντι, ἀδαμάντοιν, ἀδάμασι-ἀδάμασιν
 acc: ἀδάμαντα, ἀδάμαντε, ἀδάμαντας
 voc: ἀδάμας, ἀδάμαντε, ἀδάμαντες
 
-MA
 # ----------------------------------
 dict: ἀδελφή • (adelphḗ) f (genitive ἀδελφῆς); first declension
 
@@ -703,7 +702,6 @@ dat: Ἁδριανουπολίτῃ, Ἁδριανουπολίταιν, Ἁδρ�
 acc: Ἁδριανουπολίτην, Ἁδριανουπολίτα, Ἁδριανουπολίτας
 voc: Ἁδριανουπολῖτα, Ἁδριανουπολίτα, Ἁδριανουπολίται
 
-XXX
 # ----------------------------------
 dict: Ἀδρυάς • (Ādruás) f (genitive Ἀδρυάδος); third declension
 
@@ -10028,6 +10026,7 @@ dat: δώματι, δωμάτοιν, δώμασι-δώμασιν
 acc: δῶμα, δώματε, δώματα
 voc: δῶμα, δώματε, δώματα
 
+MA
 # ----------------------------------
 dict: δωράκινον • (dōrákinon) n pl (genitive δωρακίνου); second declension
 
@@ -37804,7 +37803,7 @@ dict: φρενῖτις • (phrenîtis)
     inflammation of the brain
 
 # ----------------------------------
-dict: φρήν • (phrḗn) f (genitive φρενός); third declension
+dict: φρήν • (phrḗn) m f (genitive φρενός); third declension
 
     (often in the plural) The midriff, stomach and lower chest or breast
     The seat of emotions, heart; seat of bodily appetites such as hunger

@@ -26,11 +26,24 @@ for (let chain of chains) {
     /* log('_Z', chain[chain.length -1]) */
 }
 
-if (fls) log('_FLS:', chains[0][0].cdicts[0].fls)
-/* if (fls) log('_FLS:', JSON.stringify(chains[0][0].cdicts[0].fls[0])) */
 
-log('_DICTS:', chains[0][0].cdicts)
+if (fls) {
+    let chain = chains[0][0]
+    let dicts = chain.cdicts.filter(dict=> dict.name && dict.gends)
+    let fls = compactNamesFls(dicts)
+    log('_FLS:', chain.cdicts[0].fls)
+    log('_FLS:', fls)
+    log('_DICTS:', dicts)
+}
 
+
+
+function compactNamesFls(dicts) {
+    let fls = dicts.map(dict=> {
+        return dict.fls.map(flex=> [flex.gend, flex.numcase].join('.'))
+    })
+    return _.flatten(fls)
+}
 
 function compactNameFls(flexes) {
     return _.uniq(flexes.map(flex=> [flex.gend, flex.numcase].join('.')))

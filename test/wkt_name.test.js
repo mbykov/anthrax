@@ -69,9 +69,10 @@ function testNames() {
                     if (rtest.pl) number = 'pl'
                     if (rtest.restrict) number = rtest.restrict.split(' ')[idx]
                     let numcase = [number, kase].join('.')
-                    /* let test = [rtest.dict, form, rtest.gend, numcase] */
-                    let test = {dict: rtest.dict, form, gend: rtest.gend, numcase}
-                    wfs.push(test)
+                    rtest.gend.split(' ').forEach(gend=> {
+                        let test = {dict: rtest.dict, form, gend: gend, numcase}
+                        wfs.push(test)
+                    })
                 }
             })
         }
@@ -79,7 +80,9 @@ function testNames() {
     return wfs
 }
 
-log('_WFS', wfs.length)
+
+/* wfs = wfs.slice(0, 20) */
+/* log('_WFS', wfs) */
 
 for (let wf of wfs) {
     let wfkey = [wf.dict, wf.form].join('-')
@@ -90,11 +93,12 @@ for (let wf of wfs) {
 /* log('_CACHE', cache) */
 
 async function testWF(wf, exp) {
-    it(`wf: ${wf.dict} - ${wf.form} `, async () => {
+    it(`wf: ${wf.dict} - ${wf.form} - ${wf.gend}`, async () => {
         let chains = await anthrax(wf.form)
         let chain = chains[0][0] // names
-        let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend))
-        let fls = compactNameFls(dict.fls)
+        /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
+        let dicts = chain.cdicts.filter(dict=> dict.name && dict.gends)
+        let fls = compactNamesFls(dicts)
         assert.deepEqual(fls, exp)
     })
 }
@@ -112,14 +116,21 @@ function compactNameFls(flexes) {
     return _.uniq(flexes.map(flex=> [flex.gend, flex.numcase].join('.')))
 }
 
+function compactNamesFls(dicts) {
+    let fls = dicts.map(dict=> {
+        return dict.fls.map(flex=> [flex.gend, flex.numcase].join('.'))
+    })
+    return _.flatten(fls)
+}
+
 function parseGend(res) {
     let head = res.formstr
     if (!head) return
     let gend
-    if (head.split(' m ').length > 1) gend = 'masc'
+    if (head.split(' m f ').length > 1) gend = 'masc fem'
+    else if (head.split(' m ').length > 1) gend = 'masc'
     else if (head.split(' f ').length > 1) gend = 'fem'
     else if (head.split(' n ').length > 1) gend = 'neut'
-    else if (head.split(' m f ').length > 1) gend = 'masc fem'
     if (head.split(' pl ').length > 1) res.pl = true
     res.gend = gend
 }
