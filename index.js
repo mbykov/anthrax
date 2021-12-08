@@ -92,6 +92,8 @@ async function dagging(oldheads, tail) {
             if (!chain) addHead(heads, ddict)
         }
 
+        if (dag.chains.length) continue // todo: тут надо разобраться - вызывать по ясному требованию, клику?
+
         if (!nexttail) continue
         await dagging(heads, nexttail)
 

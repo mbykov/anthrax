@@ -87,7 +87,9 @@ function testNames() {
 /* log('_WFS', wfs) */
 
 for (let wf of wfs) {
-    let wfkey = [wf.dict, wf.form].join('-')
+    let wfplain = plain(wf.dict)
+    let wfkey = [wfplain, wf.form].join('-') // plain.form нельзя, ἕδρᾳ - отвалится йота
+    /* let wfkey = [plain(wf.dict), plain(wf.form)].join('-') */
     if (!cache[wfkey]) cache[wfkey] = []
     cache[wfkey].push([wf.gend, wf.numcase].join('.'))
 }
@@ -107,8 +109,10 @@ async function testWF(wf, exp) {
 
 describe('test names:', () => {
     for (let wf of wfs) {
-        let wfkey = [wf.dict, wf.form].join('-')
-        let expected = cache[wfkey]
+        let wfplain = plain(wf.dict)
+        let wfkey = [wfplain, wf.form].join('-')
+        /* let wfkey = [plain(wf.dict), plain(wf.form)].join('-') */
+        let expected = cache[wfkey].sort()
         testWF(wf, expected)
     }
 })
@@ -122,7 +126,7 @@ function compactNamesFls(dicts) {
     let fls = dicts.map(dict=> {
         return dict.fls.map(flex=> [flex.gend, flex.numcase].join('.'))
     })
-    return _.flatten(fls)
+    return _.flatten(fls).sort()
 }
 
 function parseGend(res) {

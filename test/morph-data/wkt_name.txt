@@ -10132,7 +10132,6 @@ dict: ἑβδομάς • (hebdomás)
 
     A group of seven, especially a week of seven days or a group of seven years.
 
-MA
 # ----------------------------------
 dict: Ἑβδομηκοντακωμῆται • (Hebdomēkontakōmêtai) m pl (genitive Ἑβδομηκοντακωμητῶν); first declension
 
@@ -10494,21 +10493,22 @@ dat: εἰκόνι, εἰκόνοιν, εἰκόσι-εἰκόσιν
 acc: εἰκόνα, εἰκόνε, εἰκόνας
 voc: εἰκών, εἰκόνε, εἰκόνες
 
+MA
 # ----------------------------------
-dict: εἰκώ • (eikṓn) f (genitive εἰκοῦς); third declension
+# dict: εἰκώ • (eikṓn) f (genitive εἰκοῦς); third declension === big wtf ???
 
-    figure, image, likeness, portrait
-    image in a mirror, reflection
-    personal description
-    similitude, semblance, phantom
-    pattern, archetype
+#     figure, image, likeness, portrait
+#     image in a mirror, reflection
+#     personal description
+#     similitude, semblance, phantom
+#     pattern, archetype
 
-restrict: sg
-nom: εἰκώ
-gen: εἰκοῦς
-dat: εἰκοῖ
-acc: εἰκοῦν
-voc: εἰκοῖ
+# restrict: sg
+# nom: εἰκώ
+# gen: εἰκοῦς
+# dat: εἰκοῖ
+# acc: εἰκοῦν
+# voc: εἰκοῖ
 
 #
 dict: εἰλεός • (eileós) m (genitive); ? declension[1]
