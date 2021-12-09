@@ -17,10 +17,12 @@ const d = Debug('test')
 let skip = true
 
 const text = fse.readFileSync('./test/morph-data/wkt_verb.txt','utf8')
-const rows = _.compact(text.split('\n'))
+let rows = _.compact(text.split('\n'))
 
 log('_ROWS', rows.length)
 
+rows = rows.slice(0, 500)
 let tests = makeVerbTests(rows)
 
-log('_TESTS', tests.length)
+tests = tests.slice(0, 20)
+log('T', tests)

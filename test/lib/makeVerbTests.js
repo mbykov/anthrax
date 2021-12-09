@@ -5,25 +5,74 @@ import _ from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 let skip = true
+const numpers = "sg.1 sg.2 sg.3 du.2 du.3 pl.1 pl.2 pl.3".split(' ')
 
 export function makeVerbTests(rows, only) {
     let pars = parseText(rows, only)
     pars = pars.slice(0, 4)
-    parsePars (pars, only)
-
-    let tests = []
+    let tests = parsePars (pars, only)
     return tests
 }
 
 function parsePars (pars, only)  {
+    let tests = []
     for (let par of pars) {
-        log('_P', par)
+        /* log('_P', par) */
+        let descrs = par.data.map(line => { return line.descr })
+        descrs = _.uniq(descrs)
+        let voices = descrs.map(descr => { return descr.split('.')[0] })
+        voices = _.uniq(voices)
 
+        par.data.forEach(line => {
+            line.forms.forEach((form2, idy) => {
+                if (!form2) return
+                form2.split('-').forEach(form => {
+                    if (!form) return
+                    let numper = numpers[idy]
+                    let test = ['verb', par.rdict, form, line.descr, numper]
+                    tests.push(test)
+                })
+            })
+        })
+
+        par.parts.forEach(line => {
+            let descrs = line.descr.split('-')
+            let rdescr = descrs[0]
+            let gend = descrs[1]
+            line.forms.forEach((form2, idy) => {
+                if (!form2) return
+                form2.split('-').forEach(form => {
+                    if (!form) return
+                    let voice = voices[idy]
+                    let descr
+                    if (rdescr.split('.').length == 3) descr = rdescr
+                    else descr = [voice, rdescr].join('.')
+                    let test = ['part', par.rdict, form, descr, gend]
+                    tests.push(test)
+                })
+            })
+        })
+
+        par.infs.forEach(line => {
+            line.forms.forEach((form2, idy) => {
+                if (!form2) return
+                form2.split('-').forEach(form => {
+                    if (!form) return
+                    voices.forEach(voice => {
+                        let descr
+                        if (line.descr.split('.').length == 3) descr = line.descr
+                        else descr = [voice, line.descr].join('.')
+                        let test = ['inf', par.rdict, form, descr, '-']
+                        tests.push(test)
+                    })
+                })
+            })
+        })
     }
+    return tests
 }
 
 function parseText (rows, only) {
-    rows = rows.slice(0, 500)
     let pars = []
     let rdict, dict, pres, futs, trns, trn
     let formstr, futstr
