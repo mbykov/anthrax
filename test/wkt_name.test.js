@@ -31,7 +31,6 @@ function testNames() {
     let rwfs = []
     for  (let row of rows) {
         if (/MA/.test(row)) skip = false
-        /* if (/END/.test(row)) skip = true */
         if (skip) continue
         if (!row || row.slice(0,2) == '# ') continue
         row = row.split('#')[0]
