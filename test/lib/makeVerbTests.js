@@ -31,7 +31,7 @@ function parsePars (pars, only)  {
                     let numper = numpers[idy]
                     /* let test = ['verb', par.rdict, form, line.descr, numper] */
                     let test = {verb: true, dict: par.dict, form, tense: line.descr, numper}
-                    /* tests.push(test) */
+                    tests.push(test)
                 })
             })
         })
