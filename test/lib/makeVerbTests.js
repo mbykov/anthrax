@@ -29,8 +29,9 @@ function parsePars (pars, only)  {
                 form2.split('-').forEach(form => {
                     if (!form) return
                     let numper = numpers[idy]
-                    let test = ['verb', par.rdict, form, line.descr, numper]
-                    tests.push(test)
+                    /* let test = ['verb', par.rdict, form, line.descr, numper] */
+                    let test = {verb: true, dict: par.dict, form, tense: line.descr, numper}
+                    /* tests.push(test) */
                 })
             })
         })
@@ -47,7 +48,8 @@ function parsePars (pars, only)  {
                     let descr
                     if (rdescr.split('.').length == 3) descr = rdescr
                     else descr = [voice, rdescr].join('.')
-                    let test = ['part', par.rdict, form, descr, gend]
+                    /* let test = ['part', par.rdict, form, descr, gend] */
+                    let test = {part: true, dict: par.dict, form, tense: descr, gend}
                     tests.push(test)
                 })
             })
@@ -62,7 +64,8 @@ function parsePars (pars, only)  {
                         let descr
                         if (line.descr.split('.').length == 3) descr = line.descr
                         else descr = [voice, line.descr].join('.')
-                        let test = ['inf', par.rdict, form, descr, '-']
+                        /* let test = ['inf', par.rdict, form, descr, '-'] */
+                        let test = {inf: true, dict: par.dict, form, tense: descr}
                         tests.push(test)
                     })
                 })
