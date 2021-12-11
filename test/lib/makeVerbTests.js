@@ -36,6 +36,7 @@ function parsePars (pars, only)  {
             })
         })
 
+        let nums = ['sg', 'du', 'pl']
         par.parts.forEach(line => {
             let descrs = line.descr.split('-')
             let rdescr = descrs[0]

@@ -7,7 +7,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape, vowels, parseAug, vnTerms, aug2vow } from './lib/utils.js'
+import { accents, scrape, vowels, parseAug, vnTerms, aug2vow, breakByTwoParts } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
 /* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
@@ -27,24 +27,55 @@ export async function anthrax (wf) {
     dag = new Map();
     dag.chains = []
     dag.cache = {}
-    let cwf = comb(wf)
-    let flakes = scrape(cwf)
+    dag.cwf = comb(wf)
+    let flakes = scrape(dag.cwf).reverse()
     d('_flakes', flakes)
     if (!flakes.length) return
     let tails = flakes.map(flake=> flake.tail)
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
     d('_flexids', dag.flexids)
-    dag.pcwf = plain(cwf)
+    dag.pcwf = plain(dag.cwf)
     d('_pcwf', dag.pcwf)
     let aug = parseAug(dag.pcwf)
     if (aug) {
         dag.aug = aug
         dag.pcwf = dag.pcwf.substr(aug.length)
     }
-    await dagging([], dag.pcwf)
+    /* await dagging([], dag.pcwf) */
+    let breaks = makeBreaks(dag)
+    log('_breaks', breaks)
+    let headkeys = _.uniq(breaks.map(br=> br.head))
+    /* log('_headkeys', headkeys) */
+    let tailkeys = _.uniq(breaks.map(br=> br.tail))
+    /* log('_tailkeys', tailkeys) */
+    let keys = headkeys.concat(tailkeys)
+    /* log('_keys', keys) */
+    let ddicts = await getSegments(keys)
+    let chains = compactBreaks(breaks, ddicts)
+
     return dag.chains
 }
+
+function compactBreaks(breaks, ddicts) {
+    let ddictids = ddicts.map(ddict=> ddict._id)
+    log('_ddicts', ddictids)
+    let chains = []
+    for (let twopart of breaks) {
+        if (ddictids.includes(twopart.head) && ddictids.includes(twopart.tail)) chains.push(twopart)
+    }
+    log('_CHAINS', chains)
+}
+
+function makeBreaks(dag) {
+    let breaks = []
+    for (let flex of dag.flexes) {
+        let head = dag.pcwf.slice(0, - flex._id.length)
+        breakByTwoParts(breaks, head)
+    }
+    return breaks
+}
+
 
 async function getDicts(tail) {
     let flakes = scrape(tail)
