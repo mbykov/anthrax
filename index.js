@@ -66,7 +66,7 @@ export async function anthrax (wf) {
     return dag.chains
 }
 
-// ἀντιπαραγράφω,
+// ἀντιπαραγράφω, προσαπαγγέλλω
 // πολύτροπος, ψευδολόγος, εὐχαριστία
 async function selectPrefs(dag, cwf) {
     let flakes = scrape(cwf).reverse()
@@ -78,11 +78,13 @@ async function selectPrefs(dag, cwf) {
         pref = ddict.docs.find(dict=> dict.pref)
         if (pref) prefs.push(pref)
     }
-    let longest = _.maxBy(prefs, function(pref) { return pref.dict.length; });
-    if (!longest) return
+    /* log('_PREFS', prefs) */
+    if (!prefs.length) return
+    let longest = _.maxBy(prefs, function(pref) { return pref.plain.length; });
+    /* log('_longest', longest) */
     dag.prefs.push(longest)
 
-    let tail = cwf.slice(longest.dict.length)
+    let tail = cwf.slice(longest.plain.length)
     if (!tail) return
     let vowel = tail[0]
     if (vowels.includes(vowel)) {

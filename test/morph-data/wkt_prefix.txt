@@ -38,6 +38,7 @@ pref: ἀπ- • (apo-)
     Simply emphasizing the meaning of the verb
     because of, owing to
     = ἀφ
+    = π
 
 #pref: ἀρι- • (ari-)
 pref: ἀρ- • (ari-)
