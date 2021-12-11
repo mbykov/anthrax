@@ -15,57 +15,61 @@ pref: ἁ- • (ha-)
 pref: ἀν- • (an-)
     Alternative form of ἀ- (a-) used before a vowel.
 
-pref: ἀνα- • (ana-)
+# pref: ἀνα- • (ana-)
+pref: ἀν- • (ana-)
     up to, upwards, up
     (intensifier) thoroughly
     indicating repetition or improvement: re-, again
     back, backwards
 
-pref: ἀντι- • (anti-)
+# pref: ἀντι- • (anti-)
+pref: ἀντ- • (anti-)
     anti-, against
     = ἀνθ
-    = ἀνθο
-    = ἀντ
-    = ἀντ᾽
-    = ἀντ
+#    = ἀνθο
+#    = ἀντ᾽
 
-pref: ἀπο- • (apo-)
+#pref: ἀπο- • (apo-)
+pref: ἀπ- • (apo-)
     Indicating movement: away, from, off
     Indicating breaking one part from another: un-, asunder, apart, off
     Indicating ending or finishing, or almost like the negative ἀ- (a-, “not”), especially in adjectives
     back, again
     Simply emphasizing the meaning of the verb
     because of, owing to
-    = ἀπ
     = ἀφ
 
-pref: ἀρι- • (ari-)
+#pref: ἀρι- • (ari-)
+pref: ἀρ- • (ari-)
     (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
 
+#pref: ἐρι- • (eri-)
+pref: ἐρ- • (eri-)
+     (ari-) - (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
 
-pref: ἐρι- • (eri-)
-    ἀρι- • (ari-) - (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
-
-pref: ἀρχι- • (arkhi-)
+#pref: ἀρχι- • (arkhi-)
+pref: ἀρχ- • (arkhi-)
     denotes primary importance or authority.
 
-pref: ἀμφι
+#pref: ἀμφι
+pref: ἀμφ
       both, on both sides of, around
       = ἀμφ
       = ἀμπ
 
-pref: αὐτο
+#pref: αὐτο
+pref: αὐτ
       auto-
       = αὐθ
-      = αὐτ
 
-pref: ἀνισο
+pref: ἀνισ
+# pref: ἀνισο
       not equal
-      = ἀνισ
 
 # =============================D =================
 
-pref: δια- • (dia-)
+#pref: δια- • (dia-)
+pref: δι- • (dia-)
     through, right through, across, over
     in different directions
         of separation: asunder, apart
@@ -75,27 +79,29 @@ pref: δια- • (dia-)
     of completion: to the end, utterly, out
     to add strength: thoroughly, out and out
     of mixture: between, partly, somewhat
-      = δι- • (dia-)
-      = διε
+#      = διε
       = διεκ
 
 
 pref: δυσ- • (dus-)
     bad, hard, unfortunate
 
-pref: διχο- • (dixo-)
+# pref: διχο- • (dixo-)
+pref: διχ- • (dixo-)
     in two
 
-pref: δίς-
+pref: δίσ-
       twice, doubly, again
-      = δίχα
-      = δίσ
+      = δίχ
 
-pref: δύο
+# pref: δύο
+pref: δύ
      (cardinal): two
       = δύ'
       = δύω
-pref: δώδεκα
+
+#pref: δώδεκα
+pref: δώδεκ
           (cardinal) twelve
 
 # =========================================== E =======================
@@ -109,12 +115,13 @@ pref: ἐκ- • (ek-)
       = ἐξ
 
 # а тут не путается ли ударение?
-pref: ἑξα- • (hexa-)
+# pref: ἑξα- • (hexa-)
+pref: ἑξ- • (hexa-)
     Forming compound words with the sense of "six"
-    = ἑξ
     = ἐσ
 
-pref: ἐπι- • (epi-)
+# pref: ἐπι- • (epi-)
+pref: ἐπ- • (epi-)
     (place) on, upon, on top of, all over, covering
     (motion) on, over
     (addition, accompaniment) in addition to, as interest on, with
@@ -124,9 +131,9 @@ pref: ἐπι- • (epi-)
     against
     on, for the purpose of, because of
     on. at
-    = ἐπ
-    = ἐπι
-    = ἐπ
+#    = ἐπ
+#    = ἐπι
+#    = ἐπ
 
 pref: εὐ- • (eu-)
     good, well
@@ -140,36 +147,40 @@ pref: ἐν
 pref: ἐφ
       translation?
 
-pref: φιλο
+# pref: φιλο
+pref: φιλ-
       fond of ...
 
 # ============================================= H =======================
 
-pref: ἡμι- • (hēmi-)
+# pref: ἡμι- • (hēmi-)
+pref: ἡμ- • (hēmi-)
     half
 
 # ============================================= I =======================
 
-pref: ἰσο
+# pref: ἰσο
+pref: ἰσ-
       the same
 
 # ============================================= K =======================
 
-pref: κατά • (katá)
+# pref: κατά • (katá)
+pref: κατ- • (katá)
     back
     downwards
     against
     fully, completely
-    = κατ • (katá)
     = καθ
 
-pref: κακά
+# pref: κακά
+pref: κακ
       bad
-      = κακ
 
 # ============================================= M =======================
 
-pref: μετα- • (meta-)
+# pref: μετα- • (meta-)
+pref: μετ- • (meta-)
     concerning community or participation
         concerning action in common with another
     in the midst of
@@ -180,27 +191,28 @@ pref: μετα- • (meta-)
     reversely
     (most frequent) concerning change in position or condition
     = μεθ
-    = μετ
 
 # ============================================= N =======================
 
-pref: να- • (nā-)
+# pref: να- • (nā-)
+pref: ν- • (nā-)
     Alternative form of ἀ- (a-)
 
-pref: νεκρο- • (nekro-)
+# pref: νεκρο- • (nekro-)
+pref: νεκρ- • (nekro-)
     Used to derive words relating to death or the dead; necro-
 
-pref: νη- • (nē-)
+# pref: νη- • (nē-)
+pref: ν- • (nē-)
     Alternative form of ἀ- (a-)
 
-pref: νω- • (nō-)
+# pref: νω- • (nō-)
+pref: ν- • (nō-)
     Alternative form of ἀ- (a-)
 
-pref: νεά
+# pref: νεά
+pref: νε-
      new
-
-pref: νε
-      νεά
 
 # wtf?
 # νεάγγελλω
@@ -209,15 +221,18 @@ pref: νε
 
 # ============================================= O =======================
 
-pref: ὀκτα- • (okta-)
+# pref: ὀκτα- • (okta-)
+pref: ὀκτ- • (okta-)
     eight
 
-pref: ὀλιγο
+# pref: ὀλιγο
+pref: ὀλιγ-
       not many
 
 # ============================================= P =======================
 
-pref: προ- • (pro-)
+# pref: προ- • (pro-)
+pref: πρ- • (pro-)
     (with prepositions)
         (strengthener)
         (adds the notion of forward, forth)
@@ -239,25 +254,31 @@ pref: προ- • (pro-)
 
 pref: προσ- • (pros-)
        motion towards, accession to, or nearness to
-       = ποτι
+#       = ποτι
 
-pref: παρα
+# pref: παρα
+pref: παρ-
       from
-      = παρ
+#      = παρ
 
-pref: περι
+# pref: περι
+pref: περ-
       about
 
-pref: πολυ
+# pref: πολυ
+pref: πολ-
       many
 
-pref: παθο
+# pref: παθο
+pref: παθ-
       bad
 
-pref: παντο
+# pref: παντο
+pref: παντ-
       full
 
-pref: ψευδο
+# pref: ψευδο
+pref: ψευδ-
       false, unauthentic, counterfeit
 
 # ============================================= S =======================
@@ -268,24 +289,26 @@ pref: συν- • (sun-)
     = συγ
     = συμ
     = συλ
-    = συ
+#    = συ
 
 # ============================================= T =======================
 
-pref: τρι- • (tri-)
+# pref: τρι- • (tri-)
+pref: τρι • (tri-)
     tri- (three, thrice)
 
-pref: τοπο
+# pref: τοπο
+pref: τοπ-
       place
 
 # ============================================= U =======================
 
-pref: ὑπο- • (hupo-)
+# pref: ὑπο- • (hupo-)
+pref: ὑπ- • (hupo-)
     under, sub-, hypo-
         of the casing or covering
         of the agency or influence
     denoting a small degree, gradual
-    = ὑπ
     = ὑφ
 
 pref: ὑπερ

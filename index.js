@@ -36,13 +36,22 @@ export async function anthrax (wf) {
     dag.flexids = dag.flexes.map(flex=> flex._id)
     d('_flexids', dag.flexids)
     dag.pcwf = plain(dag.cwf)
+    dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
     let aug = parseAug(dag.pcwf)
     if (aug) {
         dag.aug = aug
         dag.pcwf = dag.pcwf.substr(aug.length)
     }
+    dag.prefs = []
     /* await dagging([], dag.pcwf) */
+
+    await selectPrefs(dag, dag.cwf)
+    log('_PREFS', dag.prefs)
+    log('_TAIL', dag.tail)
+
+    return dag.chains
+
     let breaks = makeBreaks(dag)
     log('_breaks', breaks)
     let headkeys = _.uniq(breaks.map(br=> br.head))
@@ -56,6 +65,38 @@ export async function anthrax (wf) {
 
     return dag.chains
 }
+
+// ἀντιπαραγράφω,
+// πολύτροπος, ψευδολόγος, εὐχαριστία
+async function selectPrefs(dag, cwf) {
+    let flakes = scrape(cwf).reverse()
+    /* log('_flakes', flakes.length) */
+    let headkeys = flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 5)
+    let ddicts = await getSegments(headkeys)
+    let pref, prefs = []
+    for (let ddict of ddicts) {
+        pref = ddict.docs.find(dict=> dict.pref)
+        if (pref) prefs.push(pref)
+    }
+    let longest = _.maxBy(prefs, function(pref) { return pref.dict.length; });
+    if (!longest) return
+    dag.prefs.push(longest)
+
+    let tail = cwf.slice(longest.dict.length)
+    if (!tail) return
+    let vowel = tail[0]
+    if (vowels.includes(vowel)) {
+        tail = tail.slice(1)
+        if (!tail) return
+        let vow = {plain: vowel, vowel: true}
+        dag.prefs.push(vow)
+    }
+    dag.tail = tail
+    await selectPrefs(dag, tail)
+}
+
+
+
 
 function compactBreaks(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
