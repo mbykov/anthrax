@@ -38,16 +38,16 @@ export async function anthrax (wf) {
     dag.pcwf = plain(dag.cwf)
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
-    let aug = parseAug(dag.pcwf)
-    if (aug) {
-        dag.aug = aug
-        dag.pcwf = dag.pcwf.substr(aug.length)
-    }
-    dag.prefs = []
-    /* await dagging([], dag.pcwf) */
 
-    await selectPrefs(dag, dag.cwf)
-    /* log('_AUG', dag.aug) */
+    // это потом, после prefs:
+    /* let aug = parseAug(dag.pcwf)
+     * if (aug) {
+     *     dag.aug = aug
+     *     dag.pcwf = dag.pcwf.substr(aug.length)
+     * } */
+    dag.prefs = []
+    let pref = await findPref(dag, dag.pcwf)
+
     log('_PREFS', dag.prefs.map(pref=> pref.plain))
     let prefstr = dag.prefs.map(pref=> pref.plain).join('')
     let tail = dag.pcwf.replace(prefstr, '')
@@ -55,7 +55,6 @@ export async function anthrax (wf) {
     log('_TAIL___', dag.cwf, '=', prefstr_, '+', tail)
 
     return dag.chains
-
     let breaks = makeBreaks(dag)
     log('_breaks', breaks)
     let headkeys = _.uniq(breaks.map(br=> br.head))
@@ -72,7 +71,10 @@ export async function anthrax (wf) {
 
 // ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, εὐχαριστία
-async function selectPrefs(dag, cwf) {
+// bug  - ἐπεξήγησις - находит ap, а нужно ep - longest туп
+// προσαναμιμνήσκω, προσδιαιρέω = без vow
+// παραγγέλλω = vow
+async function findPref(dag, cwf) {
     let flakes = scrape(cwf).reverse()
     /* log('_flakes', flakes) */
     // === PLAIN ===
@@ -81,35 +83,53 @@ async function selectPrefs(dag, cwf) {
     log('_headkeys', headkeys)
     let ddicts = await getSegments(headkeys)
     log('_ddicts', ddicts.length)
-    let pref, prefs = []
+    let cpref, prefs = []
     for (let ddict of ddicts) {
         if (!ddict.docs) log('_NO DOCS_', cwf, ddict, headkeys, flakes)
-        pref = ddict.docs.find(dict=> dict.pref)
-        if (pref) prefs.push(pref)
+        cpref = ddict.docs.find(dict=> dict.pref)
+        if (cpref) prefs.push(cpref)
     }
     /* log('_PREFS', prefs) */
     if (!prefs.length) return
-    let longest = _.maxBy(prefs, function(pref) { return pref.plain.length; });
-    // bug  - ἐπεξήγησις - находит ap, а нужно ep - longest туп
+    let pref = _.maxBy(prefs, function(pref) { return pref.plain.length; });
 
-    /* log('_longest', longest) */
-    dag.prefs.push(longest)
+    dag.prefs.push(pref)
 
-    let tail = cwf.slice(longest.plain.length)
-    if (!tail) return
-
-    tail = plain(tail)
+    let tail = cwf.replace(pref.plain, '')
+    log('_TAIL', tail)
+    let nextpref = await findPref(dag, tail)
+    log('_nextpref', nextpref)
+    if (nextpref) return
 
     let vowel = tail[0]
-    if (vowels.includes(vowel)) {
-        tail = tail.slice(1)
-        if (!tail) return
-        let vow = {plain: vowel, vowel: true}
-        dag.prefs.push(vow)
-    }
-    dag.tail = tail
-    await selectPrefs(dag, tail)
+    tail = tail.slice(1)
+    if (!tail) return
+    log('_vowel', vowel)
+    if (!vowels.includes(vowel)) return
+    let vow = {plain: vowel, vowel: true}
+    dag.prefs.push(vow)
+    nextpref = await findPref(dag, tail)
+
+    return pref
 }
+
+/* log('_longest', longest)
+ * dag.prefs.push(longest)
+ *
+ * let tail = cwf.slice(longest.plain.length)
+ * if (!tail) return
+ *
+ * tail = plain(tail)
+ *
+ * let vowel = tail[0]
+ * if (vowels.includes(vowel)) {
+ *     tail = tail.slice(1)
+ *     if (!tail) return
+ *     let vow = {plain: vowel, vowel: true}
+ *     dag.prefs.push(vow)
+ * }
+ * dag.tail = tail
+ * await findPref(dag, tail) */
 
 
 

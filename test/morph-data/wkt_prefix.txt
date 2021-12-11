@@ -21,7 +21,7 @@ pref: ἀν- • (ana-)
     (intensifier) thoroughly
     indicating repetition or improvement: re-, again
     back, backwards
-#    = ἄν
+   = αν
 
 # pref: ἀντι- • (anti-)
 pref: ἀντ- • (anti-)
