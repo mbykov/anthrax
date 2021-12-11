@@ -47,8 +47,12 @@ export async function anthrax (wf) {
     /* await dagging([], dag.pcwf) */
 
     await selectPrefs(dag, dag.cwf)
-    log('_PREFS', dag.prefs)
-    log('_TAIL', dag.tail)
+    /* log('_AUG', dag.aug) */
+    log('_PREFS', dag.prefs.map(pref=> pref.plain))
+    let prefstr = dag.prefs.map(pref=> pref.plain).join('')
+    let tail = dag.pcwf.replace(prefstr, '')
+    let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
+    log('_TAIL___', dag.cwf, '=', prefstr_, '+', tail)
 
     return dag.chains
 
@@ -66,26 +70,36 @@ export async function anthrax (wf) {
     return dag.chains
 }
 
-// ἀντιπαραγράφω, προσαπαγγέλλω
+// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, εὐχαριστία
 async function selectPrefs(dag, cwf) {
     let flakes = scrape(cwf).reverse()
-    /* log('_flakes', flakes.length) */
+    /* log('_flakes', flakes) */
+    // === PLAIN ===
     let headkeys = flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 5)
+    /* let headkeys = flakes.map(flake=> flake.head).filter(head=> head.length < 5) */
+    log('_headkeys', headkeys)
     let ddicts = await getSegments(headkeys)
+    log('_ddicts', ddicts.length)
     let pref, prefs = []
     for (let ddict of ddicts) {
+        if (!ddict.docs) log('_NO DOCS_', cwf, ddict, headkeys, flakes)
         pref = ddict.docs.find(dict=> dict.pref)
         if (pref) prefs.push(pref)
     }
     /* log('_PREFS', prefs) */
     if (!prefs.length) return
     let longest = _.maxBy(prefs, function(pref) { return pref.plain.length; });
+    // bug  - ἐπεξήγησις - находит ap, а нужно ep - longest туп
+
     /* log('_longest', longest) */
     dag.prefs.push(longest)
 
     let tail = cwf.slice(longest.plain.length)
     if (!tail) return
+
+    tail = plain(tail)
+
     let vowel = tail[0]
     if (vowels.includes(vowel)) {
         tail = tail.slice(1)

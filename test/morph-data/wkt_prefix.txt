@@ -4,16 +4,16 @@
 
 # ============================= PREFIXES ======================
 
-pref: ἀ- • (a-)
-    The alpha privativum, used to make words that have a sense opposite to the word (or stem) to which the prefix is attached. It is also known as privative a and alpha privative.
-    The alpha intensivum, used to strengthen the force of compounds.
-    The alpha euphonicum, used to soften pronunciation before two consonants.
+# pref: ἀ- • (a-)
+#     The alpha privativum, used to make words that have a sense opposite to the word (or stem) to which the prefix is attached. It is also known as privative a and alpha privative.
+#     The alpha intensivum, used to strengthen the force of compounds.
+#     The alpha euphonicum, used to soften pronunciation before two consonants.
 
-pref: ἁ- • (ha-)
-    The alpha copulativum, used to express union or likeness.
+# pref: ἁ- • (ha-)
+#     The alpha copulativum, used to express union or likeness.
 
-pref: ἀν- • (an-)
-    Alternative form of ἀ- (a-) used before a vowel.
+# pref: ἀν- • (an-)
+#     Alternative form of ἀ- (a-) used before a vowel.
 
 # pref: ἀνα- • (ana-)
 pref: ἀν- • (ana-)
@@ -21,6 +21,7 @@ pref: ἀν- • (ana-)
     (intensifier) thoroughly
     indicating repetition or improvement: re-, again
     back, backwards
+#    = ἄν
 
 # pref: ἀντι- • (anti-)
 pref: ἀντ- • (anti-)
@@ -114,8 +115,8 @@ pref: ἐκ- • (ek-)
       (With a sense of removal): out, away, off
       (Expressing completion or totality): utterly
       = ἐξ
+      = εξ
 
-# а тут не путается ли ударение?
 # pref: ἑξα- • (hexa-)
 pref: ἑξ- • (hexa-)
     Forming compound words with the sense of "six"
@@ -132,6 +133,7 @@ pref: ἐπ- • (epi-)
     against
     on, for the purpose of, because of
     on. at
+#      = π
 #    = ἐπ
 #    = ἐπι
 #    = ἐπ
@@ -195,21 +197,21 @@ pref: μετ- • (meta-)
 
 # ============================================= N =======================
 
-# pref: να- • (nā-)
-pref: ν- • (nā-)
-    Alternative form of ἀ- (a-)
-
 # pref: νεκρο- • (nekro-)
 pref: νεκρ- • (nekro-)
     Used to derive words relating to death or the dead; necro-
 
-# pref: νη- • (nē-)
-pref: ν- • (nē-)
-    Alternative form of ἀ- (a-)
+# # pref: να- • (nā-)
+# pref: ν- • (nā-)
+#     Alternative form of ἀ- (a-)
 
-# pref: νω- • (nō-)
-pref: ν- • (nō-)
-    Alternative form of ἀ- (a-)
+# # pref: νη- • (nē-)
+# pref: ν- • (nē-)
+#     Alternative form of ἀ- (a-)
+
+# # pref: νω- • (nō-)
+# pref: ν- • (nō-)
+#     Alternative form of ἀ- (a-)
 
 # pref: νεά
 pref: νε-
