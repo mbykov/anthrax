@@ -12,6 +12,7 @@
     "names_jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/wkt_name.test.js  --noStackTrace --bail",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/wkt_name.test.js  --noStackTrace --bail",
     "simple": "mocha -c -R dot -b --full-trace true test/simple_test.js",
+    "pref": "mocha -c -R dot -b --full-trace true test/prefix_test.js",
     "test_": "jest"
   },
     "jest": {

@@ -7,7 +7,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape, vowels, parseAug, vnTerms, aug2vow, breakByTwoParts } from './lib/utils.js'
+import { accents, scrape, vowels, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref } from './lib/utils.js'
 import { getFlexes, getSegments } from './lib/remote.js'
 /* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
@@ -39,20 +39,29 @@ export async function anthrax (wf) {
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
-    // это потом, после prefs:
-    /* let aug = parseAug(dag.pcwf)
-     * if (aug) {
-     *     dag.aug = aug
-     *     dag.pcwf = dag.pcwf.substr(aug.length)
-     * } */
     dag.prefs = []
-    let pref = await findPref(dag, dag.pcwf)
+    await findPref(dag, dag.pcwf)
+    if (dag.prefs.length) {
+        /* log('_PREFS', dag.prefs.map(pref=> pref.plain)) */
+        let lastpref = _.last(dag.prefs)
+        if (lastpref.vowel) dag.aug = lastpref.plain
+        let prefstr = dag.prefs.map(pref=> pref.plain).join('')
+        dag.pcwf = dag.pcwf.replace(prefstr, '')
+        let beg = dag.pcwf[0]
+        if (vowels.includes(beg)) {
+            dag.pcwf = dag.pcwf.slice(1)
+            lastpref.plain = lastpref.plain + beg
+            dag.aug = lastpref.plain
+        }
+    } else {
+        dag.aug = parseAug(dag.pcwf)
+        dag.pcwf = dag.pcwf.slice(dag.aug.length)
+    }
 
-    log('_PREFS', dag.prefs.map(pref=> pref.plain))
-    let prefstr = dag.prefs.map(pref=> pref.plain).join('')
-    let tail = dag.pcwf.replace(prefstr, '')
+    log('_dag.aug_', dag.aug)
     let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
-    log('_TAIL___', dag.cwf, '=', prefstr_, '+', tail)
+    log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf)
+    log('_PREFS_', dag.prefs)
 
     return dag.chains
     let breaks = makeBreaks(dag)
@@ -67,50 +76,6 @@ export async function anthrax (wf) {
     let chains = compactBreaks(breaks, ddicts)
 
     return dag.chains
-}
-
-// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
-// πολύτροπος, ψευδολόγος, εὐχαριστία
-// bug  - ἐπεξήγησις - находит ap, а нужно ep - longest туп
-// προσαναμιμνήσκω, προσδιαιρέω = без vow
-// παραγγέλλω = vow
-async function findPref(dag, cwf) {
-    let flakes = scrape(cwf).reverse()
-    /* log('_flakes', flakes) */
-    // === PLAIN ===
-    let headkeys = flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 5)
-    /* let headkeys = flakes.map(flake=> flake.head).filter(head=> head.length < 5) */
-    log('_headkeys', headkeys)
-    let ddicts = await getSegments(headkeys)
-    log('_ddicts', ddicts.length)
-    let cpref, prefs = []
-    for (let ddict of ddicts) {
-        if (!ddict.docs) log('_NO DOCS_', cwf, ddict, headkeys, flakes)
-        cpref = ddict.docs.find(dict=> dict.pref)
-        if (cpref) prefs.push(cpref)
-    }
-    /* log('_PREFS', prefs) */
-    if (!prefs.length) return
-    let pref = _.maxBy(prefs, function(pref) { return pref.plain.length; });
-
-    dag.prefs.push(pref)
-
-    let tail = cwf.replace(pref.plain, '')
-    log('_TAIL', tail)
-    let nextpref = await findPref(dag, tail)
-    log('_nextpref', nextpref)
-    if (nextpref) return
-
-    let vowel = tail[0]
-    tail = tail.slice(1)
-    if (!tail) return
-    log('_vowel', vowel)
-    if (!vowels.includes(vowel)) return
-    let vow = {plain: vowel, vowel: true}
-    dag.prefs.push(vow)
-    nextpref = await findPref(dag, tail)
-
-    return pref
 }
 
 /* log('_longest', longest)
