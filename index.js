@@ -54,16 +54,34 @@ export async function anthrax (wf) {
             dag.aug = lastpref.plain
         }
     } else {
-        dag.aug = parseAug(dag.pcwf)
+        dag.aug = parseAug(dag.pcwf) || ''
         dag.pcwf = dag.pcwf.slice(dag.aug.length)
     }
 
+    /* log('_PREFS_', dag.prefs) */
     log('_dag.aug_', dag.aug)
     let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
     log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf)
-    log('_PREFS_', dag.prefs)
+
+    /* let ddicts_ = await getSegments(keys) */
+
+    let heads = dag.flexes.map(flex=> dag.pcwf.slice(0, - flex._id.length))
+    log('_heads', heads)
+    let ddicts = await getSegments(heads)
+    log('_ddicts', ddicts.length)
+
+    /*
+       здесь - проверяю heads, или heads+tails
+       конструирую chains - head + flex
+       если нет, или param=comp:
+       конструирую chains - head + tail + flex
+
+     */
+
 
     return dag.chains
+
+
     let breaks = makeBreaks(dag)
     log('_breaks', breaks)
     let headkeys = _.uniq(breaks.map(br=> br.head))
@@ -71,43 +89,14 @@ export async function anthrax (wf) {
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
     /* log('_tailkeys', tailkeys) */
     let keys = headkeys.concat(tailkeys)
-    /* log('_keys', keys) */
-    let ddicts = await getSegments(keys)
+    log('_keys', keys)
+    let ddicts_ = await getSegments(keys)
+    log('_ddicts', ddicts.length)
     let chains = compactBreaks(breaks, ddicts)
 
     return dag.chains
 }
 
-/* log('_longest', longest)
- * dag.prefs.push(longest)
- *
- * let tail = cwf.slice(longest.plain.length)
- * if (!tail) return
- *
- * tail = plain(tail)
- *
- * let vowel = tail[0]
- * if (vowels.includes(vowel)) {
- *     tail = tail.slice(1)
- *     if (!tail) return
- *     let vow = {plain: vowel, vowel: true}
- *     dag.prefs.push(vow)
- * }
- * dag.tail = tail
- * await findPref(dag, tail) */
-
-
-
-
-function compactBreaks(breaks, ddicts) {
-    let ddictids = ddicts.map(ddict=> ddict._id)
-    log('_ddicts', ddictids)
-    let chains = []
-    for (let twopart of breaks) {
-        if (ddictids.includes(twopart.head) && ddictids.includes(twopart.tail)) chains.push(twopart)
-    }
-    log('_CHAINS', chains)
-}
 
 function makeBreaks(dag) {
     let breaks = []
@@ -117,6 +106,17 @@ function makeBreaks(dag) {
     }
     return breaks
 }
+
+function compactBreaks(breaks, ddicts) {
+    let ddictids = ddicts.map(ddict=> ddict._id)
+    log('_ddictids', ddictids)
+    let chains = []
+    for (let twopart of breaks) {
+        if (ddictids.includes(twopart.head) && ddictids.includes(twopart.tail)) chains.push(twopart)
+    }
+    log('_CHAINS', chains)
+}
+
 
 
 async function getDicts(tail) {
