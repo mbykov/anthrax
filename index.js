@@ -67,10 +67,12 @@ export async function anthrax (wf) {
     /* log('_PREFS_', dag.prefs) */
     /* log('_dag.aug_', dag.aug) */
     let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
-    /* log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
+    log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf)
 
     let breaks = makeBreaks(dag)
+    /* log('_breaks', breaks) */
     breaks.forEach(br=> {
+        if (!br.vow) br.vow = ''
         /* log('_br', br.head, br.vow, br.tail, br.fls._id) */
     })
 
@@ -83,9 +85,12 @@ export async function anthrax (wf) {
     let ddicts = await getSegments(keys)
     /* log('_ddicts', ddicts.length) */
     let chains = compactBreaks(breaks, ddicts)
-    /* log('_chains', chains) */
 
-    return chains
+    if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
+    log('_chains', chains)
+
+
+    return []
 }
 
 function makeBreaks(dag) {
@@ -133,12 +138,12 @@ function compactBreaks(breaks, ddicts) {
             chain.push({plain: br.head, cdicts: heads})
             if (br.vow) chain.push({plain: br.vow, vowel: true})
             dictfls = dict2flex(tails, br.fls.docs)
-            chain.push({plain: br.tail, cdicts: dictfls})
+            chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
-            chain.push({plain: br.head, cdicts: dictfls})
+            chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
         }
-        chain.flex = br.fls._id
+        /* chain.flex = br.fls._id */
         if (dictfls.length) chains.push(chain)
     }
     return chains
@@ -157,7 +162,7 @@ function dict2flex(tails, fls) {
                 if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
                 else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
                 else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
-                else if (dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+                /* else if (dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
                 if (ok) {
                     if (!cdict.fls) cdict.fls = []
                     cdict.fls.push(flex)
