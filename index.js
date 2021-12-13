@@ -95,7 +95,9 @@ function compactBreaks(breaks, ddicts) {
         if (!dhead) continue
         /* if (br.head.length < 3) continue // FC can not be short */
         let heads = dhead.docs
-        if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug)
+
+        /* if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug) */  // <<<===== HERE аккуратно после prefixes
+        /* if (dag.prefs) */
 
         let chain = []
         let dictfls
@@ -116,7 +118,7 @@ function compactBreaks(breaks, ddicts) {
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
-            /* log('____________________NO TAIL', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
+            /* log('____________________NO TAIL', br.head, heads.length, br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
         }
         if (dictfls.length) chains.push(chain)
