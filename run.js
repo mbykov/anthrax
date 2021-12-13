@@ -31,7 +31,7 @@ for (let chain of chains) {
 
 
 if (fls) {
-    let chain = chains[0][0]
+    let chain = chains[2][1]
     /* log('_CHAIN:', chain) */
     let dicts = chain.cdicts.filter(dict=> dict.name && dict.gends)
     let fls = compactNamesFls(dicts)

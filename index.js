@@ -58,14 +58,6 @@ export async function anthrax (wf) {
         dag.pcwf = dag.pcwf.slice(dag.aug.length)
     }
 
-    /*
-       здесь - проверяю heads, или heads+tails
-       конструирую chains: head + flex
-       если нет, или param=comp:
-       конструирую chains: head + tail + flex
-     */
-    /* log('_PREFS_', dag.prefs) */
-    /* log('_dag.aug_', dag.aug) */
     let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
     log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf)
 
@@ -87,10 +79,8 @@ export async function anthrax (wf) {
     let chains = compactBreaks(breaks, ddicts)
 
     if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
-    log('_chains', chains)
-
-
-    return []
+    /* log('_chains', chains) */
+    return chains
 }
 
 function makeBreaks(dag) {
@@ -105,8 +95,9 @@ function makeBreaks(dag) {
             pos--
             head = phead.slice(0, pos)
             if (!head) continue
-            /* if (head.length < 2) continue */ // в компаундах fc не короткие, нов simple м.б.
+            if (head.length < 2) continue // в компаундах fc не короткие, нов simple м.б.
             tail = phead.slice(pos)
+            /* if (tail && tail.length < 2) continue // в компаундах fc не короткие, нов simple м.б. */
             vow = tail[0]
             if (vowels.includes(vow)) {
                 tail = tail.slice(1)
@@ -125,57 +116,61 @@ function makeBreaks(dag) {
 
 function compactBreaks(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
-    /* log('_ddictids', ddictids.length) */
+    log('_ddictids', ddictids.length)
     let chains = []
     for (let br of breaks) {
-        if (!ddictids.includes(br.head) || br.tail &&  !ddictids.includes(br.tail)) continue
-        let heads = ddicts.filter(ddict=> ddict._id == br.head)
-        let tails = ddicts.filter(ddict=> ddict._id == br.tail)
-        let head = {plain: br.head, cdicts: heads}
+        /* log('____________________B', br.head, br.tail, br.fls._id) */
+        let dhead = ddicts.find(ddict=> ddict._id == br.head)
+        if (!dhead) continue
+        let heads = dhead.docs
+        heads = heads.filter(dict=> dict.aug == dag.aug)
+
         let chain = []
         let dictfls
         if (br.tail) {
+            let dtail = ddicts.find(ddict=> ddict._id == br.tail)
+            if (!dtail) continue
+            let tails = dtail.docs
             chain.push({plain: br.head, cdicts: heads})
-            if (br.vow) chain.push({plain: br.vow, vowel: true})
+            if (br.vow) {
+                chain.push({plain: br.vow, vowel: true})
+                tails = tails.filter(dict=> dict.aug == br.vow)
+            } else {
+                tails = tails.filter(dict=> !dict.aug)
+            }
             dictfls = dict2flex(tails, br.fls.docs)
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
             chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
         }
-        /* chain.flex = br.fls._id */
         if (dictfls.length) chains.push(chain)
     }
-    return chains
     log('_CHAINS', chains)
+    return []
 }
 
 /* function dict2flex(headstr, ddict) { */
-function dict2flex(tails, fls) {
+function dict2flex(dicts, fls) {
     let cdicts = []
-    for (let ddict of tails) {
-        let cdict = {}
-        for (let dict of ddict.docs) {
-            for (let flex of fls) {
-                let ok = false
-                let key = plain(flex.key.split('-')[0])
-                if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
-                else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
-                else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
-                /* else if (dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
-                if (ok) {
-                    if (!cdict.fls) cdict.fls = []
-                    cdict.fls.push(flex)
-                }
-            }
+    for (let dict of dicts) {
+        dict.fls = []
+        for (let flex of fls) {
+            let ok = false
+            let key = plain(flex.key.split('-')[0])
+            if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
+            else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
+            else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
+            else if (dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+            if (ok) dict.fls.push(flex)
         }
-        if (cdict.fls && cdict.fls.length) cdicts.push(cdict)
+        if (dict.fls.length) cdicts.push(dict)
     }
     return cdicts
 }
 
 
-
+// =================================
 
 
 
