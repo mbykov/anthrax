@@ -63,46 +63,58 @@ export async function anthrax (wf) {
     let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
     log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf)
 
-    /* let ddicts_ = await getSegments(keys) */
-
-    let heads = dag.flexes.map(flex=> dag.pcwf.slice(0, - flex._id.length))
-    log('_heads', heads)
-    let ddicts = await getSegments(heads)
-    log('_ddicts', ddicts.length)
-
     /*
        здесь - проверяю heads, или heads+tails
-       конструирую chains - head + flex
+       конструирую chains: head + flex
        если нет, или param=comp:
-       конструирую chains - head + tail + flex
-
+       конструирую chains: head + tail + flex
      */
 
 
-    return dag.chains
-
-
     let breaks = makeBreaks(dag)
-    log('_breaks', breaks)
+    breaks.forEach(br=> {
+        log('_br', br.head, br.vow, br.tail, br.flex._id)
+    })
+
     let headkeys = _.uniq(breaks.map(br=> br.head))
     /* log('_headkeys', headkeys) */
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
     /* log('_tailkeys', tailkeys) */
     let keys = headkeys.concat(tailkeys)
     log('_keys', keys)
-    let ddicts_ = await getSegments(keys)
+    let ddicts = await getSegments(keys)
     log('_ddicts', ddicts.length)
     let chains = compactBreaks(breaks, ddicts)
+    log('_chains', chains)
 
     return dag.chains
 }
 
-
 function makeBreaks(dag) {
     let breaks = []
+    /* const brkeys = new Map() */
     for (let flex of dag.flexes) {
-        let head = dag.pcwf.slice(0, - flex._id.length)
-        breakByTwoParts(breaks, head)
+        let pterm = plain(flex._id)
+        let phead = dag.pcwf.slice(0, -pterm.length)
+        let pos = phead.length + 1
+        let head, tail, vow, res
+        while (pos > 0) {
+            pos--
+            head = phead.slice(0, pos)
+            if (!head) continue
+            tail = phead.slice(pos)
+            vow = tail[0]
+            if (vowels.includes(vow)) {
+                tail = tail.slice(1)
+                if (!tail) continue
+                res = {head, vow, tail, flex}
+            } else {
+                res = {head, tail, flex}
+            }
+            /* if (brkeys[tail]) continue */
+            /* brkeys[tail] = true */
+            breaks.push(res)
+        }
     }
     return breaks
 }
@@ -111,12 +123,63 @@ function compactBreaks(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
     log('_ddictids', ddictids)
     let chains = []
-    for (let twopart of breaks) {
-        if (ddictids.includes(twopart.head) && ddictids.includes(twopart.tail)) chains.push(twopart)
+    for (let br of breaks) {
+        if (!ddictids.includes(br.head) || !ddictids.includes(br.tail)) continue
+        let heads = ddicts.filter(ddict=> ddict._id == br.head)
+        let tails = ddicts.filter(ddict=> ddict._id == br.tail)
+        let chain, vow
+        if (br.vow) {
+            vow = {plain: br.vow, vowel: true}
+            chain = {heads, vow, tails, fls: br.flex.docs}
+        } else {
+            chain = {heads, tails, fls: br.flex.docs}
+        }
+        chains.push(chain)
     }
+    return chains
     log('_CHAINS', chains)
 }
 
+
+
+
+
+
+function makeBreaks_(dag) {
+    const breaks = []
+    for (let flex of dag.flexes) {
+        let head = dag.pcwf.slice(0, - flex._id.length)
+        breakByTwoParts_(breaks, head)
+    }
+    return breaks
+}
+
+export function breakByTwoParts_ (breaks, str) {
+    const brkeys = {}
+    let head = str
+    let pos = str.length
+    let vow, tail, res, brkey
+    while (pos > 0) {
+        pos--
+        tail = str.slice(pos)
+        head = str.substr(0, pos)
+        if (!head) continue
+        vow = tail[0]
+        if (vowels.includes(vow)) {
+            tail = tail.slice(1)
+            if (!tail) continue
+            res = {head, vow, tail}
+            brkey = [vow, tail].join('')
+        } else {
+            res = {head: head, tail: tail}
+            brkey = tail
+        }
+        if (brkeys[brkey]) continue
+        brkeys[brkey] = true
+        breaks.push(res)
+    }
+    return breaks
+}
 
 
 async function getDicts(tail) {
