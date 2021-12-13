@@ -13,6 +13,9 @@ let chains = await anthrax(wordform)
 
 for (let chain of chains) {
     log('_chain:', chain)
+
+    continue
+
     for (let seg of chain) {
         /* log('_seg:', seg) */
         if (!seg.cdicts) continue

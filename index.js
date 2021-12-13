@@ -58,43 +58,41 @@ export async function anthrax (wf) {
         dag.pcwf = dag.pcwf.slice(dag.aug.length)
     }
 
-    /* log('_PREFS_', dag.prefs) */
-    log('_dag.aug_', dag.aug)
-    let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
-    log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf)
-
     /*
        здесь - проверяю heads, или heads+tails
        конструирую chains: head + flex
        если нет, или param=comp:
        конструирую chains: head + tail + flex
      */
-
+    /* log('_PREFS_', dag.prefs) */
+    /* log('_dag.aug_', dag.aug) */
+    let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
+    /* log('_TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
 
     let breaks = makeBreaks(dag)
     breaks.forEach(br=> {
-        log('_br', br.head, br.vow, br.tail, br.flex._id)
+        /* log('_br', br.head, br.vow, br.tail, br.fls._id) */
     })
 
     let headkeys = _.uniq(breaks.map(br=> br.head))
     /* log('_headkeys', headkeys) */
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
     /* log('_tailkeys', tailkeys) */
-    let keys = headkeys.concat(tailkeys)
-    log('_keys', keys)
+    let keys = _.compact(headkeys.concat(tailkeys))
+    /* log('_keys', keys.length) */
     let ddicts = await getSegments(keys)
-    log('_ddicts', ddicts.length)
+    /* log('_ddicts', ddicts.length) */
     let chains = compactBreaks(breaks, ddicts)
-    log('_chains', chains)
+    /* log('_chains', chains) */
 
-    return dag.chains
+    return chains
 }
 
 function makeBreaks(dag) {
     let breaks = []
     /* const brkeys = new Map() */
-    for (let flex of dag.flexes) {
-        let pterm = plain(flex._id)
+    for (let fls of dag.flexes) {
+        let pterm = plain(fls._id)
         let phead = dag.pcwf.slice(0, -pterm.length)
         let pos = phead.length + 1
         let head, tail, vow, res
@@ -102,14 +100,15 @@ function makeBreaks(dag) {
             pos--
             head = phead.slice(0, pos)
             if (!head) continue
+            /* if (head.length < 2) continue */ // в компаундах fc не короткие, нов simple м.б.
             tail = phead.slice(pos)
             vow = tail[0]
             if (vowels.includes(vow)) {
                 tail = tail.slice(1)
                 if (!tail) continue
-                res = {head, vow, tail, flex}
+                res = {head, vow, tail, fls}
             } else {
-                res = {head, tail, flex}
+                res = {head, tail, fls}
             }
             /* if (brkeys[tail]) continue */
             /* brkeys[tail] = true */
@@ -121,23 +120,53 @@ function makeBreaks(dag) {
 
 function compactBreaks(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
-    log('_ddictids', ddictids)
+    /* log('_ddictids', ddictids.length) */
     let chains = []
     for (let br of breaks) {
-        if (!ddictids.includes(br.head) || !ddictids.includes(br.tail)) continue
+        if (!ddictids.includes(br.head) || br.tail &&  !ddictids.includes(br.tail)) continue
         let heads = ddicts.filter(ddict=> ddict._id == br.head)
         let tails = ddicts.filter(ddict=> ddict._id == br.tail)
-        let chain, vow
-        if (br.vow) {
-            vow = {plain: br.vow, vowel: true}
-            chain = {heads, vow, tails, fls: br.flex.docs}
+        let head = {plain: br.head, cdicts: heads}
+        let chain = []
+        let dictfls
+        if (br.tail) {
+            chain.push({plain: br.head, cdicts: heads})
+            if (br.vow) chain.push({plain: br.vow, vowel: true})
+            dictfls = dict2flex(tails, br.fls.docs)
+            chain.push({plain: br.tail, cdicts: dictfls})
         } else {
-            chain = {heads, tails, fls: br.flex.docs}
+            dictfls = dict2flex(heads, br.fls.docs)
+            chain.push({plain: br.head, cdicts: dictfls})
         }
-        chains.push(chain)
+        chain.flex = br.fls._id
+        if (dictfls.length) chains.push(chain)
     }
     return chains
     log('_CHAINS', chains)
+}
+
+/* function dict2flex(headstr, ddict) { */
+function dict2flex(tails, fls) {
+    let cdicts = []
+    for (let ddict of tails) {
+        let cdict = {}
+        for (let dict of ddict.docs) {
+            for (let flex of fls) {
+                let ok = false
+                let key = plain(flex.key.split('-')[0])
+                if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
+                else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
+                else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
+                else if (dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+                if (ok) {
+                    if (!cdict.fls) cdict.fls = []
+                    cdict.fls.push(flex)
+                }
+            }
+        }
+        if (cdict.fls && cdict.fls.length) cdicts.push(cdict)
+    }
+    return cdicts
 }
 
 
@@ -255,7 +284,7 @@ function tailBySize(ddict, tail) {
     return nexttail
 }
 
-function dict2flex(heads, ddict) {
+function dict2flex_(heads, ddict) {
     let headstr = heads.map(doc=> doc.plain).join('')
     /* let cdicts */
     /* if (dag.cache[ddict._id]) cdicts = dag.cache[ddict._id] */
@@ -271,7 +300,7 @@ function dict2flex(heads, ddict) {
     return chain
 }
 
-function parseCDicts(headstr, ddict) {
+function parseCDicts_(headstr, ddict) {
     let cdicts = []
     let cflexes = dag.flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
     for (let dict of ddict.docs) {
