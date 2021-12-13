@@ -93,6 +93,7 @@ function compactBreaks(breaks, ddicts) {
         /* log('____________________B', br.head, br.tail, br.fls._id) */
         let dhead = ddicts.find(ddict=> ddict._id == br.head)
         if (!dhead) continue
+        /* if (br.head.length < 3) continue // FC can not be short */
         let heads = dhead.docs
         if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug)
 
@@ -111,6 +112,7 @@ function compactBreaks(breaks, ddicts) {
                 tails = tails.filter(dict=> !dict.aug)
             }
             dictfls = dict2flex(tails, br.fls.docs)
+            /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
@@ -145,7 +147,6 @@ function dict2flex(dicts, fls) {
 
 function makeBreaks(dag) {
     let breaks = []
-    /* const brkeys = new Map() */
     for (let fls of dag.flexes) {
         let pterm = plain(fls._id)
         let phead = dag.pcwf.slice(0, -pterm.length)
@@ -155,7 +156,7 @@ function makeBreaks(dag) {
             pos--
             head = phead.slice(0, pos)
             if (!head) continue
-            if (head.length < 2) continue // в компаундах fc не короткие, нов simple м.б.
+            /* if (head.length < 3) continue // в компаундах FC не короткие, нов simple м.б. */
             tail = phead.slice(pos)
             /* if (tail && tail.length < 2) continue // в компаундах fc не короткие, нов simple м.б. */
             vow = tail[0]
@@ -166,8 +167,7 @@ function makeBreaks(dag) {
             } else {
                 res = {head, tail, fls}
             }
-            /* if (brkeys[tail]) continue */
-            /* brkeys[tail] = true */
+            if (tail && head.length < 3) continue // в компаундах FC не короткие, нов simple м.б.
             breaks.push(res)
         }
     }
