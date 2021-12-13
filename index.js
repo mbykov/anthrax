@@ -59,7 +59,7 @@ export async function anthrax (wf) {
     }
 
     let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
-    log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf)
+    /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
 
     let breaks = makeBreaks(dag)
     breaks.forEach(br=> {
@@ -94,7 +94,7 @@ function compactBreaks(breaks, ddicts) {
         let dhead = ddicts.find(ddict=> ddict._id == br.head)
         if (!dhead) continue
         let heads = dhead.docs
-        heads = heads.filter(dict=> dict.aug == dag.aug)
+        if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug)
 
         let chain = []
         let dictfls
@@ -114,6 +114,7 @@ function compactBreaks(breaks, ddicts) {
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
+            /* log('____________________NO TAIL', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
         }
         if (dictfls.length) chains.push(chain)
@@ -126,6 +127,7 @@ function compactBreaks(breaks, ddicts) {
 function dict2flex(dicts, fls) {
     let cdicts = []
     for (let dict of dicts) {
+        /* log('____________________dict', dict.rdict) */
         dict.fls = []
         for (let flex of fls) {
             let ok = false
