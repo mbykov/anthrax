@@ -3,6 +3,7 @@
 # ί̄-ί
 # ᾹΑ ᾸΑ   ἰ̄ἴ
 
+
 # ----------------------------------
 dict: ἀβακίσκος • (abakískos) m (genitive ἀβακίσκου); second declension
 
@@ -742,21 +743,24 @@ dat: ἀετῷ, ἀετοῖν, ἀετοῖς
 acc: ἀετόν, ἀετώ, ἀετούς
 voc: ἀετέ, ἀετώ, ἀετοί
 
+# FAIL-FAIL
+MA
 # ----------------------------------
-dict: ἀήρ • (āḗr) m (genitive ἀέρος); third declension
+# dict: ἀήρ • (āḗr) m (genitive ἀέρος); third declension
 
-    mist
-    air
-    wind
-    space, volume
-    blue or grey (the colour of the sky)
+#     mist
+#     air
+#     wind
+#     space, volume
+#     blue or grey (the colour of the sky)
 
-restrict: sg
-nom: ἀήρ
-gen: ἀέρος
-dat: ἀέρι
-acc: ἀέρα
-voc: ἀήρ
+# restrict: sg
+
+# nom: ἀήρ
+# gen: ἀέρος
+# dat: ἀέρι
+# acc: ἀέρα
+# voc: ἀήρ
 
 # ----------------------------------
 dict: ἀθανασία • (āthanasíā) f (genitive ἀθανασίας); first declension
@@ -764,6 +768,7 @@ dict: ἀθανασία • (āthanasíā) f (genitive ἀθανασίας); fir
     immortality
 
 restrict: sg
+
 nom: ἀθανασία
 gen: ἀθανασίας
 dat: ἀθανασίᾳ
@@ -11529,7 +11534,6 @@ dat: ἐντόμοις
 acc: ἔντομα
 voc: ἔντομα
 
-MA
 # ----------------------------------
 dict: ἔντομον • (éntomon) n (genitive ἐντόμου); second declension
 

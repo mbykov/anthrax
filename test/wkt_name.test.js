@@ -88,6 +88,7 @@ function testNames() {
 for (let wf of wfs) {
     let wfplain = plain(wf.dict)
     let wfkey = [wfplain, wf.form].join('-') // plain.form нельзя, ἕδρᾳ - отвалится йота
+    wfkey = wf.form
     /* let wfkey = [plain(wf.dict), plain(wf.form)].join('-') */
     if (!cache[wfkey]) cache[wfkey] = []
     cache[wfkey].push([wf.gend, wf.numcase].join('.'))
@@ -110,6 +111,7 @@ describe('test names:', () => {
     for (let wf of wfs) {
         let wfplain = plain(wf.dict)
         let wfkey = [wfplain, wf.form].join('-')
+        wfkey = wf.form
         /* let wfkey = [plain(wf.dict), plain(wf.form)].join('-') */
         let expected = cache[wfkey].sort()
         testWF(wf, expected)

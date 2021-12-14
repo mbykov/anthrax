@@ -26,7 +26,7 @@ const m = Debug('more')
 export async function anthrax (wf) {
     dag = new Map();
     dag.chains = []
-    dag.cache = {}
+    /* dag.cache = {} */
     dag.cwf = comb(wf)
     let flakes = scrape(dag.cwf).reverse()
     d('_flakes', flakes)
@@ -76,33 +76,33 @@ export async function anthrax (wf) {
     /* log('_keys', keys.length) */
     let ddicts = await getSegments(keys)
     /* log('_ddicts', ddicts.length) */
-    let ddictids = ddicts.map(ddict=> ddict._id)
+    dag.ddictids = ddicts.map(ddict=> ddict._id)
     /* log('_ddictids', ddictids) */
 
-    let chains = compactBreaks(breaks, ddicts)
+    let chains = makeChains(breaks, ddicts)
 
     if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
     /* log('_chains', chains) */
 
     delete dag.flexes
-    /* log('_DAG', dag) */
+    log('_DAG', dag)
 
     return chains
 }
 
-function compactBreaks(breaks, ddicts) {
+function makeChains(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
-    /* log('_ddictids', ddictids.length) */
+    /* log('_ddictids', ddicts) */
     let chains = []
     for (let br of breaks) {
-        /* log('____________________B', br.head, br.tail, br.fls._id) */
+        /* log('_BR aug:', dag.aug, '_h:', br.head, '_t:', br.tail, '_term:', br.fls._id) */
         let dhead = ddicts.find(ddict=> ddict._id == br.head)
         if (!dhead) continue
         /* if (br.head.length < 3) continue // FC can not be short */
         let heads = dhead.docs
         if (!heads.length) continue
 
-        /* if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug) */  // <<<===== HERE аккуратно после prefixes
+        if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug) // <<<===== HERE аккуратно после prefixes
         /* if (dag.prefs) */
 
         let chain = []
@@ -124,10 +124,9 @@ function compactBreaks(breaks, ddicts) {
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
-            /* log('____________________NO TAIL', br.head, heads.length, br.tail, br.fls._id, 'fls', dictfls.length) */
+            log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', dictfls.length)
             chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
         }
-        /* if (dictfls.length) log('____________________NO TAIL-chain', chain) */
         if (dictfls.length) chains.push(chain)
     }
     return chains
@@ -140,6 +139,7 @@ function dict2flex(dicts, fls) {
         /* log('____________________dict', dict.rdict) */
         dict.fls = []
         for (let flex of fls) {
+            // if (flex.adj) continue // чтобы убрать чужой gend из flex
             let ok = false
             let key = plain(flex.key.split('-')[0])
             if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
