@@ -80,12 +80,12 @@ export async function anthrax (wf) {
     /* log('_ddictids', ddictids) */
 
     let chains = makeChains(breaks, ddicts)
-
-    if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
     /* log('_chains', chains) */
 
+    if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
+
     delete dag.flexes
-    log('_DAG', dag)
+    /* log('_DAG', dag) */
 
     return chains
 }
@@ -102,8 +102,12 @@ function makeChains(breaks, ddicts) {
         let heads = dhead.docs
         if (!heads.length) continue
 
-        if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug) // <<<===== HERE аккуратно после prefixes
-        /* if (dag.prefs) */
+        if (dag.prefs) {
+            let connect = dag.prefs[dag.prefs.length-1]
+            if (connect && connect.vowel) heads = heads.filter(dict=> aug2vow(connect.plain, dict.aug))
+        } else if (dag.aug) {
+            heads = heads.filter(dict=> dict.aug == dag.aug)
+        }
 
         let chain = []
         let dictfls
@@ -124,7 +128,7 @@ function makeChains(breaks, ddicts) {
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
-            log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', dictfls.length)
+            /* log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
         }
         if (dictfls.length) chains.push(chain)
