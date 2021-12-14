@@ -62,6 +62,7 @@ export async function anthrax (wf) {
     /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
 
     let breaks = makeBreaks(dag)
+
     breaks.forEach(br=> {
         if (!br.vow) br.vow = ''
         /* log('_br', br.head, br.vow, br.tail, br.fls._id) */
@@ -82,6 +83,10 @@ export async function anthrax (wf) {
 
     if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
     /* log('_chains', chains) */
+
+    delete dag.flexes
+    /* log('_DAG', dag) */
+
     return chains
 }
 
@@ -95,6 +100,7 @@ function compactBreaks(breaks, ddicts) {
         if (!dhead) continue
         /* if (br.head.length < 3) continue // FC can not be short */
         let heads = dhead.docs
+        if (!heads.length) continue
 
         /* if (dag.aug) heads = heads.filter(dict=> dict.aug == dag.aug) */  // <<<===== HERE аккуратно после prefixes
         /* if (dag.prefs) */
@@ -121,9 +127,9 @@ function compactBreaks(breaks, ddicts) {
             /* log('____________________NO TAIL', br.head, heads.length, br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
         }
+        /* if (dictfls.length) log('____________________NO TAIL-chain', chain) */
         if (dictfls.length) chains.push(chain)
     }
-    /* log('_CHAINS', chains) */
     return chains
 }
 
