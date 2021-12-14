@@ -123,7 +123,7 @@ function makeChains(breaks, ddicts) {
             } else {
                 tails = tails.filter(dict=> !dict.aug)
             }
-            dictfls = dict2flex(tails, br.fls.docs)
+            dictfls = dict2flex(tails, br.fls.docs, true)
             /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
@@ -137,7 +137,7 @@ function makeChains(breaks, ddicts) {
 }
 
 /* function dict2flex(headstr, ddict) { */
-function dict2flex(dicts, fls) {
+function dict2flex(dicts, fls, compound) {
     let cdicts = []
     for (let dict of dicts) {
         /* log('____________________dict', dict.rdict) */
@@ -149,7 +149,7 @@ function dict2flex(dicts, fls) {
             if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
             else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
             else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
-            else if (dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+            else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
             if (ok) dict.fls.push(flex)
         }
         if (dict.fls.length) cdicts.push(dict)

@@ -14,30 +14,21 @@ let chains = await anthrax(wordform)
 for (let chain of chains) {
     log('_chain:', chain)
 
-    continue
-
-    for (let seg of chain) {
-        /* log('_seg:', seg) */
-        if (!seg.cdicts) continue
-        for (let dict of seg.cdicts) {
-            continue
-            log('_dict:', dict.rdict, '_plain:', dict.plain)
-            if (dict.flexes) log('_flexes:', dict.flexes.length)
-            /* if (dict.flexes) log('_cmpfls:', compactNameFls(dict.flexes)) */
-        }
+    if (fls) {
+        let plains = chain.map(seg=> seg.plain)
+        log('plains', plains, _.last(chain).flex)
+        chain.forEach(seg=> {
+            if (seg.cdicts) {
+                let rdicts = seg.cdicts.map(cdict=> cdict.rdict)
+                log('_rdicts:', seg.plain, '-', rdicts)
+            } else {
+                log('_seg:', seg)
+            }
+        })
     }
-    /* log('_Z', chain[chain.length -1]) */
+
 }
 
-
-if (fls) {
-    let chain = chains[0][0]
-    let dicts = chain.cdicts.filter(dict=> dict.name && dict.gends)
-    let fls = compactNamesFls(dicts)
-    log('_FLS:', chain.cdicts[0].fls)
-    log('_FLS:', fls)
-    log('_DICTS:', dicts)
-}
 
 
 
