@@ -1154,17 +1154,18 @@ dat: αἴνῳ, αἴνοιν, αἴνοις
 acc: αἶνον, αἴνω, αἴνους
 voc: αἶνε, αἴνω, αἶνοι
 
+# FAIL-FAIL - no plain
 # ----------------------------------
-dict: αἴξ • (aíx) m f (genitive αἰγός); third declension
+# dict: αἴξ • (aíx) m f (genitive αἰγός); third declension
 
-    goat
-    a kind of waterfowl, possibly a goose
+#     goat
+#     a kind of waterfowl, possibly a goose
 
-nom: αἴξ, αἶγε, αἶγες
-gen: αἰγός, αἰγοῖν, αἰγῶν
-dat: αἰγί, αἰγοῖν, αἰξί-αἰξίν
-acc: αἶγα, αἶγε, αἶγας
-voc: αἴξ, αἶγε, αἶγες
+# nom: αἴξ, αἶγε, αἶγες
+# gen: αἰγός, αἰγοῖν, αἰγῶν
+# dat: αἰγί, αἰγοῖν, αἰξί-αἰξίν
+# acc: αἶγα, αἶγε, αἶγας
+# voc: αἴξ, αἶγε, αἶγες
 
 # double
 # ----------------------------------

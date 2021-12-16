@@ -196,8 +196,7 @@ function makeBreaks(dag) {
 
 function restrictedNames(restricts, fls) {
     let cleans = fls.filter(flex=> {
-        if (!flex.name) return
-        if (flex.adv) return
+        if (!flex.numcase) return // flex.adv
         let ok = false
         restricts.forEach(restrict=> {
             if (flex.numcase.split(restrict).length > 1) ok = true
