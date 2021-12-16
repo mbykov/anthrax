@@ -1085,6 +1085,7 @@ dict: Αἴθων • (Aíthōn) m (genitive Αἴθωνος); third declension
     name of the eagle that eats the liver of Prometheus
 
 restrict: sg
+
 nom: Αἴθων
 gen: Αἴθωνος
 dat: Αἴθωνι

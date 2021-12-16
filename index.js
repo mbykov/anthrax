@@ -105,7 +105,9 @@ function makeChains(breaks, ddicts) {
         if (dag.prefs) {
             let connect = dag.prefs[dag.prefs.length-1]
             if (connect && connect.vowel) heads = heads.filter(dict=> aug2vow(connect.plain, dict.aug))
-        } else if (dag.aug) {
+        }
+
+        if (dag.aug) {
             heads = heads.filter(dict=> dict.aug == dag.aug)
         }
 
@@ -128,8 +130,8 @@ function makeChains(breaks, ddicts) {
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
-            /* log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', dictfls.length) */
-            chain.push({plain: br.head, cdicts: dictfls, flex:br.fls._id})
+            /* log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
+            chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id})
         }
         if (dictfls.length) chains.push(chain)
     }
@@ -140,19 +142,22 @@ function makeChains(breaks, ddicts) {
 function dict2flex(dicts, fls, compound) {
     let cdicts = []
     for (let dict of dicts) {
+        let cfls = _.clone(fls)
         /* log('____________________dict', dict.rdict) */
-        if (dict.name && dict.restrict) fls = restrictedNames(dict.restrict, fls)
-        if (dict.name) fls = fls.filter(flex=> !flex.adv)
+        if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls)
+        if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv
+        if (dict.verb) continue // todo: remove до тестов verb
         dict.fls = []
-        for (let flex of fls) {
-            // if (flex.adj) continue // чтобы убрать чужой gend из flex
+        for (let flex of cfls) {
             let ok = false
+            if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict)
             let key = plain(flex.key.split('-')[0])
             if (dict.name && dict.adj && flex.name && dict.keys[flex.gend].includes(flex.key)) ok = true
             else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
             else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
             if (ok) dict.fls.push(flex)
+            if (dict.verb && ok) log('_OK', flex)
         }
         if (dict.fls.length) cdicts.push(dict)
     }
@@ -192,6 +197,7 @@ function makeBreaks(dag) {
 function restrictedNames(restricts, fls) {
     let cleans = fls.filter(flex=> {
         if (!flex.name) return
+        if (flex.adv) return
         let ok = false
         restricts.forEach(restrict=> {
             if (flex.numcase.split(restrict).length > 1) ok = true

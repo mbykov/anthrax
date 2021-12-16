@@ -69,6 +69,7 @@ async function testWF(wf, exp) {
         let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names
         /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
         let dicts = _.last(chain).cdicts // .filter(dict=> dict.name && dict.gends)
+        dicts = dicts.filter(dict=> dict.name) // todo: remove до тестов verb
         let fls = compactNamesFls(dicts)
         assert.deepEqual(fls, exp)
     })
