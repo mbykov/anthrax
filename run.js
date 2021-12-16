@@ -27,8 +27,6 @@ for (let chain of chains) {
                 let fls = compactNameFls(cdict.fls)
                 log('_dict', cdict.rdict, fls)
             })
-
-
         } else {
             log('_seg:', seg)
         }
