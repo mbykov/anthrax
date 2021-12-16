@@ -56,13 +56,15 @@ for (let wfkey in cache) {
     cache[wfkey] = _.uniq(cache[wfkey])
 }
 
-log('_CACHE', cache['ἄδυτον'])
+/* log('_CACHE', cache['ἄδυτον']) */
 
-tests = tests.slice(0,1000)
+/* tests = tests.slice(0,1000) */
+/* tests = tests.filter(test => test.form == 'ἄδυτον') */
+/* log('_TEST', tests) */
 /* tests = [] */
 
 async function testWF(wf, exp) {
-    it(`wf: ${wf.dict} - ${wf.form} - ${wf.gend}`, async () => {
+    it(`wf: ${wf.dict} - ${wf.form} - ${wf.descr}`, async () => {
         let chains = await anthrax(wf.form)
         let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names
         /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
@@ -90,7 +92,7 @@ function compactNameFls(flexes) {
 
 function compactNamesFls(dicts) {
     let fls = dicts.map(dict=> {
-        return dict.fls.map(flex=> [flex.gend, flex.numcase].join('.'))
+        return dict.fls.filter(flex=> !flex.adv).map(flex=> [flex.gend, flex.numcase].join('.'))
     })
     return _.uniq(_.flatten(fls).sort())
 }
