@@ -141,6 +141,7 @@ function dict2flex(dicts, fls, compound) {
     let cdicts = []
     for (let dict of dicts) {
         /* log('____________________dict', dict.rdict) */
+        if (dict.name && dict.restrict) fls = restrictedNames(dict.restrict, fls)
         dict.fls = []
         for (let flex of fls) {
             // if (flex.adj) continue // чтобы убрать чужой gend из flex
@@ -186,6 +187,18 @@ function makeBreaks(dag) {
     return breaks
 }
 
+
+function restrictedNames(restricts, fls) {
+    let cleans = fls.filter(flex=> {
+        if (!flex.name) return
+        let ok = false
+        restricts.forEach(restrict=> {
+            if (flex.numcase.split(restrict).length > 1) ok = true
+        })
+        return ok
+    })
+    return cleans
+}
 
 
 // =================================
