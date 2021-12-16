@@ -76,6 +76,7 @@ export function adjTests(rows, limit) {
 
             line.forms.forEach((forms2, idy) => {
                 forms2.split('-').forEach(form => {
+                    form = comb(form)
                     let gends = tgends[idy]
                     gends.split(' ').forEach(gend => {
                         let num = tnums[idy]

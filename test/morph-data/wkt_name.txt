@@ -1794,6 +1794,7 @@ dict: ἅλας • (hálas) n (genitive ἅλατος); third declension
     Synonym of ἅλς (háls, “salt”)
 
 restrict: sg
+
 nom: ἅλας
 gen: ἅλατος
 dat: ἅλατι
@@ -2072,6 +2073,7 @@ dict: ἅλς • (háls) m (genitive ἁλός); third declension irreg
     wit
 
 #, Irregular declension, of, ὁ, ἅλς; τοῦ, ἁλός, (Attic) irreg
+
 restrict: sg pl
 nom: ἅλς, ἅλες
 gen: ἁλός, ἁλῶν
@@ -24455,11 +24457,12 @@ voc: νόε, νόω, νόοι
 
 #, Irregular declension, of, ὁ, νόος; τοῦ, νόος, (Attic)
 
-nom: νόος, -, νόες
-gen: νόος, νόοιν, νόων
-dat: νοΐ, νόοιν, νόσι-νόσιν
-acc: νόα, -, νόας
-voc: νόε, -, νόες
+#
+# nom: νόος, -, νόες
+# gen: νόος, νόοιν, νόων
+# dat: νοΐ, νόοιν, νόσι-νόσιν
+# acc: νόα, -, νόας
+# voc: νόε, -, νόες
 
 # ----------------------------------
 dict: νόσημα • (nósēma) n (genitive νοσήματος); third declension

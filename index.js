@@ -142,6 +142,7 @@ function dict2flex(dicts, fls, compound) {
     for (let dict of dicts) {
         /* log('____________________dict', dict.rdict) */
         if (dict.name && dict.restrict) fls = restrictedNames(dict.restrict, fls)
+        if (dict.name) fls = fls.filter(flex=> !flex.adv)
         dict.fls = []
         for (let flex of fls) {
             // if (flex.adj) continue // чтобы убрать чужой gend из flex

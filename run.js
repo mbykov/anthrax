@@ -20,8 +20,10 @@ for (let chain of chains) {
     /* log('plains', plains, _.last(chain).flex) */
     chain.forEach(seg=> {
         if (seg.cdicts) {
-            let cdicts = seg.cdicts.map(cdict=> cdict.rdict)
+            /* let rdicts = seg.cdicts.map(cdict=> cdict.rdict) */
             seg.cdicts.forEach(cdict=> {
+                /* log('_D', cdict.rdict) */
+                /* log('_F', cdict.fls) */
                 let fls = compactNameFls(cdict.fls)
                 log('_dict', cdict.rdict, fls)
             })

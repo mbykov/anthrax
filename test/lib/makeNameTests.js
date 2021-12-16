@@ -54,6 +54,7 @@ export function nameTests(rows, limit) {
                 let forms = form2.split('-')
                 for  (let form of forms) {
                     if (!form) continue
+                    form = comb(form)
                     let number = numbers[idx]
                     if (rtest.pl) number = 'pl'
                     if (rtest.restrict) number = rtest.restrict.split(' ')[idx]
