@@ -17,11 +17,16 @@ for (let chain of chains) {
     if (!true)  continue
 
     let plains = chain.map(seg=> seg.plain)
-    log('plains', plains, _.last(chain).flex)
+    /* log('plains', plains, _.last(chain).flex) */
     chain.forEach(seg=> {
         if (seg.cdicts) {
-            let rdicts = seg.cdicts.map(cdict=> cdict.rdict)
-            log('_rdicts:', seg.plain, '-', rdicts)
+            let cdicts = seg.cdicts.map(cdict=> cdict.rdict)
+            seg.cdicts.forEach(cdict=> {
+                let fls = compactNameFls(cdict.fls)
+                log('_dict', cdict.rdict, fls)
+            })
+
+
         } else {
             log('_seg:', seg)
         }

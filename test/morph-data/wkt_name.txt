@@ -8123,18 +8123,19 @@ dat: δαίμονι, δαιμόνοιν, δαίμοσι-δαίμοσιν
 acc: δαίμονα, δαίμονε, δαίμονας
 voc: δαῖμον, δαίμονε, δαίμονες
 
+# FAIL-FAIL
 # ----------------------------------
-dict: δάϊς • (dáïs), f third declension
+# dict: δάϊς • (dáïs), f third declension
 
-    battle
+#     battle
 
-#, Irregular declension, of, ἡ, δάϊς; -, (Attic)
-restrict: sg
-nom: δάϊς
-gen: -
-dat: δαΐ
-acc: δάϊν
-voc: -
+# #, Irregular declension, of, ἡ, δάϊς; -, (Attic)
+# restrict: sg
+# nom: δάϊς
+# gen: -
+# dat: δαΐ
+# acc: δάϊν
+# voc: -
 
 # ----------------------------------
 dict: δαίς • (daís) f (genitive δαιτός); third declension
@@ -14168,7 +14169,7 @@ acc: θείαν, θεία, θείας
 voc: θεία, θεία, θεῖαι
 
 # ----------------------------------
-dict: θεῖον • (theîon), n (xxx)
+dict: θεῖον • (theîon), n (genitive θείου)
 
     Neuter nominative singular form of θεῖος (theîos, “divine”).
     (as substantive)
@@ -19990,20 +19991,21 @@ dat: κυνί, κυνοῖν, κυσί-κυσίν-κύνεσσι
 acc: κύνα, κύνε, κύνας
 voc: κύον-κύων, κύνε, κύνες
 
+# FAIL-FAIL
 # ----------------------------------
 # sg pl - не обраба
-dict: κῶας • (kôas) n (genitive); third declension
+# dict: κῶας • (kôas) n (genitive); third declension
 
-    fleece
+#     fleece
 
-#, Irregular declension, of, τὸ, κῶας; -, (Attic)
+# #, Irregular declension, of, τὸ, κῶας; -, (Attic)
 
-restrict: sg pl
-nom: κῶας-κῶς, κώεα
-#gen: -, -
-dat: -, κώεσιν
-acc: κῶας-κῶς, κώεα
-voc: κῶας-κῶς, κώεα
+# restrict: sg pl
+# nom: κῶας-κῶς, κώεα
+# #gen: -, -
+# dat: -, κώεσιν
+# acc: κῶας-κῶς, κώεα
+# voc: κῶας-κῶς, κώεα
 
 # ----------------------------------
 dict: κῴδιον • (kṓidion) n (genitive κῳδίου); second declension
@@ -25500,18 +25502,19 @@ dat: ὄντι, ὀντοῖν, -
 acc: ὄν, ὄντε, ὄντα
 voc: ὄν, ὄντε, ὄντα
 
+# FAIL-FAIL
 # ----------------------------------
-dict: ὄναρ • (ónar) n (genitive); third declension
+# dict: ὄναρ • (ónar) n (genitive); third declension
 
-    a dream
+#     a dream
 
-# This, noun, is, only, used, in, nom., sg., and, acc., sg.; otherwise, it, is, replaced, by, ὄνειρος, (óneiros).
-restrict: sg pl
-nom: ὄναρ, -
-gen: -, -
-dat: -, -
-acc: ὄναρ, -
-voc: -, -
+# # This, noun, is, only, used, in, nom., sg., and, acc., sg.; otherwise, it, is, replaced, by, ὄνειρος, (óneiros).
+# restrict: sg pl
+# nom: ὄναρ, -
+# gen: -, -
+# dat: -, -
+# acc: ὄναρ, -
+# voc: -, -
 
 # ----------------------------------
 dict: ὄνειδος • (óneidos) n (genitive ὀνείδεος or ὀνείδους); third declension
@@ -26268,19 +26271,20 @@ dat: ὄσσῃ, ὄσσαιν, ὄσσαις
 acc: ὄσσαν, ὄσσα, ὄσσας
 voc: ὄσσα, ὄσσα, ὄσσαι
 
+# FAIL-FAIL
 # ----------------------------------
-dict: ὄσσε • (ósse) n du, (genitive); second declension
+# dict: ὄσσε • (ósse) n du, (genitive); second declension
 
-    eyes
+#     eyes
 
-# Irregular declension of ὄσσε; -, (Attic)
+# # Irregular declension of ὄσσε; -, (Attic)
 
-restrict: du pl
-nom: ὄσσε, ὄσσε
-gen: -, ὄσσων
-dat: -, ὄσσοις
-acc: ὄσσε, ὄσσε
-voc: ὄσσε, -
+# restrict: du pl
+# nom: ὄσσε, ὄσσε
+# gen: -, ὄσσων
+# dat: -, ὄσσοις
+# acc: ὄσσε, ὄσσε
+# voc: ὄσσε, -
 
 # ----------------------------------
 dict: ὀστέον • (ostéon) n (genitive ὀστέου); second declension
@@ -28803,7 +28807,7 @@ acc: πνεῦμα, πνεύματε, πνεύματα
 voc: πνεῦμα, πνεύματε, πνεύματα
 
 # ----------------------------------
-dict: πνευμονία • (pneumoníā) f (xxx)
+dict: πνευμονία • (pneumoníā) f (genitive πνευμονίας)
 
     a disease of the lungs
 

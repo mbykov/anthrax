@@ -31,41 +31,49 @@ let arows = atext.split('\n')
 let cache =  new Map();
 /* let res = {} */
 
-/* let ntests = nameTests(nrows, 2) */
-/* log('_NTESTS', ntests) */
+let limit = 0
 
-
-let atests = adjTests(arows, 2)
+let ntests = nameTests(nrows, limit)
+log('_NTESTS', ntests.length)
+let atests = adjTests(arows, limit)
 log('_ATESTS', atests.length)
 
-
-/* let wfs = testNames() */
+let tests = ntests.concat(atests)
+log('_TESTS', tests.length)
 
 let wfs = []
-for (let wf of wfs) {
+for (let wf of tests) {
+    if (!wf.dict) log('__NO DICT', wf)
     let wfplain = plain(wf.dict)
     let wfkey = [wfplain, wf.form].join('-') // plain.form нельзя, ἕδρᾳ - отвалится йота
     wfkey = wf.form
     /* let wfkey = [plain(wf.dict), plain(wf.form)].join('-') */
     if (!cache[wfkey]) cache[wfkey] = []
-    cache[wfkey].push([wf.gend, wf.numcase].join('.'))
+    cache[wfkey].push(wf.descr)
 }
 
-/* log('_CACHE', cache) */
+for (let wfkey in cache) {
+    cache[wfkey] = _.uniq(cache[wfkey])
+}
+
+log('_CACHE', cache['ἄδυτον'])
+
+tests = tests.slice(0,1000)
+/* tests = [] */
 
 async function testWF(wf, exp) {
     it(`wf: ${wf.dict} - ${wf.form} - ${wf.gend}`, async () => {
         let chains = await anthrax(wf.form)
         let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names
         /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
-        let dicts = _.last(chain).cdicts.filter(dict=> dict.name && dict.gends)
+        let dicts = _.last(chain).cdicts // .filter(dict=> dict.name && dict.gends)
         let fls = compactNamesFls(dicts)
         assert.deepEqual(fls, exp)
     })
 }
 
 describe('test names:', () => {
-    for (let wf of wfs) {
+    for (let wf of tests) {
         let wfplain = plain(wf.dict)
         let wfkey = [wfplain, wf.form].join('-')
         wfkey = wf.form

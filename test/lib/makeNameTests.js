@@ -59,7 +59,9 @@ export function nameTests(rows, limit) {
                     if (rtest.restrict) number = rtest.restrict.split(' ')[idx]
                     let numcase = [number, kase].join('.')
                     rtest.gend.split(' ').forEach(gend=> {
-                        let test = {dict: rtest.dict, form, gend: gend, numcase}
+                        /* let test = {dict: rtest.dict, form, gend: gend, numcase} */
+                        let descr = [gend, numcase].join('.')
+                        let test = {dict: rtest.dict, form, descr}
                         ntests.push(test)
                     })
                 }

@@ -62,13 +62,9 @@ export function adjTests(rows, limit) {
             let line = {descr: descr, forms: str.trim().split(', ')}
             res.lines.push(line)
         }
-        // log('IDX', idx, descr)
     }
 
-    log('_RTS', rtests.length)
     if (limit) rtests = rtests.slice(0, limit)
-    /* log('_LIMIT', rtests) */
-    /* log('_LINES', rtests[0].lines[2]) */
 
     for  (let rtest of rtests) {
         if (!rtest.lines) continue
@@ -77,8 +73,6 @@ export function adjTests(rows, limit) {
             let size = line.forms.length
             let tgends = gends[size]
             let tnums = nums[size]
-            /* log('_line', line) */
-            log('_size', size)
 
             line.forms.forEach((forms2, idy) => {
                 forms2.split('-').forEach(form => {
@@ -86,31 +80,12 @@ export function adjTests(rows, limit) {
                     gends.split(' ').forEach(gend => {
                         let num = tnums[idy]
                         let descr = [gend, num, kase].join('.')
-                        let test = [rtest.dict, form, descr]
-                        log('__t', test)
+                        let test = {dict: rtest.dict, form, descr}
                         tests.push(test)
                     })
                 })
             })
-
-
         }
     }
     return tests
-}
-
-
-
-function a() {
-    tarr.forEach((arg2, idy) => {
-        arg2.split('-').forEach(arg => {
-            let gends = tgends[idy]
-            gends.split(' ').forEach(gend => {
-                let num = tnums[idy]
-                let test = [dict, arg, gend, num, descr]
-                rtests.push(test)
-            })
-        })
-    })
-
 }
