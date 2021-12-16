@@ -12,21 +12,20 @@ let fls = process.argv[3]
 let chains = await anthrax(wordform)
 
 for (let chain of chains) {
-    log('_chain:', chain)
 
-    if (fls) {
-        let plains = chain.map(seg=> seg.plain)
-        log('plains', plains, _.last(chain).flex)
-        chain.forEach(seg=> {
-            if (seg.cdicts) {
-                let rdicts = seg.cdicts.map(cdict=> cdict.rdict)
-                log('_rdicts:', seg.plain, '-', rdicts)
-            } else {
-                log('_seg:', seg)
-            }
-        })
-    }
+    log('\n_chain:', chain)
+    if (!true)  continue
 
+    let plains = chain.map(seg=> seg.plain)
+    log('plains', plains, _.last(chain).flex)
+    chain.forEach(seg=> {
+        if (seg.cdicts) {
+            let rdicts = seg.cdicts.map(cdict=> cdict.rdict)
+            log('_rdicts:', seg.plain, '-', rdicts)
+        } else {
+            log('_seg:', seg)
+        }
+    })
 }
 
 

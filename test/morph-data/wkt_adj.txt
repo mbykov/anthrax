@@ -11,7 +11,6 @@
 # ᾖ
 # ἐλέθτω - fail
 
-MA
 #---------------------------------
 dict: ἀάατος • (aā́atos) m, f (neuter ἀάατον) second declension (Epic)
 
@@ -74,6 +73,7 @@ adv: ἀαγέως, ἀαγέστερος, ἀαγέστατος
 
 caution: !
 
+MA
 #---------------------------------
 dict: ἀβαρής • (abarḗs) m, f (neuter ἀβαρές) third declension
 
