@@ -25,10 +25,16 @@ const m = Debug('more')
 export async function anthrax(wf) {
     let cwf = comb(wf)
     let terms = await getTerms(cwf)
+    log('_terms_1:', terms)
+    if (terms.length) return terms
+
+    let chains = await anthraxChains(wf)
+    log('_chains:', chains)
+
     return terms
 }
 
-export async function anthrax_(wf) {
+export async function anthraxChains(wf) {
     dag = new Map();
     dag.chains = []
     /* dag.cache = {} */

@@ -11,7 +11,7 @@ let fls = process.argv[3]
 
 let res = await anthrax(wordform)
 
-log('_ANTHRAX', res)
+/* log('_ANTHRAX', res) */
 
 let chains = []
 
