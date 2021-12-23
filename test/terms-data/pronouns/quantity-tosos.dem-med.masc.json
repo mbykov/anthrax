@@ -1,0 +1,24 @@
+{
+    "var":"quantity",
+    "type": "dem-med",
+    "trn": "this much; so much, so very, so great; synonym of ὅσος",
+    "gend": "masc",
+    "dict": "τόσος",
+    "adv": "τόσως",
+    "comp": "τοσώτερος",
+    "super": "τοσώτᾰτος",
+    "forms": {
+        "sg.nom": "τόσος",
+        "sg.gen": "τόσου",
+        "sg.dat": "τόσῳ",
+        "sg.acc": "τόσον",
+        "du.nom": "τόσω",
+        "du.gen": "τόσοιν",
+        "du.dat": "τόσοιν",
+        "du.acc": "τόσω",
+        "pl.nom": "τόσοι",
+        "pl.gen": "τόσων",
+        "pl.dat": "τόσοις",
+        "pl.acc": "τόσους"
+    }
+}

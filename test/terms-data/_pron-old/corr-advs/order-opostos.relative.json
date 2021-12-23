@@ -1,0 +1,10 @@
+{
+    "var":"order",
+    "type": "relative",
+    "trn": "in which place in a series",
+    "gend": "",
+    "dict": "ὁπόστος",
+    "forms":{
+        "sg.nom": "ὁπόστος"
+    }
+}

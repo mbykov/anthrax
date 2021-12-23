@@ -8,7 +8,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { accents, scrape, vowels, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref } from './lib/utils.js'
-import { getFlexes, getSegments } from './lib/remote.js'
+import { getTerms, getFlexes, getSegments } from './lib/remote.js'
 /* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
 
@@ -21,9 +21,14 @@ const h = Debug('head')
 const g = Debug('dag')
 const m = Debug('more')
 
-/* anthrax(wordform) */
 
-export async function anthrax (wf) {
+export async function anthrax(wf) {
+    let cwf = comb(wf)
+    let terms = await getTerms(cwf)
+    return terms
+}
+
+export async function anthrax_(wf) {
     dag = new Map();
     dag.chains = []
     /* dag.cache = {} */

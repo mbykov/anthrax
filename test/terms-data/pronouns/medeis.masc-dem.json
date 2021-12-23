@@ -1,0 +1,21 @@
+{
+    "type":"demonstr",
+    "var": "quantity",
+    "trn": "not one, nobody",
+    "dict": "μηδείς",
+    "gend": "masc",
+    "forms":{
+        "sg.nom": "μηδείς",
+        "sg.gen": "μηδενός",
+        "sg.dat": "μηδενί",
+        "sg.acc": "μηδένα",
+        "du.nom": "",
+        "du.acc": "",
+        "du.gen": "",
+        "du.dat": "",
+        "pl.nom": "μηδένες",
+        "pl.gen": "μηδένων",
+        "pl.dat": "μηδέσι μηδέσιν",
+        "pl.acc": "μηδένας"
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "pos": "pron",
+    "type": "pers",
+    "trn": "(first person plural, personal pronoun) we, us, our",
+    "dict": "ἐγώ",
+    "gend": "mfn",
+    "forms": {
+        "pl.nom": "ἡμεῖς",
+        "pl.gen": "ἡμῶν",
+        "pl.dat": "ἡμῖν",
+        "pl.acc": "ἡμᾶς"
+    }
+}

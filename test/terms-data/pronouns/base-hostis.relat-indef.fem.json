@@ -1,0 +1,21 @@
+{
+    "var":"base",
+    "type": "relat-indef",
+    "trn": "whoever, whatever, anyone who, anything which; someone who, something which",
+    "gend": "fem",
+    "dict": "ὅστῐς",
+    "forms":{
+        "sg.nom": "ἥτῐς",
+        "sg.gen": "ἧστῐνος",
+        "sg.dat": "ᾗτῐνῐ",
+        "sg.acc": "ἥντῐνᾰ",
+        "du.nom": "ὥτῐνε",
+        "du.gen": "οἷντῐνοιν",
+        "du.dat": "οἷντῐνοιν",
+        "du.acc": "ὥτῐνε",
+        "pl.nom": "αἵτῐνες",
+        "pl.gen": "ὧντῐνων",
+        "pl.dat": "αἷστῐσῐ αἷστῐσῐν",
+        "pl.acc": "ᾱ̔́στῐνᾰς"
+    }
+}

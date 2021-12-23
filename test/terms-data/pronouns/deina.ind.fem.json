@@ -1,0 +1,21 @@
+{
+    "type":"indef",
+    "var": "quality",
+    "trn": "such an one, so-and-so",
+    "dict": "δεῖνα",
+    "gend": "fem",
+    "forms":{
+        "sg.nom": "δεῖνα",
+        "sg.gen": "δεῖνος",
+        "sg.dat": "δεῖνι",
+        "sg.acc": "δεῖνα",
+        "du.nom": "",
+        "du.acc": "",
+        "du.gen": "",
+        "du.dat": "",
+        "pl.nom": "δεῖνες",
+        "pl.gen": "δείνων",
+        "pl.dat": "δεῖσι",
+        "pl.acc": "δεῖνας"
+    }
+}

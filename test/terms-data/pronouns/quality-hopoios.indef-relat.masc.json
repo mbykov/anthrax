@@ -1,0 +1,24 @@
+{
+    "var":"quality",
+    "type": "indef",
+    "trn": "whatever kind",
+    "gend": "masc",
+    "dict": "ὁποιός",
+    "adv": "ὁποιῶς",
+    "comp": "ὁποιότερος",
+    "super": "ὁποιότᾰτος",
+    "forms": {
+        "sg.nom": "ὁποιός",
+        "sg.gen": "ὁποιοῦ",
+        "sg.dat": "ὁποιῷ",
+        "sg.acc": "ὁποιόν",
+        "du.nom": "ὁποιώ",
+        "du.gen": "ὁποιοῖν",
+        "du.dat": "ὁποιοῖν",
+        "du.acc": "ὁποιώ",
+        "pl.nom": "ὁποιοί",
+        "pl.gen": "ὁποιῶν",
+        "pl.dat": "ὁποιοῖς",
+        "pl.acc": "ὁποιούς"
+    }
+}

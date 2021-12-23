@@ -9,7 +9,12 @@ const log = console.log
 
 let fls = process.argv[3]
 
-let chains = await anthrax(wordform)
+let res = await anthrax(wordform)
+
+log('_ANTHRAX', res)
+
+let chains = []
+
 
 for (let chain of chains) {
 

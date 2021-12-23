@@ -1,0 +1,22 @@
+{
+    "var":"quality",
+    "type": "relative",
+    "trn": "which kind; such as; what sort, manner, kind of”",
+    "gend": "masc",
+    "dict": "οἷος",
+    "adv": "οἷον",
+    "forms": {
+        "sg.nom": "οἷος",
+        "sg.gen": "οἵου",
+        "sg.dat": "οἵῳ",
+        "sg.acc": "οἷον",
+        "du.nom": "οἵω",
+        "du.gen": "οἵοιν",
+        "du.dat": "οἵοιν",
+        "du.acc": "οἵω",
+        "pl.nom": "οἷοι",
+        "pl.gen": "οἵων",
+        "pl.dat": "οἵοις",
+        "pl.acc": "οἵους"
+    }
+}

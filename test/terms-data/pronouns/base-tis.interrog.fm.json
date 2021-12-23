@@ -1,0 +1,21 @@
+{
+    "var":"base",
+    "type": "inter",
+    "trn": "(substantive); (masculine, feminine) who?; (neuter) what?; (adjective) what? which? what kind?",
+    "gend": "fem, masc",
+    "dict": "τίς",
+    "forms":{
+        "sg.nom": "τίς",
+        "sg.gen": "τίνος, τοῦ",
+        "sg.dat": "τίνι, τῷ",
+        "sg.acc": "τίνα",
+        "du.nom": "τίνε",
+        "du.gen": "τίνοιν",
+        "du.dat": "τίνοιν",
+        "du.acc": "τίνε",
+        "pl.nom": "τίνες",
+        "pl.gen": "τίνων",
+        "pl.dat": "τίσι τίσιν",
+        "pl.acc": "τίνας"
+    }
+}

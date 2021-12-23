@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "indef",
+    "trn": "some kind of; of a certain nature, kind or quality",
+    "gend": "neut",
+    "dict": "ποιός",
+    "forms": {
+        "sg.nom": "ποιόν",
+        "sg.gen": "ποιοῦ",
+        "sg.dat": "ποιῷ",
+        "sg.acc": "ποιόν",
+        "du.nom": "ποιώ",
+        "du.gen": "ποιοῖν",
+        "du.dat": "ποιοῖν",
+        "du.acc": "ποιώ",
+        "pl.nom": "ποιᾰ́",
+        "pl.gen": "ποιῶν",
+        "pl.dat": "ποιοῖς",
+        "pl.acc": "ποιᾰ́"
+    }
+}

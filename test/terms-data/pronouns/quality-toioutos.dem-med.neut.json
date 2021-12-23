@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "dem-med",
+    "trn": "this kind; of this sort, such",
+    "gend": "neut",
+    "dict": "τοιοῦτος",
+    "forms": {
+        "sg.nom": "τοιοῦτο τοιοῦτον",
+        "sg.gen": "τοιούτου",
+        "sg.dat": "τοιούτῳ",
+        "sg.acc": "τοιοῦτο τοιοῦτον",
+        "du.nom": "τοιούτω",
+        "du.gen": "τοιούτοιν",
+        "du.dat": "τοιούτοιν",
+        "du.acc": "τοιούτω",
+        "pl.nom": "τοιαῦτᾰ",
+        "pl.gen": "τοιούτων",
+        "pl.dat": "τοιούτοις",
+        "pl.acc": "τοιαῦτᾰ"
+    }
+}

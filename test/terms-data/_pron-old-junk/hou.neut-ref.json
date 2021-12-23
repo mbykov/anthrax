@@ -1,0 +1,16 @@
+{
+    "type":"term",
+    "pos": "pron",
+    "descr": "Indirect Reflexive Pronoun: third person",
+    "trn": "that, (where)",
+    "dict": "σφεῖς",
+    "gend": "neut",
+    "forms":{
+        "sg.gen": "οὗ, οὑ",
+        "sg.dat": "οἷ",
+        "sg.acc": "ἕ, ἑ",
+        "pl.gen": "σφῶν",
+        "pl.dat": "σφίσι, σφίσιν, σφισι, σφισιν",
+        "pl.acc": "σφέα, σφεα"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "var":"quantity",
+    "type": "interrog",
+    "trn": "how much?; how many?, how big?, how great?, how far?, how long?",
+    "gend": "masc",
+    "dict": "πόσος",
+    "adv": "πόσως",
+    "comp": "ποσώτερος",
+    "super": "ποσώτᾰτος",
+    "forms": {
+        "sg.nom": "πόσος",
+        "sg.gen": "πόσου",
+        "sg.dat": "πόσῳ",
+        "sg.acc": "πόσον",
+        "du.nom": "πόσω",
+        "du.gen": "πόσοιν",
+        "du.dat": "πόσοιν",
+        "du.acc": "πόσω",
+        "pl.nom": "πόσοι",
+        "pl.gen": "πόσων",
+        "pl.dat": "πόσοις",
+        "pl.acc": "πόσους"
+    }
+}

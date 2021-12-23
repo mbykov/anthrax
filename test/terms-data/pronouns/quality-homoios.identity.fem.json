@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "identity",
+    "trn": "the same kind; Like, resembling [+dative = someone, something], similar [+dative = to someone, something]; Shared, common, mutual; Suited to, appropriate for; Equal; The same",
+    "gend": "fem",
+    "dict": "ὅμοιος",
+    "forms": {
+        "sg.nom": "ὁμοίᾱ",
+        "sg.gen": "ὁμοίᾱς",
+        "sg.dat": "ὁμοίᾳ",
+        "sg.acc": "ὁμοίᾱν",
+        "du.nom": "ὁμοίᾱ",
+        "du.gen": "ὁμοίαιν",
+        "du.dat": "ὁμοίαιν",
+        "du.acc": "ὁμοίᾱ",
+        "pl.nom": "ὅμοιαι",
+        "pl.gen": "ὁμοίων",
+        "pl.dat": "ὁμοίαις",
+        "pl.acc": "ὁμοίᾱς"
+    }
+}

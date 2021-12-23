@@ -1,0 +1,17 @@
+{
+    "type": "pers",
+    "trn": "of himself, herself, itself, 3d person",
+    "dict": "ἑαυτοῦ",
+    "gend": "neut",
+    "forms": {
+        "sg.gen": "ἑαυτοῦ",
+        "sg.dat": "ἑαυτῷ",
+        "sg.acc": "ἑαυτό",
+        "du.gen": "ἑαυτοῖν",
+        "du.dat": "ἑαυτοῖν",
+        "du.acc": "ἑαυτώ",
+        "pl.gen": "ἑαυτῶν",
+        "pl.dat": "ἑαυτοῖς",
+        "pl.acc": "ἑαυτά"
+    }
+}

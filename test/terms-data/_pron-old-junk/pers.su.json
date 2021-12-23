@@ -1,0 +1,23 @@
+{
+    "type":"term",
+    "pos": "pron",
+    "descr": "2st person",
+    "var": "pers",
+    "trn": "you",
+    "dict": "σφεῖς",
+    "gend": "",
+    "forms":{
+        "sg.nom": "σύ",
+        "sg.gen": "σοῦ σου",
+        "sg.dat": "σοί σοι σῷ",
+        "sg.acc": "σέ σε",
+        "du.nom": "σφώ",
+        "du.acc": "σφώ",
+        "du.gen": "σφῷν",
+        "du.dat": "σφῷν",
+        "pl.nom": "ὑμεῖς",
+        "pl.gen": "ὑμῶν",
+        "pl.dat": "ὑμῖν",
+        "pl.acc": "ὑμᾶς"
+    }
+}

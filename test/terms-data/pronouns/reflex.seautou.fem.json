@@ -1,0 +1,11 @@
+{
+    "type": "pers",
+    "trn": "of yourself, reflexive, third person",
+    "dict": "σεαυτοῦ",
+    "gend": "fem",
+    "forms": {
+        "sg.gen": "σεαυτῆς, σαυτῆς, σεωυτῆς",
+        "sg.dat": "σεαυτῇ, σαυτῇ, σεωυτῇ",
+        "sg.acc": "σεαυτήν, σαυτήν, σεωυτήν"
+    }
+}

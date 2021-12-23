@@ -1,0 +1,24 @@
+{
+    "var":"size",
+    "type": "relative",
+    "trn": "which size; (relative adjective) as big or great as, as old as; (indirect interrogative adjective) how big; extraordinarily big or small; (exclamatory adjective) how big!",
+    "gend": "masc",
+    "dict": "ἡλίκος",
+    "adv": "ἡλῐ́κως",
+    "comp": "ἡλῐκώτερος",
+    "super": "ἡλῐκώτᾰτος",
+    "forms":{
+        "sg.nom": "ἡλίκος",
+        "sg.gen": "ἡλῐ́κου",
+        "sg.dat": "ἡλῐ́κῳ",
+        "sg.acc": "ἡλῐ́κον",
+        "du.nom": "ἡλῐ́κω",
+        "du.gen": "ἡλῐ́κοιν",
+        "du.dat": "ἡλῐ́κοιν",
+        "du.acc": "ἡλῐ́κω",
+        "pl.nom": "ἡλῐ́κοι",
+        "pl.gen": "ἡλῐ́κων",
+        "pl.dat": "ἡλῐ́κοις",
+        "pl.acc": "ἡλῐ́κους"
+    }
+}

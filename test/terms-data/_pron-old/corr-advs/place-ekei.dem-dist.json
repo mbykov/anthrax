@@ -1,0 +1,10 @@
+{
+    "var":"place",
+    "type": "dem-dist",
+    "trn": "there; in that place",
+    "gend": "",
+    "dict": "ἐκεῖ",
+    "forms": {
+        "sg.nom": "ἐκεῖ ἔνθα κεῖθι ἐκεῖθῐ"
+    }
+}

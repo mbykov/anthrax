@@ -1,0 +1,23 @@
+{
+    "type":"term",
+    "pos": "pron",
+    "descr": "ὅς, ἥ, ὅ, who, which",
+    "var": "relat",
+    "trn": "who, which, his, her",
+    "dict": "ὅς",
+    "gend": "masc",
+    "forms":{
+        "sg.nom": "ὅς",
+        "sg.gen": "οὗ",
+        "sg.dat": "ᾧ",
+        "sg.acc": "ὅν",
+        "du.nom": "ὥ",
+        "du.acc": "ὥ",
+        "du.gen": "οἷν",
+        "du.dat": "οἷν",
+        "pl.nom": "οἵ",
+        "pl.gen": "ὧν",
+        "pl.dat": "οἷς",
+        "pl.acc": "οὕς"
+    }
+}

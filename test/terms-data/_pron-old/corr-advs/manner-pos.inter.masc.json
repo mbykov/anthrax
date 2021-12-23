@@ -1,0 +1,10 @@
+{
+    "var":"manner",
+    "type": "interrog",
+    "trn": "how?, in what way?",
+    "gend": "",
+    "dict": "πῶς",
+    "forms": {
+        "sg.nom": "πῶς"
+    }
+}

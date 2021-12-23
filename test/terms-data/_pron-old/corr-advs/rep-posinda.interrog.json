@@ -1,0 +1,10 @@
+{
+    "var":"repetition",
+    "type": "interrog",
+    "trn": "how many times?",
+    "gend": "",
+    "dict": "ποσίνδα",
+    "forms":{
+        "sg.nom": "ποσίνδα"
+    }
+}

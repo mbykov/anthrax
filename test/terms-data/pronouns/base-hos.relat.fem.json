@@ -1,0 +1,21 @@
+{
+    "var":"base",
+    "type": "relat",
+    "trn": "(relative) who, which, that",
+    "gend": "fem",
+    "dict": "ὅς",
+    "forms":{
+        "sg.nom": "ἥ",
+        "sg.gen": "ἧς",
+        "sg.dat": "ᾗ",
+        "sg.acc": "ἥν",
+        "du.nom": "ᾱ̔́",
+        "du.gen": "αἷν",
+        "du.dat": "αἷν",
+        "du.acc": "ᾱ̔́",
+        "pl.nom": "αἵ",
+        "pl.gen": "ὧν",
+        "pl.dat": "αἷς",
+        "pl.acc": "ᾱ̔́ς"
+    }
+}

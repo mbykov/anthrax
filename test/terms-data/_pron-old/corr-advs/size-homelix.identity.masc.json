@@ -1,0 +1,10 @@
+{
+    "var":"size",
+    "type": "relative",
+    "trn": "the same age",
+    "gend": "masc",
+    "dict": "ὁμῆλιξ",
+    "forms":{
+        "sg.nom": "ὁμῆλιξ"
+    }
+}

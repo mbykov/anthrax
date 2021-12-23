@@ -1,0 +1,10 @@
+{
+    "var":"base",
+    "type": "interrog",
+    "trn": "what?",
+    "gend": "",
+    "dict": "τίς",
+    "forms": {
+        "sg.nom": "τίς"
+    }
+}

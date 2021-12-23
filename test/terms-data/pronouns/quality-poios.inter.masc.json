@@ -1,0 +1,24 @@
+{
+    "var":"quality",
+    "type": "interrog",
+    "trn": "what kind?; of what kind?, of what nature?; which?, what?",
+    "gend": "masc",
+    "dict": "ποῖος",
+    "adv": "ποιῶς",
+    "comp": "ποιότερος",
+    "super": "ποιότᾰτος",
+    "forms": {
+        "sg.nom": "ποῖος",
+        "sg.gen": "ποίου",
+        "sg.dat": "ποίῳ",
+        "sg.acc": "ποῖον",
+        "du.nom": "ποίω",
+        "du.gen": "ποίοιν",
+        "du.dat": "ποίοιν",
+        "du.acc": "ποίω",
+        "pl.nom": "ποῖοι",
+        "pl.gen": "ποίων",
+        "pl.dat": "ποίοις",
+        "pl.acc": "ποίους"
+    }
+}

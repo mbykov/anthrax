@@ -1,0 +1,21 @@
+{
+    "type":"relative",
+    "var": "recip",
+    "dict": "ἄλλος",
+    "trn": "another",
+    "gend": "fem",
+    "forms":{
+        "sg.nom": "ἄλλη",
+        "sg.gen": "ἄλλης",
+        "sg.dat": "ἄλλῃ",
+        "sg.acc": "ἄλλην",
+        "du.nom": "ἄλλα",
+        "du.gen": "ἄλλαιν",
+        "du.dat": "ἄλλαιν",
+        "du.acc": "ἄλλα",
+        "pl.nom": "ἄλλαι",
+        "pl.gen": "ἄλλων",
+        "pl.dat": "ἄλλαις",
+        "pl.acc": "ἄλλας"
+    }
+}

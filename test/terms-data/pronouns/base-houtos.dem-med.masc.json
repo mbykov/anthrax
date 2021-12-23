@@ -1,0 +1,21 @@
+{
+    "var":"base",
+    "type": "dem-med",
+    "trn": "this; (of place) here; in contrast with ὅδε (hóde): the preceding; in contrast with ἐκεῖνος (ekeînos): the latter; of someone or something famous or infamous",
+    "gend": "masc",
+    "dict": "οὗτος",
+    "forms":{
+        "sg.nom": "οὗτος",
+        "sg.gen": "τούτου",
+        "sg.dat": "τούτῳ",
+        "sg.acc": "τοῦτον",
+        "du.nom": "τούτω",
+        "du.gen": "τούτοιν",
+        "du.dat": "τούτοιν",
+        "du.acc": "τούτω",
+        "pl.nom": "οὗτοι",
+        "pl.gen": "τούτων",
+        "pl.dat": "τούτοις",
+        "pl.acc": "τούτους"
+    }
+}

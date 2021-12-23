@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "indef",
+    "trn": "whatever kind",
+    "gend": "neut",
+    "dict": "ὁποιός",
+    "forms": {
+        "sg.nom": "ὁποιόν",
+        "sg.gen": "ὁποιοῦ",
+        "sg.dat": "ὁποιῷ",
+        "sg.acc": "ὁποιόν",
+        "du.nom": "ὁποιώ",
+        "du.gen": "ὁποιοῖν",
+        "du.dat": "ὁποιοῖν",
+        "du.acc": "ὁποιώ",
+        "pl.nom": "ὁποιᾰ́",
+        "pl.gen": "ὁποιῶν",
+        "pl.dat": "ὁποιοῖς",
+        "pl.acc": "ὁποιᾰ́"
+    }
+}

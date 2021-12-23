@@ -1,0 +1,10 @@
+{
+    "var": "time",
+    "type": "relative",
+    "trn": "when (relative), at which time",
+    "gend": "",
+    "dict": "ἦμος",
+    "forms": {
+        "sg.nom": "ἦμος"
+    }
+}

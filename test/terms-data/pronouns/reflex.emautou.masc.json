@@ -1,0 +1,11 @@
+{
+    "type": "pers",
+    "trn": "of my, of myself, 1st pers",
+    "dict": "ἐμαυτοῦ",
+    "gend": "masc",
+    "forms": {
+        "sg.gen": "ἐμαυτοῦ ἐμεωυτοῦ",
+        "sg.dat": "ἐμαυτῷ ἐμεωυτῷ",
+        "sg.acc": "ἐμαυτόν ἐμεωυτόν"
+    }
+}

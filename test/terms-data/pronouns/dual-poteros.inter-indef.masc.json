@@ -1,0 +1,22 @@
+{
+    "var":"dual",
+    "type": "indef",
+    "trn": "(interrog) which of the two?; (indefinite) whichever of the two, either of two",
+    "gend": "masc",
+    "dict": "πότερος",
+    "adv": "πότερον",
+    "forms":{
+        "sg.nom": "πότερος",
+        "sg.gen": "ποτέρου",
+        "sg.dat": "ποτέρῳ",
+        "sg.acc": "πότερον",
+        "du.nom": "ποτέρω",
+        "du.gen": "ποτέροιν",
+        "du.dat": "ποτέροιν",
+        "du.acc": "ποτέρω",
+        "pl.nom": "πότεροι",
+        "pl.gen": "ποτέρων",
+        "pl.dat": "ποτέροις",
+        "pl.acc": "ποτέρους"
+    }
+}

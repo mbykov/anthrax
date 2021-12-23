@@ -1,0 +1,21 @@
+{
+    "var":"base",
+    "type": "identity",
+    "trn": "same, common, joint",
+    "gend": "neut",
+    "dict": "ὁμός",
+    "forms":{
+        "sg.nom": "ὁμόν",
+        "sg.gen": "ὁμοῦ",
+        "sg.dat": "ὁμῷ",
+        "sg.acc": "ὁμόν",
+        "du.nom": "ὁμώ",
+        "du.gen": "ὁμοῖν",
+        "du.dat": "ὁμοῖν",
+        "du.acc": "ὁμώ",
+        "pl.nom": "ὁμᾰ́",
+        "pl.gen": "ὁμῶν",
+        "pl.dat": "ὁμοῖς",
+        "pl.acc": "ὁμᾰ́"
+    }
+}

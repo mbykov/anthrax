@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "dem-med",
+    "trn": "this kind; of this sort, such",
+    "gend": "fem",
+    "dict": "τοῖος",
+    "forms": {
+        "sg.nom": "τοίᾱ",
+        "sg.gen": "τοίᾱς",
+        "sg.dat": "τοίᾳ",
+        "sg.acc": "τοίᾱν",
+        "du.nom": "τοίᾱ",
+        "du.gen": "τοίαιν",
+        "du.dat": "τοίαιν",
+        "du.acc": "τοίᾱ",
+        "pl.nom": "τοῖαι",
+        "pl.gen": "τοίων",
+        "pl.dat": "τοίαις",
+        "pl.acc": "τοίᾱς"
+    }
+}

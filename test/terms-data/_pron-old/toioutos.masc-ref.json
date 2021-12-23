@@ -1,0 +1,23 @@
+{
+    "type":"term",
+    "pos": "pron",
+    "descr": "ref",
+    "var": "ref",
+    "dict": "τοιοῦτος",
+    "trn": "such as this",
+    "gend": "masc",
+    "forms":{
+        "sg.nom": "τοιοῦτος",
+        "sg.gen": "τοιούτου",
+        "sg.dat": "τοιούτῳ",
+        "sg.acc": "τοιοῦτον",
+        "du.nom": "τοιούτω",
+        "du.acc": "τοιούτω",
+        "du.gen": "τοιούτοιν",
+        "du.dat": "τοιούτοιν",
+        "pl.nom": "τοιοῦτοι",
+        "pl.gen": "τοιούτων",
+        "pl.dat": "τοιούτοις",
+        "pl.acc": "τοιούτους"
+    }
+}

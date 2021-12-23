@@ -1,0 +1,21 @@
+{
+    "var":"size",
+    "type": "interrog",
+    "trn": "how large? how great? of what age?; indef: some size",
+    "gend": "masc",
+    "dict": "πηλίκος",
+    "forms":{
+        "sg.nom": "πηλίκος",
+        "sg.gen": "πηλῐ́κου",
+        "sg.dat": "πηλῐ́κῳ",
+        "sg.acc": "πηλῐ́κον",
+        "du.nom": "πηλῐ́κω",
+        "du.gen": "πηλῐ́κοιν",
+        "du.dat": "πηλῐ́κοιν",
+        "du.acc": "πηλῐ́κω",
+        "pl.nom": "πηλῐ́κοι",
+        "pl.gen": "πηλῐ́κων",
+        "pl.dat": "πηλῐ́κοις",
+        "pl.acc": "πηλῐ́κους"
+    }
+}

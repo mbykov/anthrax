@@ -1,0 +1,23 @@
+{
+    "type":"indef",
+    "var": "quantity",
+    "trn": " all, when used of many; when of one only, all, the whole",
+    "dict": "πᾶς",
+    "gend": "fem",
+    "forms":{
+        "sg.nom": "πᾶσα",
+        "sg.gen": "πάσης",
+        "sg.dat": "πάσῃ",
+        "sg.acc": "πᾶσαν",
+        "sg.voc": "πᾶσα",
+        "du.nom": "",
+        "du.acc": "",
+        "du.gen": "",
+        "du.dat": "",
+        "pl.nom": "πᾶσαι",
+        "pl.gen": "πασῶν",
+        "pl.dat": "πάσαις",
+        "pl.acc": "πάσας",
+        "pl.voc": "πᾶσαι"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "var":"quantity",
+    "type": "indef",
+    "trn": "whatever much",
+    "gend": "masc",
+    "dict": "ὁποσός",
+    "adv": "ὁποσῶς",
+    "comp": "ὁποσώτερος",
+    "super": "ὁποσώτᾰτος",
+    "forms": {
+        "sg.nom": "ὁποσός",
+        "sg.gen": "ὁποσοῦ",
+        "sg.dat": "ὁποσῷ",
+        "sg.acc": "ὁποσόν",
+        "du.nom": "ὁποσώ",
+        "du.gen": "ὁποσοῖν",
+        "du.dat": "ὁποσοῖν",
+        "du.acc": "ὁποσώ",
+        "pl.nom": "ὁποσοί",
+        "pl.gen": "ὁποσῶν",
+        "pl.dat": "ὁποσοῖς",
+        "pl.acc": "ὁποσούς"
+    }
+}

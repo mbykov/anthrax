@@ -1,0 +1,10 @@
+{
+    "var":"order",
+    "type": "interrog",
+    "trn": "which in a series?",
+    "gend": "",
+    "dict": "πόστος",
+    "forms":{
+        "sg.nom": "πόστος"
+    }
+}

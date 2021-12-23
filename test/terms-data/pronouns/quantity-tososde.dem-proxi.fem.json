@@ -1,0 +1,21 @@
+{
+    "var":"quantity",
+    "type": "dem-proximal",
+    "trn": "(proximal demonstrative adjective of quantity) this much, this many; as much, many (as); (neuter accusative singular, τοσόνδε, as adverb) as much (as); as long (as)",
+    "gend": "fem",
+    "dict": "τοσόσδε",
+    "forms": {
+        "sg.nom": "τοσήδε",
+        "sg.gen": "τοσῆσδε",
+        "sg.dat": "τοσῇδε",
+        "sg.acc": "τοσήνδε",
+        "du.nom": "τοσᾱ́δε",
+        "du.gen": "τοσαῖνδε",
+        "du.dat": "τοσαῖνδε",
+        "du.acc": "τοσᾱ́δε",
+        "pl.nom": "τοσαίδε",
+        "pl.gen": "τοσῶνδε",
+        "pl.dat": "τοσαῖσδε",
+        "pl.acc": "τοσᾱ́σδε"
+    }
+}

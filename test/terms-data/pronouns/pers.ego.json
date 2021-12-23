@@ -1,0 +1,13 @@
+{
+    "pos": "pron",
+    "type": "pers",
+    "trn": "first person singular personal pronoun: I, me, my",
+    "dict": "ἐγώ",
+    "gend": "1st person",
+    "forms": {
+        "sg.nom": "ἐγώ",
+        "sg.gen": "ἐμοῦ μοῦ",
+        "sg.dat": "ἐμοί μοί",
+        "sg.acc": "ἐμέ μέ"
+    }
+}

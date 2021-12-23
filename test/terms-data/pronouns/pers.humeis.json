@@ -1,0 +1,12 @@
+{
+    "type": "personal",
+    "trn": "second person plural personal pronoun: you (ye, y'all, you guys)",
+    "dict": "ἐγώ",
+    "gend": "mfn",
+    "forms": {
+        "pl.nom": "ῡ̔μεῖς",
+        "pl.gen": "ῡ̔μῶν",
+        "pl.dat": "ῡ̔μῖν",
+        "pl.acc": "ῡ̔μᾶς"
+    }
+}

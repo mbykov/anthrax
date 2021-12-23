@@ -1,0 +1,15 @@
+{
+    "type":"relative",
+    "var": "recip",
+    "dict": "ἀλλήλων",
+    "trn": "of one another, to one another, one another",
+    "gend": "fem",
+    "forms":{
+        "du.gen": "ἀλλήλαιν",
+        "du.dat": "ἀλλήλαιν",
+        "du.acc": "ἀλλήλᾱ",
+        "pl.gen": "ἀλλήλων",
+        "pl.dat": "ἀλλήλαις",
+        "pl.acc": "ἀλλήλᾱς"
+    }
+}

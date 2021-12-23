@@ -1,0 +1,10 @@
+{
+    "var":"repetition",
+    "type": "relative",
+    "trn": "however many times",
+    "gend": "",
+    "dict": "ὁσάκις",
+    "forms":{
+        "sg.nom": "ὁσάκις"
+    }
+}

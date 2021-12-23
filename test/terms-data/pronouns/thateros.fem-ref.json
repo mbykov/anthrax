@@ -1,0 +1,21 @@
+{
+    "type":"relat",
+    "var": "other",
+    "trn": "alter, the other, one of two",
+    "dict": "θάτερος",
+    "gend": "fem",
+    "forms":{
+        "sg.nom": "θάτερος",
+        "sg.gen": "θατέρου",
+        "sg.dat": "θατέρῳ",
+        "sg.acc": "θάτερον",
+        "du.nom": "",
+        "du.acc": "",
+        "du.gen": "",
+        "du.dat": "",
+        "pl.nom": "θάτεροι",
+        "pl.gen": "θατέρων",
+        "pl.dat": "θατέροις",
+        "pl.acc": "θατέρους"
+    }
+}

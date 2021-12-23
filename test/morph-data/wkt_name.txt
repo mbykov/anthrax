@@ -303,7 +303,7 @@ dat: ἁγίῳ, ἁγίοις
 acc: ἅγιον, ἁγίους
 voc: ἅγιε, ἅγιοι
 
-# ----------------------------------
+# --------------0--------------------
 dict: ἁγιότης • (hagiótēs) f (genitive ἁγιότητος); third declension
 
     Synonym of ἁγιωσύνη (hagiōsúnē)
@@ -714,7 +714,6 @@ dat: Ἀδρυάδι, Ἀδρυάδοιν, Ἀδρυάσι-Ἀδρυάσιν
 acc: Ἀδρυάδα, Ἀδρυάδε, Ἀδρυάδας
 voc: Ἀδρυάς, Ἀδρυάδε, Ἀδρυάδες
 
-MA
 # ----------------------------------
 dict: ἄδυτον • (áduton) n (genitive ἀδύτου); second declension
 
@@ -747,21 +746,21 @@ voc: ἀετέ, ἀετώ, ἀετοί
 # FAIL-FAIL
 
 # ----------------------------------
-# dict: ἀήρ • (āḗr) m (genitive ἀέρος); third declension
+dict: ἀήρ • (āḗr) m (genitive ἀέρος); third declension
 
-#     mist
-#     air
-#     wind
-#     space, volume
-#     blue or grey (the colour of the sky)
+    mist
+    air
+    wind
+    space, volume
+    blue or grey (the colour of the sky)
 
-# restrict: sg
+restrict: sg
 
-# nom: ἀήρ
-# gen: ἀέρος
-# dat: ἀέρι
-# acc: ἀέρα
-# voc: ἀήρ
+nom: ἀήρ
+gen: ἀέρος
+dat: ἀέρι
+acc: ἀέρα
+voc: ἀήρ
 
 # ----------------------------------
 dict: ἀθανασία • (āthanasíā) f (genitive ἀθανασίας); first declension
@@ -1167,6 +1166,7 @@ voc: αἶνε, αἴνω, αἶνοι
 # acc: αἶγα, αἶγε, αἶγας
 # voc: αἴξ, αἶγε, αἶγες
 
+MA
 # double
 # ----------------------------------
 dict: Αἰολεύς • (Aioleús) m (genitive Αἰολέως); third declension
@@ -1371,7 +1371,6 @@ dict: αἰών • (aiṓn) m (genitive αἰῶνος); third declension
     lifetime
     generation
     a long period of time, eon, epoch, age
-    the current world
     eternity
 
 nom: αἰών, αἰῶνε, αἰῶνες
@@ -13748,6 +13747,7 @@ dict: ἡνία • (hēnía) n pl (genitive ἡνίων); second declension, (p
     rein, bridle
 
 restrict: pl
+
 nom: ἡνία
 gen: ἡνίων
 dat: ἡνίοισι-ἡνίοισιν-ἡνίοις
@@ -13756,7 +13756,8 @@ voc: ἡνία
 
 dict: ἡνία • (hēníā) f (genitive ἡνίας); first declension, (post-Homeric)
 
-restrict: sg plnom: ἡνία, ἡνίαι
+restrict: sg pl
+nom: ἡνία, ἡνίαι
 gen: ἡνίας, ἡνιῶν
 dat: ἡνίᾳ, ἡνίαις
 acc: ἡνίαν, ἡνίας
@@ -13957,6 +13958,7 @@ dict: ἠώς • (ēṓs) f (genitive ἠοῦς); third declension, (Epic, Ion
 #, Irregular declension, of, ἠώς; ἠοῦς, ((Epic, Ionic), Epic)
 
 restrict: sg
+
 nom: ἠώς
 gen: ἠοῦς
 dat: ἠοῖ
@@ -14758,7 +14760,7 @@ dat: θριάμβῳ, θριάμβοιν, θριάμβοις
 acc: θρίαμβον, θριάμβω, θριάμβους
 voc: θρίαμβε, θριάμβω, θρίαμβοι
 
-# thrix trix
+# thrix trix FAIL-FAIL
 # ----------------------------------
 dict: θρίξ • (thríx) f (genitive τριχός); third declension
 
@@ -26480,19 +26482,20 @@ dat: οὔρῳ, οὔροιν, οὔροις
 acc: οὖρον, οὔρω, οὔρους
 voc: οὖρε, οὔρω, οὖροι
 
+# FAIL-FAIL
 # ----------------------------------
-dict: οὖς • (oûs) n (genitive ὠτός); third declension
+# dict: οὖς • (oûs) n (genitive ὠτός); third declension
 
-    ear
-    hearing
-    (figuratively) spy
-    handle of a pitcher or cup
+#     ear
+#     hearing
+#     (figuratively) spy
+#     handle of a pitcher or cup
 
-nom: οὖς, ὦτε, ὦτα
-gen: ὠτός, ὤτοιν, ὤτων
-dat: ὠτί, ὤτοιν, ὠσί-ὠσίν
-acc: οὖς, ὦτε, ὦτα
-voc: οὖς, ὦτε, ὦτα
+# nom: οὖς, ὦτε, ὦτα
+# gen: ὠτός, ὤτοιν, ὤτων
+# dat: ὠτί, ὤτοιν, ὠσί-ὠσίν
+# acc: οὖς, ὦτε, ὦτα
+# voc: οὖς, ὦτε, ὦτα
 
 # ----------------------------------
 dict: οὐσία • (ousíā) f (genitive οὐσίας); first declension
@@ -26654,6 +26657,7 @@ dat: ὀχυρώσει, ὀχυρωσέοιν, ὀχυρώσεσι-ὀχυρώσ
 acc: ὀχύρωσιν, ὀχυρώσει, ὀχυρώσεις
 voc: ὀχύρωσι, ὀχυρώσει, ὀχυρώσεις
 
+# FAIL
 # ----------------------------------
 dict: ὄψ • (óps) f (genitive ὀπός); third declension
 

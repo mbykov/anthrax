@@ -1,0 +1,10 @@
+{
+    "var":"place",
+    "type": "relative",
+    "trn": "where, when, wherever",
+    "gend": "",
+    "dict": "ὅπου",
+    "forms": {
+        "sg.nom": "ὅπου ὅκου ὁπόθι"
+    }
+}

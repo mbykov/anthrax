@@ -1,0 +1,21 @@
+{
+    "var":"dual",
+    "type": "relative",
+    "trn": "whichever of two",
+    "gend": "neut",
+    "dict": "ὁπότερος",
+    "forms": {
+        "sg.nom": "ὁπότερον",
+        "sg.gen": "ὁποτέρου",
+        "sg.dat": "ὁποτέρῳ",
+        "sg.acc": "ὁπότερον",
+        "du.nom": "ὁποτέρω",
+        "du.gen": "ὁποτέροιν",
+        "du.dat": "ὁποτέροιν",
+        "du.acc": "ὁποτέρω",
+        "pl.nom": "ὁπότερᾰ",
+        "pl.gen": "ὁποτέρων",
+        "pl.dat": "ὁποτέροις",
+        "pl.acc": "ὁπότερᾰ"
+    }
+}

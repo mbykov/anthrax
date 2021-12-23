@@ -1,0 +1,21 @@
+{
+    "var":"base",
+    "type": "dem-prox",
+    "trn": "this; here",
+    "gend": "fem",
+    "dict": "ὅδε",
+    "forms":{
+        "sg.nom": "ἥδε",
+        "sg.gen": "τῆσδε",
+        "sg.dat": "τῇδε",
+        "sg.acc": "τήνδε",
+        "du.nom": "τώδε",
+        "du.gen": "τοῖνδε",
+        "du.dat": "τοῖνδε",
+        "du.acc": "τώδε",
+        "pl.nom": "αἵδε",
+        "pl.gen": "τῶνδε",
+        "pl.dat": "ταῖσδε",
+        "pl.acc": "τᾱ́σδε"
+    }
+}

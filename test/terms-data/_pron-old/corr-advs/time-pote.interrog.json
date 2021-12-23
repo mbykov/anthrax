@@ -1,0 +1,10 @@
+{
+    "var": "time",
+    "type": "interrog",
+    "trn": "when? at what time?",
+    "gend": "",
+    "dict": "πότε",
+    "forms": {
+        "sg.nom": "πότε"
+    }
+}

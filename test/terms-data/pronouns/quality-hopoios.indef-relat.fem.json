@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "indef",
+    "trn": "whatever kind",
+    "gend": "fem",
+    "dict": "ὁποιός",
+    "forms": {
+        "sg.nom": "ὁποιᾱ́",
+        "sg.gen": "ὁποιᾶς",
+        "sg.dat": "ὁποιᾷ",
+        "sg.acc": "ὁποιᾱ́ν",
+        "du.nom": "ὁποιᾱ́",
+        "du.gen": "ὁποιαῖν",
+        "du.dat": "ὁποιαῖν",
+        "du.acc": "ὁποιᾱ́",
+        "pl.nom": "ὁποιαί",
+        "pl.gen": "ὁποιῶν",
+        "pl.dat": "ὁποιαῖς",
+        "pl.acc": "ὁποιᾱ́ς"
+    }
+}

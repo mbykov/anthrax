@@ -1,0 +1,25 @@
+{
+    "type":"term",
+    "pos": "pron",
+    "descr": "",
+    "var": "",
+    "trn": "",
+    "dict": "",
+    "gend": "",
+    "forms":{
+        "sg.nom": "",
+        "sg.gen": "",
+        "sg.dat": "",
+        "sg.acc": "",
+        "sg.voc": "",
+        "du.nom": "",
+        "du.acc": "",
+        "du.gen": "",
+        "du.dat": "",
+        "pl.nom": "",
+        "pl.gen": "",
+        "pl.dat": "",
+        "pl.acc": "",
+        "pl.voc": ""
+    }
+}

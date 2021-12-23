@@ -1,0 +1,23 @@
+{
+    "type":"indef",
+    "var": "quantity",
+    "trn": "quite all, the whole (in the plural) all together",
+    "dict": "ἅπας",
+    "gend": "fem",
+    "forms": {
+        "sg.nom": "ἅπασα",
+        "sg.gen": "ἅπασης",
+        "sg.dat": "ἅπασῃ",
+        "sg.acc": "ἅπασαν",
+        "sg.voc": "ἅπασα",
+        "du.nom": "ἅπασα",
+        "du.gen": "ἅπασαιν",
+        "du.dat": "ἅπασαιν",
+        "du.acc": "ἅπασα",
+        "pl.nom": "ἅπασαι",
+        "pl.gen": "ἅπασῶν",
+        "pl.dat": "ἅπασαις",
+        "pl.acc": "ἅπασας",
+        "pl.voc": "ἅπασαι"
+    }
+}

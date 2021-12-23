@@ -1,0 +1,10 @@
+{
+    "var":"order",
+    "type": "indef",
+    "trn": "somewhere in a series",
+    "gend": "",
+    "dict": "ποστός",
+    "forms":{
+        "sg.nom": "ποστός"
+    }
+}

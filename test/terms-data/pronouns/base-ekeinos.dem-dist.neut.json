@@ -1,0 +1,21 @@
+{
+    "var":"base",
+    "type": "dem-dist",
+    "trn": "that; there",
+    "gend": "neut",
+    "dict": "ἐκεῖνος",
+    "forms":{
+        "sg.nom": "ἐκεῖνο",
+        "sg.gen": "ἐκείνου",
+        "sg.dat": "ἐκείνῳ",
+        "sg.acc": "ἐκεῖνο",
+        "du.nom": "ἐκείνω",
+        "du.gen": "ἐκείνοιν",
+        "du.dat": "ἐκείνοιν",
+        "du.acc": "ἐκείνω",
+        "pl.nom": "ἐκεῖνᾰ",
+        "pl.gen": "ἐκείνων",
+        "pl.dat": "ἐκείνοις",
+        "pl.acc": "ἐκεῖνᾰ"
+    }
+}

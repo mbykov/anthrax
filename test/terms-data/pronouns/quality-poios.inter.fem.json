@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "interrog",
+    "trn": "what kind?; of what kind?, of what nature?; which?, what?",
+    "gend": "fem",
+    "dict": "ποῖος",
+    "forms": {
+        "sg.nom": "ποίᾱ",
+        "sg.gen": "ποίᾱς",
+        "sg.dat": "ποίᾳ",
+        "sg.acc": "ποίᾱν",
+        "du.nom": "ποίᾱ",
+        "du.gen": "ποίαιν",
+        "du.dat": "ποίαιν",
+        "du.acc": "ποίᾱ",
+        "pl.nom": "ποῖαι",
+        "pl.gen": "ποίων",
+        "pl.dat": "ποίαις",
+        "pl.acc": "ποίᾱς"
+    }
+}

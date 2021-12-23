@@ -1,0 +1,21 @@
+{
+    "var": "dual",
+    "type": "indef",
+    "trn": "both",
+    "dict": "ἄμφω",
+    "gend": "-",
+    "forms": {
+        "sg.nom": "",
+        "sg.gen": "",
+        "sg.dat": "",
+        "sg.acc": "",
+        "du.nom": "ἄμφω",
+        "du.gen": "ἀμφοῖν",
+        "du.dat": "ἀμφοῖν",
+        "du.acc": "ἄμφω",
+        "pl.nom": "",
+        "pl.gen": "",
+        "pl.dat": "",
+        "pl.acc": ""
+    }
+}

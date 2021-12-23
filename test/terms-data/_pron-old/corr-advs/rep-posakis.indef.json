@@ -1,0 +1,10 @@
+{
+    "var":"repetition",
+    "type": "indef",
+    "trn": "some number of times",
+    "gend": "",
+    "dict": "ποσάκις",
+    "forms":{
+        "sg.nom": "ποσάκις"
+    }
+}

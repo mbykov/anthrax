@@ -1,0 +1,23 @@
+{
+    "type":"term",
+    "pos": "pron",
+    "descr": "ὅδε, ἥδε, τόδε this",
+    "var": "dem",
+    "dict": "ὅδε",
+    "trn": "this",
+    "gend": "neut",
+    "forms":{
+        "sg.nom": "τόδε",
+        "sg.gen": "τοῦδε",
+        "sg.dat": "τῷδε",
+        "sg.acc": "τόδε",
+        "du.nom": "τώδε",
+        "du.acc": "τώδε",
+        "du.gen": "τοῖνδε",
+        "du.dat": "τοῖνδε",
+        "pl.nom": "τάδε",
+        "pl.gen": "τῶνδε",
+        "pl.dat": "τοῖσδε",
+        "pl.acc": "τάδε"
+    }
+}

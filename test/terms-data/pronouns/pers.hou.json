@@ -1,0 +1,11 @@
+{
+  "type": "personal",
+     "trn": "of him, her, it",
+    "dict": "οὗ",
+    "gend": "mfn",
+    "forms": {
+        "sg.gen": "οὗ, οὑ",
+        "sg.dat": "οἷ",
+        "sg.acc": "ἕ, ἑ"
+    }
+}

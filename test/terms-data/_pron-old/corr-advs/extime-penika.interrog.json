@@ -1,0 +1,10 @@
+{
+    "var": "exact-time",
+    "type": "interrog",
+    "trn": "at what time?",
+    "gend": "",
+    "dict": "πηνίκα",
+    "forms": {
+        "sg.nom": "πηνίκα"
+    }
+}

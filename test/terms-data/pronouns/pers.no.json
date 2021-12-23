@@ -1,0 +1,13 @@
+{
+    "pos": "pron",
+    "type": "pers",
+    "trn": "(first person dual personal pronoun) we two, both of us, us two",
+    "dict": "ἐγώ",
+    "gend": "mfn",
+    "forms": {
+        "du.nom": "νώ",
+        "du.gen": "νῷν",
+        "du.dat": "νῷν",
+        "du.acc": "νώ"
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "var":"quality",
+    "type": "dem-proximal",
+    "trn": " of this sort or kind, such",
+    "gend": "fem",
+    "dict": "τοιόσδε",
+    "forms": {
+        "sg.nom": "τοιᾱ́δε",
+        "sg.gen": "τοιᾶσδε",
+        "sg.dat": "τοιᾷδε",
+        "sg.acc": "τοιᾱ́νδε",
+        "du.nom": "τοιᾱ́δε",
+        "du.gen": "τοιαῖνδε",
+        "du.dat": "τοιαῖνδε",
+        "du.acc": "τοιᾱ́δε",
+        "pl.nom": "τοιαίδε",
+        "pl.gen": "τοιῶνδε",
+        "pl.dat": "τοιαῖσδε",
+        "pl.acc": "τοιᾱ́σδε"
+    }
+}

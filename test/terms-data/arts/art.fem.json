@@ -1,0 +1,19 @@
+{
+    "dict": "ὁ",
+    "trn": "article the",
+    "gend": "fem",
+    "forms":{
+        "sg.nom": "ἡ",
+        "sg.gen": "τῆς",
+        "sg.dat": "τῇ",
+        "sg.acc": "τήν",
+        "du.nom": "τώ",
+        "du.acc": "τώ",
+        "du.gen": "τοῖν",
+        "du.dat": "τοῖν",
+        "pl.nom": "αἱ",
+        "pl.gen": "τῶν",
+        "pl.dat": "ταῖς",
+        "pl.acc": "τάς"
+    }
+}
