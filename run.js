@@ -15,9 +15,7 @@ let res = await anthrax(wordform)
 
 let chains = []
 
-
 for (let chain of chains) {
-
     log('\n_chain:', chain)
     if (!true)  continue
 

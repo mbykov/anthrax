@@ -25,13 +25,12 @@ const m = Debug('more')
 export async function anthrax(wf) {
     let cwf = comb(wf)
     let terms = await getTerms(cwf)
-    log('_terms_1:', terms)
+    log('_terms_final:', terms)
     if (terms.length) return terms
 
     let chains = await anthraxChains(wf)
     log('_chains:', chains)
-
-    return terms
+    return chains
 }
 
 export async function anthraxChains(wf) {
@@ -154,24 +153,26 @@ function dict2flex(dicts, fls, compound) {
     let cdicts = []
     for (let dict of dicts) {
         let cfls = _.clone(fls)
-        /* log('____________________dict', dict.rdict) */
+        /* log('____________________dict', dict) */
         if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls)
         if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv
         if (dict.verb) continue // todo: remove до тестов verb
         dict.fls = []
         for (let flex of cfls) {
+            /* log('____________________flex', flex) */
             let ok = false
             if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict)
             let key = plain(flex.key.split('-')[0])
             if (dict.name && dict.adj && flex.name && dict.keys[flex.gend].includes(flex.key)) ok = true
-            else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
+            else if (dict.name && flex.name && dict.keys.includes(flex.key) && dict.gends.includes(flex.gend)) ok = true
             else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
             if (ok) dict.fls.push(flex)
-            if (dict.verb && ok) log('_OK', flex)
+            /* if (dict.name && ok) log('_OK', flex) */
         }
         if (dict.fls.length) cdicts.push(dict)
     }
+    /* log('__cdicts', cdicts) */
     return cdicts
 }
 
