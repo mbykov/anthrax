@@ -9,11 +9,10 @@ const log = console.log
 
 let fls = process.argv[3]
 
-let res = await anthrax(wordform)
-
+let chains = await anthrax(wordform)
 /* log('_ANTHRAX', res) */
 
-let chains = []
+/* chains = [] */
 
 for (let chain of chains) {
     log('\n_chain:', chain)
@@ -41,11 +40,11 @@ for (let chain of chains) {
 
 function compactNamesFls(dicts) {
     let fls = dicts.map(dict=> {
-        return dict.fls.map(flex=> [flex.gend, flex.numcase].join('.'))
+        return dict.fls.map(flex=> [flex.gend, flex.number, flex.case].join('.'))
     })
     return _.flatten(fls)
 }
 
 function compactNameFls(flexes) {
-    return _.uniq(flexes.map(flex=> [flex.gend, flex.numcase].join('.')))
+    return _.uniq(flexes.map(flex=> [flex.gend, flex.number, flex.case].join('.')))
 }

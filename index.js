@@ -25,11 +25,12 @@ const m = Debug('more')
 export async function anthrax(wf) {
     let cwf = comb(wf)
     let terms = await getTerms(cwf)
-    log('_terms_final:', terms)
+    /* log('_terms_final:', terms) */
     if (terms.length) return terms
 
     let chains = await anthraxChains(wf)
-    log('_chains:', chains)
+    /* log('_chains:', chains) */
+    /* log('_cdicts:', chains[0][0].cdicts) */
     return chains
 }
 
