@@ -73,6 +73,7 @@ export async function anthraxChains(wf) {
     /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
 
     let breaks = makeBreaks(dag)
+    /* log('_breaks', breaks.length) */
 
     breaks.forEach(br=> {
         if (!br.vow) br.vow = ''
@@ -88,7 +89,7 @@ export async function anthraxChains(wf) {
     let ddicts = await getSegments(keys)
     /* log('_ddicts', ddicts.length) */
     dag.ddictids = ddicts.map(ddict=> ddict._id)
-    /* log('_ddictids', ddictids) */
+    /* log('_ddictids', dag.ddictids) */
 
     let chains = makeChains(breaks, ddicts)
     /* log('_chains', chains) */

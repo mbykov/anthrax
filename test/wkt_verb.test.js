@@ -26,8 +26,8 @@ let cache =  new Map();
 rows = rows.slice(0, 500)
 let tests = makeVerbTests(rows)
 
-/* tests = tests.slice(0, 50) */
 log('T', tests.length)
+/* tests = [] */
 
 /* tests = tests.slice(0, 2) */
 for (let wf of tests) {
@@ -43,7 +43,7 @@ for (let wf of tests) {
 
 async function testWF(wf) {
     it(`wf: ${wf.dict} - ${wf.form} - ${wf.gend}`, async () => {
-        log(wf)
+        /* log(wf) */
         if (wf.part) return
         let chains = await anthrax(wf.form)
         let chain = chains[0][0]
