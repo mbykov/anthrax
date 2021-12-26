@@ -157,19 +157,20 @@ function dict2flex(dicts, fls, compound) {
         /* log('____________________dict', dict) */
         if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls)
         if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv
-        if (dict.verb) continue // todo: remove до тестов verb
         dict.fls = []
         for (let flex of cfls) {
             /* log('____________________flex', flex) */
             let ok = false
-            if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict)
+            /* if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict) */
             let key = plain(flex.key.split('-')[0])
             if (dict.name && dict.adj && flex.name && dict.keys[flex.gend].includes(flex.key)) ok = true
             else if (dict.name && flex.name && dict.keys.includes(flex.key) && dict.gends.includes(flex.gend)) ok = true
-            else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
+            /* else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true */
+            /* else if (dict.verb && flex.verb) ok = true */
+            else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
             if (ok) dict.fls.push(flex)
-            /* if (dict.name && ok) log('_OK', flex) */
+            /* if (dict.verb && ok) log('_OK', flex) */
         }
         if (dict.fls.length) cdicts.push(dict)
     }
