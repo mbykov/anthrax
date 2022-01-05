@@ -1,7 +1,4 @@
 const log = console.log
-// gitlab.rd.aorti.ru
-// pass - liana - cuf -
-// паша беляков - кротовкуф, днмкинкуф
 
 import path  from 'path'
 import _  from 'lodash'
@@ -12,15 +9,13 @@ import { getTerms, getFlexes, getSegments } from './lib/remote.js'
 /* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
 
-// 1. вопросы: εἰσαγγέλλω
-
-let dag
-
 const d = Debug('app')
 const h = Debug('head')
 const g = Debug('dag')
 const m = Debug('more')
 
+// 1. вопросы: εἰσαγγέλλω
+let dag
 
 export async function anthrax(wf) {
     let cwf = comb(wf)
@@ -160,12 +155,15 @@ function dict2flex(dicts, fls, compound) {
         if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv
         dict.fls = []
         for (let flex of cfls) {
-            /* log('____________________flex', flex) */
+            /* log('______flex', flex) */
             let ok = false
             /* if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict) */
-            let key = plain(flex.key.split('-')[0])
-            if (dict.name && dict.adj && flex.name && dict.keys[flex.gend].includes(flex.key)) ok = true
-            else if (dict.name && flex.name && dict.keys.includes(flex.key) && dict.gends.includes(flex.gend)) ok = true
+            /* let key = plain(flex.key.split('-')[0]) */
+            /* if (dict.name && dict.adj && flex.name && dict.keys[flex.gend].includes(flex.key)) ok = true */
+            /* else if (dict.name && flex.name && dict.keys.includes(flex.key) && dict.gends.includes(flex.gend)) ok = true */
+
+            if (dict.name && flex.name && dict.keys[flex.gend] && dict.keys[flex.gend].includes(flex.key)) ok = true
+
             /* else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true */
             /* else if (dict.verb && flex.verb) ok = true */
             else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
