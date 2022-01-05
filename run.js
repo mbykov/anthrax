@@ -20,9 +20,13 @@ for (let chain of chains) {
         if (seg.cdicts) {
             /* let rdicts = seg.cdicts.map(cdict=> cdict.rdict) */
             seg.cdicts.forEach(cdict=> {
-                let fls = compactNameFls(cdict.fls)
+                let advfls = cdict.fls.filter(flex=> flex.adv)
+                advfls = compactAdvFls(advfls)
+                let fls = cdict.fls.filter(flex=> !flex.adv)
+                fls = compactNameFls(fls)
                 d('_dict', cdict.rdict)
-                d('_fls', fls)
+                if (fls.length) d('_fls', fls)
+                if (advfls.length) d('_adv', advfls)
             })
         } else {
             log('_seg_no_cdicts:', seg)
@@ -32,6 +36,10 @@ for (let chain of chains) {
 
 function compactNameFls(flexes) {
     return _.uniq(flexes.map(flex=> [flex.gend, flex.num, flex.case].join('.')))
+}
+
+function compactAdvFls(flexes) {
+    return _.uniq(flexes.map(flex=> ['adv', flex.degree].join('.')))
 }
 
 function compactNamesFls(dicts) {

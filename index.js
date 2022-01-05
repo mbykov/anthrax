@@ -152,10 +152,11 @@ function dict2flex(dicts, fls, compound) {
         let cfls = _.clone(fls)
         /* log('____________________dict', dict) */
         if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls)
-        if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv
+        /* if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv */
         dict.fls = []
         for (let flex of cfls) {
             /* log('______flex', flex) */
+            /* if (flex.adv) log('______flex-adv', flex) */
             let ok = false
             /* if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict) */
             /* let key = plain(flex.key.split('-')[0]) */
@@ -163,6 +164,7 @@ function dict2flex(dicts, fls, compound) {
             /* else if (dict.name && flex.name && dict.keys.includes(flex.key) && dict.gends.includes(flex.gend)) ok = true */
 
             if (dict.name && flex.name && dict.keys[flex.gend] && dict.keys[flex.gend].includes(flex.key)) ok = true
+            if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
 
             /* else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true */
             /* else if (dict.verb && flex.verb) ok = true */
