@@ -164,7 +164,8 @@ function dict2flex(dicts, fls, compound) {
             /* else if (dict.name && flex.name && dict.keys.includes(flex.key) && dict.gends.includes(flex.gend)) ok = true */
 
             if (dict.name && flex.name && dict.keys[flex.gend] && dict.keys[flex.gend].includes(flex.key)) ok = true
-            if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
+            else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
+            else if (dict.part && flex.part ) ok = true
 
             /* else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true */
             /* else if (dict.verb && flex.verb) ok = true */
