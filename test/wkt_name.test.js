@@ -87,13 +87,13 @@ describe('test names:', () => {
 })
 
 
-function compactNameFls(flexes) {
-    return _.uniq(flexes.map(flex=> [flex.gend, flex.number, flex.case].join('.')))
-}
-
 function compactNamesFls(dicts) {
     let fls = dicts.map(dict=> {
-        return dict.fls.filter(flex=> !flex.adv).map(flex=> [flex.gend, flex.number, flex.case].join('.'))
+        return dict.fls.filter(flex=> !flex.adv).map(flex=> [flex.gend, flex.num, flex.case].join('.'))
     })
     return _.uniq(_.flatten(fls).sort())
+}
+
+function compactNameFls_(flexes) {
+    return _.uniq(flexes.map(flex=> [flex.gend, flex.num, flex.case].join('.')))
 }

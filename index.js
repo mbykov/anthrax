@@ -10,7 +10,6 @@ import { getTerms, getFlexes, getSegments } from './lib/remote.js'
 import Debug from 'debug'
 
 const d = Debug('app')
-const h = Debug('head')
 const g = Debug('dag')
 const m = Debug('more')
 
@@ -64,7 +63,7 @@ export async function anthraxChains(wf) {
         dag.pcwf = dag.pcwf.slice(dag.aug.length)
     }
 
-    let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-')
+    /* let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-') */
     /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
 
     let breaks = makeBreaks(dag)
@@ -91,7 +90,7 @@ export async function anthraxChains(wf) {
 
     if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
 
-    delete dag.flexes
+    /* delete dag.flexes */
     /* log('_DAG', dag) */
 
     return chains
@@ -151,11 +150,12 @@ function dict2flex(dicts, fls, compound) {
     for (let dict of dicts) {
         let cfls = _.clone(fls)
         /* log('____________________dict', dict) */
+        /* log('____________________cfls', cfls) */
         if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls)
         /* if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv */
         dict.fls = []
         for (let flex of cfls) {
-            /* log('______flex', flex) */
+            /* log('______flex', flex.key) */
             /* if (flex.adv) log('______flex-adv', flex) */
             let ok = false
             /* if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict) */
@@ -171,6 +171,7 @@ function dict2flex(dicts, fls, compound) {
             /* else if (dict.verb && flex.verb) ok = true */
             else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+
             if (ok) dict.fls.push(flex)
             /* if (dict.verb && ok) log('_OK', flex) */
         }
@@ -267,7 +268,7 @@ export function breakByTwoParts_ (breaks, str) {
 async function getDicts(tail) {
     let flakes = scrape(tail)
     let headkeys = flakes.map(flake=> plain(flake.head))
-    h('_headkeys_', headkeys)
+    log('_headkeys_', headkeys)
     let ddicts = await getSegments(headkeys)
     // todo: return ddicts
     let dictids = ddicts.map(dict=> dict._id)
