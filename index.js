@@ -81,7 +81,8 @@ export async function anthraxChains(wf) {
     let keys = _.compact(headkeys.concat(tailkeys))
     /* log('_keys', keys.length) */
     let ddicts = await getSegments(keys)
-    /* log('_ddicts', ddicts.length) */
+    /* log('_ddicts', ddicts) */
+    /* log('_ddicts', ddicts[0].docs) */
     dag.ddictids = ddicts.map(ddict=> ddict._id)
     /* log('_ddictids', dag.ddictids) */
 
@@ -151,7 +152,7 @@ function dict2flex(dicts, fls, compound) {
         let cfls = _.clone(fls)
         /* log('____________________dict', dict) */
         /* log('____________________cfls', cfls) */
-        if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls)
+        /* if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls) */
         /* if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv */
         dict.fls = []
         for (let flex of cfls) {
