@@ -152,7 +152,7 @@ function makeChains(breaks, ddicts) {
 
 /* function dict2flex(headstr, ddict) { */
 function dict2flex(dicts, fls, compound) {
-    log('__DAG.CWF', dag.cwf, dag.aug, dag.augstress)
+    /* log('__DAG.CWF', dag.cwf, dag.aug, dag.augstress) */
     let cdicts = []
     for (let dict of dicts) {
         let cfls = _.clone(fls)

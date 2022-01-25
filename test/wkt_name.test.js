@@ -66,16 +66,26 @@ for (let wfkey in cache) {
 async function testWF(wf, exp) {
     it(`wf: ${wf.dict} - ${wf.form} - ${wf.descr}`, async () => {
         let chains = await anthrax(wf.form)
+        /* log('_WF', wf) */
         /* log('_CHS', chains) */
+        let chain = chains[0][0] // потом prefs
+        let dict = chain.cdicts.find(cdict=> cdict.dict == wf.dict)
+        let fls = dict.fls.filter(flex=> !flex.adv)
+        fls = fls.map(flex=> [flex.gend, flex.num, flex.case].join('.'))
+        fls = _.uniq(_.flatten(fls).sort())
+        /* log('_FLS', fls) */
+        assert.deepEqual(fls, exp)
+        return
         /* log('_CDICTS', wf.dict, chains[0][0].cdicts) */
         /* let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict && dict.gends.includes(wf.gend))) // last: - heades does not matter for names */
-        let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names
+        /* let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names */
         /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
         /* log('_CH', chain) */
-        let dicts = _.last(chain).cdicts // .filter(dict=> dict.name && dict.gends)
-        dicts = dicts.filter(dict=> dict.name) // todo: remove до тестов verb
-        let fls = compactNamesFls(dicts)
-        assert.deepEqual(fls, exp)
+
+        /* let dicts = _.last(chain).cdicts // .filter(dict=> dict.name && dict.gends) */
+        /* dicts = dicts.filter(dict=> dict.name) // todo: remove до тестов verb */
+        /* let fls = compactNamesFls(dicts) */
+        /* assert.deepEqual(fls, exp) */
     })
 }
 
