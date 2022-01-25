@@ -66,12 +66,12 @@ for (let wfkey in cache) {
 async function testWF(wf, exp) {
     it(`wf: ${wf.dict} - ${wf.form} - ${wf.descr}`, async () => {
         let chains = await anthrax(wf.form)
-        log('_CHS', chains)
-        log('_CDICTS', wf.dict, chains[0][0].cdicts)
+        /* log('_CHS', chains) */
+        /* log('_CDICTS', wf.dict, chains[0][0].cdicts) */
         /* let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict && dict.gends.includes(wf.gend))) // last: - heades does not matter for names */
         let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names
         /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
-        log('_CH', chain)
+        /* log('_CH', chain) */
         let dicts = _.last(chain).cdicts // .filter(dict=> dict.name && dict.gends)
         dicts = dicts.filter(dict=> dict.name) // todo: remove до тестов verb
         let fls = compactNamesFls(dicts)

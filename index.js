@@ -4,7 +4,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape, vowels, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref } from './lib/utils.js'
+import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref } from './lib/utils.js'
 import { getTerms, getFlexes, getSegments } from './lib/remote.js'
 /* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
@@ -61,6 +61,11 @@ export async function anthraxChains(wf) {
     } else {
         dag.aug = parseAug(dag.pcwf) || ''
         dag.pcwf = dag.pcwf.slice(dag.aug.length)
+        if (dag.aug) {
+            let tmptail = dag.cwf.replace(dag.aug, '')
+            let tmpstress = tmptail[0]
+            if (stresses.includes(tmpstress)) dag.augstress = true
+        }
     }
 
     /* let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-') */
@@ -147,38 +152,30 @@ function makeChains(breaks, ddicts) {
 
 /* function dict2flex(headstr, ddict) { */
 function dict2flex(dicts, fls, compound) {
+    log('__DAG.CWF', dag.cwf, dag.aug, dag.augstress)
     let cdicts = []
     for (let dict of dicts) {
         let cfls = _.clone(fls)
         /* log('____________________dict', dict) */
-        /* log('____________________cfls', cfls) */
+        /* log('____________________cfls', cfls.slice(0,2)) */
         /* if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls) */
-        /* if (dict.name) cfls = cfls.filter(flex=> !flex.adv) // todo: временно, до тестов adv */
         dict.fls = []
         for (let flex of cfls) {
-            /* log('______flex', flex.key) */
+            /* log('______flex', flex.aug, flex.augstress) */
             /* if (flex.adv) log('______flex-adv', flex) */
             let ok = false
-            /* if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) log('_VERB', dict) */
-            /* let key = plain(flex.key.split('-')[0]) */
-            /* if (dict.name && dict.adj && flex.name && dict.keys[flex.gend].includes(flex.key)) ok = true */
-            /* else if (dict.name && flex.name && dict.keys.includes(flex.key) && dict.gends.includes(flex.gend)) ok = true */
-
-            if (dict.name && flex.name && dict.keys[flex.gend] && dict.keys[flex.gend].includes(flex.key)) ok = true
+            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.augstress == flex.augstress) ok = true */
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.augstress == flex.augstress) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
 
-            /* else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true */
-            /* else if (dict.verb && flex.verb) ok = true */
             else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
 
             if (ok) dict.fls.push(flex)
-            /* if (dict.verb && ok) log('_OK', flex) */
         }
         if (dict.fls.length) cdicts.push(dict)
     }
-    /* log('__cdicts', cdicts) */
     return cdicts
 }
 
