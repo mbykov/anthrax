@@ -4,7 +4,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref } from './lib/utils.js'
+import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref, stressPosition } from './lib/utils.js'
 import { getTerms, getFlexes, getSegments } from './lib/remote.js'
 /* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
@@ -61,12 +61,8 @@ export async function anthraxChains(wf) {
     } else {
         dag.aug = parseAug(dag.pcwf) || ''
         dag.pcwf = dag.pcwf.slice(dag.aug.length)
-        if (dag.aug) {
-            let tmptail = dag.cwf.replace(dag.aug, '')
-            let tmpstress = tmptail[0]
-            if (stresses.includes(tmpstress)) dag.augstress = true
-        }
     }
+    dag.stress = stressPosition(dag.cwf)
 
     /* let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-') */
     /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
@@ -152,7 +148,7 @@ function makeChains(breaks, ddicts) {
 
 /* function dict2flex(headstr, ddict) { */
 function dict2flex(dicts, fls, compound) {
-    /* log('__DAG.CWF', dag.cwf, dag.aug, dag.augstress) */
+    /* log('__DAG.CWF', dag.cwf, dag.aug) */
     let cdicts = []
     for (let dict of dicts) {
         let cfls = _.clone(fls)
@@ -161,11 +157,9 @@ function dict2flex(dicts, fls, compound) {
         /* if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls) */
         dict.fls = []
         for (let flex of cfls) {
-            /* log('______flex', flex.aug, flex.augstress) */
             /* if (flex.adv) log('______flex-adv', flex) */
             let ok = false
-            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.augstress == flex.augstress) ok = true */
-            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.augstress == flex.augstress) ok = true
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress == flex.stress) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
 
