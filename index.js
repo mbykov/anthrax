@@ -152,8 +152,8 @@ function dict2flex(dicts, fls, compound) {
     let cdicts = []
     for (let dict of dicts) {
         let cfls = _.clone(fls)
-        log('____________________dict', dict)
-        log('____________________cfls', cfls.slice(0,2))
+        /* log('____________________dict', dict) */
+        /* log('____________________cfls', cfls.slice(0,2)) */
         /* if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls) */
         dict.fls = []
         for (let flex of cfls) {

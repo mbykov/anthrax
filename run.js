@@ -25,7 +25,7 @@ for (let chain of chains) {
                 let fls = cdict.fls.filter(flex=> !flex.adv)
                 fls = compactNameFls(fls)
                 d('_dict', cdict.rdict)
-                if (fls.length) d('_fls', fls)
+                if (fls.length) d('_fls', fls.sort())
                 if (advfls.length) d('_adv', advfls)
             })
         } else {
