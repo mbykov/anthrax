@@ -12432,10 +12432,10 @@ adv: ὀρφανῶς, ὀρφανώτερος, ὀρφανώτατος
 
 PRON
 #---------------------------------
-dict: ὅς • (hós) m, ἥ f (hḗ), ὅ n (hó)
+# dict: ὅς • (hós) m, ἥ f (hḗ), ὅ n (hó)
 
- (in Homeric Greek, often demonstrative pronoun) this
- (relative) who, which, that
+ # (in Homeric Greek, often demonstrative pronoun) this
+ # (relative) who, which, that
 
 # variant: Masculine Feminine Neuter Masculine Feminine Neuter Masculine Feminine Neuter
 
