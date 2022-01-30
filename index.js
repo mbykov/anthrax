@@ -146,6 +146,7 @@ function makeChains(breaks, ddicts) {
     return chains
 }
 
+// ================================================= FILTERS ==============
 /* function dict2flex(headstr, ddict) { */
 function dict2flex(dicts, fls, compound) {
     /* log('__DAG.CWF', dag.cwf, dag.aug) */

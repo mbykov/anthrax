@@ -69,10 +69,13 @@ async function testWF(wf, exp) {
         /* log('_WF', wf) */
         /* log('_CHS', chains) */
         let chain = chains[0][0] // потом prefs
-        let dict = chain.cdicts.find(cdict=> cdict.dict == wf.dict)
-        let fls = dict.fls.filter(flex=> !flex.adv)
-        fls = fls.map(flex=> [flex.gend, flex.num, flex.case].join('.'))
-        fls = _.uniq(_.flatten(fls).sort())
+        let dicts = chain.cdicts.filter(cdict=> cdict.dict == wf.dict)
+        let fls = compactNamesFls(dicts)
+
+        /* let dict = chain.cdicts.find(cdict=> cdict.dict == wf.dict) */
+        /* let fls = dict.fls.filter(flex=> !flex.adv) */
+        /* fls = fls.map(flex=> [flex.gend, flex.num, flex.case].join('.')) */
+        /* fls = _.uniq(_.flatten(fls).sort()) */
         /* log('_FLS', fls) */
         assert.deepEqual(fls, exp)
         return
