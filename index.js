@@ -18,9 +18,9 @@ let dag
 
 export async function anthrax(wf) {
     let cwf = comb(wf)
-    let terms = await getTerms(cwf)
-    log('_terms_wf:', wf, cwf, terms)
-    if (terms) return []
+    let termcdicts = await getTerms(cwf)
+    /* log('_terms_wf_cdicts:', wf, cwf, termcdicts) */
+    if (termcdicts) return [[{cdicts: termcdicts}]]
 
     let chains = await anthraxChains(wf)
     /* log('_chains:', chains) */
