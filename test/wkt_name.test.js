@@ -64,7 +64,7 @@ for (let wfkey in cache) {
 /* tests = [] */
 
 async function testWF(wf, exp) {
-    it(`wf: ${wf.dict} - ${wf.form} - ${wf.descr}`, async () => {
+    it(`wf: ${wf.rdict} - ${wf.form} - ${wf.descr}`, async () => {
         let chains = await anthrax(wf.form)
         /* log('_WF', wf) */
         /* log('_CHS', chains) */

@@ -3749,9 +3749,9 @@ adv: αὐτομάτως, αὐτοματώτερος, αὐτοματώτατο
 #---------------------------------
 # dict: αὑτός • (hautós) m (feminine αὑτή, neuter ταὐτόν or ταὐτό) first/second declension
 
- # the same
+ # the same - αὐτός, crasis with the article, i.e. αὐτός in the attributive position
 
-# это бы надо проверить: other stems
+# интересно: нет аккузатива - αὑτός - номинатив, нет, напр., я вижу то же самое, о чем уже была речь, почему нет такой конструкции?
 # variant: Masculine Feminine Neuter Masculine Feminine Neuter Masculine Feminine Neuter
 
 # nom: αὑτός-ταὐτός, αὑτή-ταὐτή, ταὐτόν-ταὐτό, ταὐτώ, ταὐτά, ταὐτώ, ταὐτοί, ταὐταί, ταὐτά
@@ -7912,11 +7912,11 @@ adv: ἥκιστα, ἡκιστότερος, ἡκιστότατος
 
 # adv: ἡλίκως, ἡλικώτερος, ἡλικώτατος
 
-# PRON
+# PRON? - в pron этого нет
 #---------------------------------
 # dict: ἡμέτερος • (hēméteros) m (feminine ἡμετέρα, neuter ἡμέτερον) first/second declension
 
-#  (Attic, Ionic, Epic, Koine first person plural possessive pronoun),
+#  (Attic, Ionic, Epic, Koine first person plural possessive pronoun), our
 #  (modifying a noun) our, of ours, (as substantive, often with article) ours
 #  (in the plural) our friends or family; our possessions
 

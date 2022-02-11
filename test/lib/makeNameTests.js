@@ -10,7 +10,7 @@ const d = Debug('test')
 let skip = true
 
 let res = {}
-let dict, formstr, restrict
+let rdict, dict, formstr, restrict
 let numbers = ['sg', 'du', 'pl']
 
 export function nameTests(rows, limit) {
@@ -25,11 +25,11 @@ export function nameTests(rows, limit) {
         let descr = row.split(':')[0].trim()
         if (descr == 'dict') {
             let txt = row.split(':')[1].trim()
-            dict = txt.split('•')[0].trim()
-            dict = comb(dict)
+            rdict = txt.split('•')[0].trim()
+            dict = comb(rdict)
             formstr = txt.split('•')[1].trim()
             if (!/genitive /.test(formstr)) dict = null // todo: ??? wtf ???
-            res =  {dict: dict, formstr: formstr, lines: []}
+            res =  {rdict, dict, formstr, lines: []}
             parseGend(res)
             rtests.push(res)
         } else if (descr == 'restrict') {
@@ -62,7 +62,7 @@ export function nameTests(rows, limit) {
                     rtest.gend.split(' ').forEach(gend=> {
                         /* let test = {dict: rtest.dict, form, gend: gend, numcase} */
                         let descr = [gend, numcase].join('.')
-                        let test = {dict: rtest.dict, form, descr}
+                        let test = {dict: rtest.dict, rdict: rtest.rdict, form, descr}
                         ntests.push(test)
                     })
                 }
