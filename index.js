@@ -149,11 +149,11 @@ function makeChains(breaks, ddicts) {
 // ================================================= FILTERS ==============
 /* function dict2flex(headstr, ddict) { */
 function dict2flex(dicts, fls, compound) {
-    /* log('__DAG.CWF', dag.cwf, dag.aug) */
+    log('__DAG.CWF', dag.cwf, dag.aug, dag.stress)
     let cdicts = []
     for (let dict of dicts) {
         let cfls = _.clone(fls) // wtf ???
-        /* log('____________________dict', dict) */
+        log('____________________dict', dict.stem)
         /* log('____________________cfls', cfls.length) */
         /* log('____________________cfls', cfls.slice(0,2)) */
         /* if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls) */
@@ -161,9 +161,9 @@ function dict2flex(dicts, fls, compound) {
         for (let flex of cfls) {
             /* if (flex.adv) log('______flex-adv', flex) */
             /* log('_flex-term', flex.term) */
-            /* if (flex.md5 == 'c574ff08c43d3d0a476aab63f4dd2f59') log('_FLEX MD5', flex.key) */
+            /* if (flex.md5 == '07f403784d0232ed413bd27b0f4e9916' && flex.stress == 2) log('_FLEX MD5', flex.key) */
             let ok = false
-            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress == flex.stress) ok = true
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress == flex.stress && dict.dict == flex.dict) ok = true
             /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5)) ok = true */
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
@@ -172,7 +172,7 @@ function dict2flex(dicts, fls, compound) {
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
 
             if (ok) dict.fls.push(flex)
-            /* if (ok) log('_F', flex) */
+            if (ok) log('_F', flex.key, flex.term, flex.stress, flex.rdict)
         }
         if (dict.fls.length) cdicts.push(dict)
     }
