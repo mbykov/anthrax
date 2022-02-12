@@ -17,14 +17,14 @@ const m = Debug('more')
 let dag
 
 export async function anthrax(wf) {
+    let chains = []
     let cwf = comb(wf)
     let termcdicts = await getTerms(cwf)
-    /* log('_terms_wf_cdicts:', wf, cwf, termcdicts) */
-    if (termcdicts) return [[{cdicts: termcdicts}]]
+    let tchains =  [[{cdicts: termcdicts}]]
+    if (termcdicts) chains.push(...tchains)
 
-    let chains = await anthraxChains(wf)
-    /* log('_chains:', chains) */
-    /* log('_cdicts:', chains[0][0].cdicts) */
+    let dchains = await anthraxChains(wf)
+    if (dchains) chains.push(...dchains)
     return chains
 }
 
@@ -149,25 +149,20 @@ function makeChains(breaks, ddicts) {
 // ================================================= FILTERS ==============
 /* function dict2flex(headstr, ddict) { */
 function dict2flex(dicts, fls, compound) {
-    log('__DAG.CWF', dag.cwf, dag.aug, dag.stress)
+    /* log('__DAG.CWF', dag.cwf, dag.aug, dag.stress) */
     let cdicts = []
     for (let dict of dicts) {
-        if (dict.stem != 'κανθ') continue
+        /* if (dict.stem != 'κανθ') continue */
         let cfls = _.clone(fls) // wtf ???
-        log('____________________dict', dict.stem)
-        /* log('____________________cfls', cfls.length) */
+        /* log('____________________dict', dict.stem) */
         /* log('____________________cfls', cfls.slice(0,2)) */
-        /* if (dict.name && dict.restrict) cfls = restrictedNames(dict.restrict, cfls) */
         dict.fls = []
         for (let flex of cfls) {
             /* if (flex.adv) log('______flex-adv', flex) */
             /* log('_flex-term', flex.term) */
             /* if (flex.md5 == '07f403784d0232ed413bd27b0f4e9916' && flex.stress == 2) log('_FLEX MD5', flex.key) */
             let ok = false
-            // ахренеть, оказывается, keys и md5 не нужны, совсем. Вот это сюрприз ========= surprise!
-            // но тогда я просто сохраняю в базу все слова как они есть, ничего не группируя, ну и что
-            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress == flex.stress && dict.dict == flex.dict) ok = true */
-            if (dict.name && flex.name && dag.stress == flex.stress && dict.dict == flex.dict) ok = true
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress == flex.stress) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
 
@@ -175,7 +170,7 @@ function dict2flex(dicts, fls, compound) {
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
 
             if (ok) dict.fls.push(flex)
-            if (ok) log('_F', flex.key, flex.term, flex.stress, flex.dict)
+            /* if (ok) log('_F', flex.key, flex.term, flex.stress, flex.dict) */
         }
         if (dict.fls.length) cdicts.push(dict)
     }
@@ -209,19 +204,6 @@ function makeBreaks(dag) {
         }
     }
     return breaks
-}
-
-
-function restrictedNames(restricts, fls) {
-    let cleans = fls.filter(flex=> {
-        if (!flex.numcase) return // flex.adv
-        let ok = false
-        restricts.forEach(restrict=> {
-            if (flex.numcase.split(restrict).length > 1) ok = true
-        })
-        return ok
-    })
-    return cleans
 }
 
 

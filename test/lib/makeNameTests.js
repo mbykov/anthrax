@@ -62,7 +62,7 @@ export function nameTests(rows, limit) {
                     rtest.gend.split(' ').forEach(gend=> {
                         /* let test = {dict: rtest.dict, form, gend: gend, numcase} */
                         let descr = [gend, numcase].join('.')
-                        let test = {dict: rtest.dict, rdict: rtest.rdict, form, descr}
+                        let test = {dict: rtest.dict, rdict: rtest.rdict, form, descr, type: 'name'}
                         ntests.push(test)
                     })
                 }

@@ -20,7 +20,7 @@ const nums = {
     '9': ['sg', 'sg',  'sg', 'du', 'du', 'du', 'pl', 'pl', 'pl' ]
 }
 
-let dict, formstr
+let rdict, dict, formstr
 let res = {}
 
 let rtests = []
@@ -42,9 +42,10 @@ export function adjTests(rows, limit) {
         let tgends = gends[size]
         let tnums = nums[size]
         if (descr == 'dict') {
-            dict = txt.split('•')[0].trim()
+            rdict = txt.split('•')[0].trim()
+            dict = comb(rdict)
             formstr = txt.split('•')[1].trim()
-            res =  {dict: dict, formstr: formstr, lines: []}
+            res =  {rdict, dict, formstr: formstr, lines: []}
             rtests.push(res)
         } else if (size == '6' || size == '9') {
             let str = row.split(':')[1]
@@ -81,12 +82,15 @@ export function adjTests(rows, limit) {
                     gends.split(' ').forEach(gend => {
                         let num = tnums[idy]
                         let descr = [gend, num, kase].join('.')
-                        let test = {dict: rtest.dict, form, descr}
+                        /* let test = {dict: rtest.dict, form, descr} */
+                        let test = {dict: rtest.dict, rdict: rtest.rdict, form, descr}
                         tests.push(test)
                     })
                 })
             })
         }
     }
+    /* let xxx = tests.filter(test=> test.form == 'ἀλαζόνε') */
+    /* log('_XXXXXXXX_', xxx) */
     return tests
 }

@@ -39,15 +39,16 @@ let atests = adjTests(arows, limit)
 log('_ATESTS', atests.length)
 
 let tests = ntests.concat(atests)
+/* let tests = ntests */
+/* log('_TESTS', tests.slice(0,2)) */
 log('_TESTS', tests.length)
+/* tests = [] */
 
 let wfs = []
 for (let wf of tests) {
     if (!wf.dict) log('__NO DICT', wf)
-    let wfplain = plain(wf.dict)
-    let wfkey = [wfplain, wf.form].join('-') // plain.form нельзя, ἕδρᾳ - отвалится йота
-    wfkey = wf.form
-    /* let wfkey = [plain(wf.dict), plain(wf.form)].join('-') */
+    let wfkey = wf.form
+    wfkey = [wf.dict, wf.form].join('-')
     if (!cache[wfkey]) cache[wfkey] = []
     cache[wfkey].push(wf.descr)
 }
@@ -56,49 +57,32 @@ for (let wfkey in cache) {
     cache[wfkey] = _.uniq(cache[wfkey])
 }
 
-/* log('_CACHE', cache['ἄδυτον']) */
-
-/* tests = tests.slice(0,1000) */
-/* tests = tests.filter(test => test.form == 'ἄδυτον') */
-/* log('_TEST', tests) */
-/* tests = [] */
+/* log('_CACHE', cache['ἀλαζών-ἀλαζόνε']) */
 
 async function testWF(wf, exp) {
     it(`wf: ${wf.rdict} - ${wf.form} - ${wf.descr}`, async () => {
         let chains = await anthrax(wf.form)
+        /* log('_EXP', wf.key, exp) */
         /* log('_WF', wf) */
         /* log('_CHS', chains) */
-        let chain = chains[0][0] // потом prefs
-        let dicts = chain.cdicts.filter(cdict=> cdict.dict == wf.dict)
+        let dicts = []
+        for (let chain of chains) {
+            let chdicts = chain[0].cdicts.filter(cdict=> cdict.dict == wf.dict)
+            dicts.push(...chdicts)
+        }
+        /* let chain = chains[0][0] // потом prefs */
+        /* let dicts = chain.cdicts.filter(cdict=> cdict.dict == wf.dict) */
         let fls = compactNamesFls(dicts)
-
-        /* let dict = chain.cdicts.find(cdict=> cdict.dict == wf.dict) */
-        /* let fls = dict.fls.filter(flex=> !flex.adv) */
-        /* fls = fls.map(flex=> [flex.gend, flex.num, flex.case].join('.')) */
-        /* fls = _.uniq(_.flatten(fls).sort()) */
-        /* log('_FLS', fls) */
         assert.deepEqual(fls, exp)
-        return
-        /* log('_CDICTS', wf.dict, chains[0][0].cdicts) */
-        /* let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict && dict.gends.includes(wf.gend))) // last: - heades does not matter for names */
-        /* let chain = chains.find(ch=> _.last(ch).cdicts.find(cdict=> cdict.dict == wf.dict)) // last: - heades does not matter for names */
-        /* let dict = chain.cdicts.find(dict=> dict.name && dict.gends.includes(wf.gend)) */
-        /* log('_CH', chain) */
-
-        /* let dicts = _.last(chain).cdicts // .filter(dict=> dict.name && dict.gends) */
-        /* dicts = dicts.filter(dict=> dict.name) // todo: remove до тестов verb */
-        /* let fls = compactNamesFls(dicts) */
-        /* assert.deepEqual(fls, exp) */
     })
 }
 
 describe('test names:', () => {
     for (let wf of tests) {
-        let wfplain = plain(wf.dict)
-        let wfkey = [wfplain, wf.form].join('-')
-        wfkey = wf.form
-        /* let wfkey = [plain(wf.dict), plain(wf.form)].join('-') */
+        let wfkey = wf.form
+        wfkey = [wf.dict, wf.form].join('-')
         let expected = cache[wfkey].sort()
+        wf.key = wfkey
         testWF(wf, expected)
     }
 })
