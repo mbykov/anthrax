@@ -120,7 +120,7 @@ function makeChains(breaks, ddicts) {
         }
 
         let chain = []
-        let dictfls
+        let dictfls = []
         if (br.tail) {
             let dtail = ddicts.find(ddict=> ddict._id == br.tail)
             if (!dtail) continue
@@ -133,21 +133,26 @@ function makeChains(breaks, ddicts) {
             } else {
                 tails = tails.filter(dict=> !dict.aug)
             }
-            dictfls = dict2flex(tails, br.fls.docs, true)
+            /* dictfls = dict2flex(tails, br.fls.docs, true) */
             /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
+            if (!dictfls.length) continue
+            log('_DC-fls', dictfls)
             /* log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
             chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id})
         }
+        if (dictfls.length) log('_CHAIN', chain[0].cdicts)
         if (dictfls.length) chains.push(chain)
     }
+    log('_====!!', chains[0][0])
+    log('_====!!', chains.length)
     return chains
 }
 
 // ================================================= FILTERS ==============
-/* function dict2flex(headstr, ddict) { */
+
 function dict2flex(dicts, fls, compound) {
     /* log('__DAG.CWF', dag.cwf, dag.aug, dag.stress) */
     let cdicts = []
@@ -158,8 +163,6 @@ function dict2flex(dicts, fls, compound) {
         /* log('____________________cfls', cfls.slice(0,2)) */
         dict.fls = []
         for (let flex of cfls) {
-            /* if (flex.adv) log('______flex-adv', flex) */
-            /* log('_flex-term', flex.term) */
             /* if (flex.md5 == '07f403784d0232ed413bd27b0f4e9916' && flex.stress == 2) log('_FLEX MD5', flex.key) */
             let ok = false
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress == flex.stress) ok = true
@@ -170,10 +173,15 @@ function dict2flex(dicts, fls, compound) {
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
 
             if (ok) dict.fls.push(flex)
-            /* if (ok) log('_F', flex.key, flex.term, flex.stress, flex.dict) */
+            if (ok && false) {
+                log('__DAG.CWF', dag.cwf, dag.aug, dag.stress)
+                log('____________________dict', dict.stem)
+                log('____flex', flex)
+            }
         }
         if (dict.fls.length) cdicts.push(dict)
     }
+    /* log('____CDS', cdicts) */
     return cdicts
 }
 
@@ -204,160 +212,4 @@ function makeBreaks(dag) {
         }
     }
     return breaks
-}
-
-
-// =================================
-
-
-
-function makeBreaks_(dag) {
-    const breaks = []
-    for (let flex of dag.flexes) {
-        let head = dag.pcwf.slice(0, - flex._id.length)
-        breakByTwoParts_(breaks, head)
-    }
-    return breaks
-}
-
-export function breakByTwoParts_ (breaks, str) {
-    const brkeys = {}
-    let head = str
-    let pos = str.length
-    let vow, tail, res, brkey
-    while (pos > 0) {
-        pos--
-        tail = str.slice(pos)
-        head = str.substr(0, pos)
-        if (!head) continue
-        vow = tail[0]
-        if (vowels.includes(vow)) {
-            tail = tail.slice(1)
-            if (!tail) continue
-            res = {head, vow, tail}
-            brkey = [vow, tail].join('')
-        } else {
-            res = {head: head, tail: tail}
-            brkey = tail
-        }
-        if (brkeys[brkey]) continue
-        brkeys[brkey] = true
-        breaks.push(res)
-    }
-    return breaks
-}
-
-
-async function getDicts(tail) {
-    let flakes = scrape(tail)
-    let headkeys = flakes.map(flake=> plain(flake.head))
-    log('_headkeys_', headkeys)
-    let ddicts = await getSegments(headkeys)
-    // todo: return ddicts
-    let dictids = ddicts.map(dict=> dict._id)
-    g('_dictids_', dictids, 'aug:', dag.aug, 'tail:', tail)
-    return ddicts
-}
-
-function addHead(heads, ddict) {
-    let head
-    let prefixes = ddict.docs.filter(dict=> dict.pref)
-    if (prefixes.length) {
-        head = {plain: ddict._id, cdicts: prefixes, pref: true}
-    } else if (ddict._id.length > 1 && ddict.docs.length) {
-        head = {plain: ddict._id, cdicts: ddict.docs}
-    }
-    if (head) heads.push(head)
-}
-
-async function dagging(oldheads, tail) {
-    let ddicts = await getDicts(tail)
-    if (!ddicts.length) return
-    let headstr = oldheads.map(doc=> doc.plain).join('')
-    g('_headstr_', oldheads.length, headstr, '_tail_', tail)
-
-    for (let ddict of ddicts) {
-        let nexttail = tailBySize(ddict, tail)
-        g('___ddict_start:', ddict._id, '_aug:', dag.aug)
-        let heads = _.clone(oldheads)
-        if (heads.length == 0) {
-            ddict.docs = ddict.docs.filter(dict=> dict.aug == dag.aug)
-            let chain = dict2flex(heads, ddict)
-            if (!chain) addHead(heads, ddict)
-        } else {
-            g('__ELSE', headstr, ddict._id)
-            let prefix = heads.slice(-1)[0].pref ? heads.slice(-1)[0].plain : null
-            let vowel = heads.slice(-1)[0].vowel ? heads.slice(-1)[0].plain : null
-            if (!prefix) ddict.docs = ddict.docs.filter(dict=> aug2vow(vowel, dict.aug))
-            /* if (!vowel && headstr == 'δια' && ddict._id == 'γγελ') log('__DIA', headstr, '_vow:', vowel, ddict.docs.length) */
-            let chain = dict2flex(heads, ddict)
-            if (!chain) addHead(heads, ddict)
-        }
-
-        if (dag.chains.length) continue // todo: тут надо разобраться - вызывать по ясному требованию, клику?
-
-        if (!nexttail) continue
-        await dagging(heads, nexttail)
-
-        if (!heads.length || heads[0].pref) continue // пока что отключаю aug после префиксов
-
-        let pdict = plain(ddict._id)
-        let vowel = nexttail[0]
-        g('_========pdict_1', pdict, 'vow:', vowel, '_nexttail:', nexttail)
-        if (!vowels.includes(vowel)) continue
-        pdict = pdict + vowel
-        nexttail = nexttail.substr(vowel.length)
-        heads.push({plain: vowel, vowel: true})
-        g('_========pdict_2', pdict, 'vow:', vowel, '_nexttail:', nexttail, 'headstr:', heads.length)
-        await dagging(heads, nexttail)
-
-    } // ddicts
-}
-
-function tailBySize(ddict, tail) {
-    let pdict = plain(ddict._id)
-    let nexttail = tail.substr(pdict.length)
-    if (dag.flexids.includes(nexttail)) nexttail = null
-    return nexttail
-}
-
-function dict2flex_(heads, ddict) {
-    let headstr = heads.map(doc=> doc.plain).join('')
-    /* let cdicts */
-    /* if (dag.cache[ddict._id]) cdicts = dag.cache[ddict._id] */
-    /* else cdicts = parseCDicts(headstr, ddict) */
-    let cdicts = parseCDicts(headstr, ddict)
-    if (!cdicts.length) return
-    /* if (cdicts.length) log('____________inner headstr', headstr, '_ddict:', ddict._id, '_cdicts:', cdicts.length) */
-
-    m('___else pushed', ddict._id)
-    let chain = [{plain: ddict._id, cdicts}]
-    if (heads.length) chain.unshift(...heads)
-    dag.chains.push(chain)
-    return chain
-}
-
-function parseCDicts_(headstr, ddict) {
-    let cdicts = []
-    let cflexes = dag.flexes.filter(flex=> dag.pcwf == headstr + ddict._id + plain(flex._id))
-    for (let dict of ddict.docs) {
-        for (let cflex of cflexes) {
-            for (let flex of cflex.docs) {
-                let ok = false
-                let key = plain(flex.key.split('-')[0])
-                if (dict.name && dict.adj && flex.name && dict.key == flex.key) ok = true
-                else if (dict.name && flex.name && dict.key == flex.key && dict.gends.includes(flex.gend)) ok = true
-                else if (dict.verb && flex.verb && dict.keys.find(verbkey=> flex.key == verbkey.key)) ok = true
-                else if (headstr && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
-                if (ok) {
-                    if (!dict.fls) dict.fls = []
-                    dict.fls.push(flex)
-                }
-            }
-        }
-        /* dict.fls = _.uniq(dict.fls) // TODO: ???? почему много в одном dict? */
-        if (dict.fls && dict.fls.length) cdicts.push(dict)
-    }
-    /* dag.cache[ddict._id] = cdicts */
-    return cdicts
 }
