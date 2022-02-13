@@ -20,6 +20,7 @@ for (let chain of chains) {
         if (seg.cdicts) {
             /* let rdicts = seg.cdicts.map(cdict=> cdict.rdict) */
             seg.cdicts.forEach(cdict=> {
+                if (!cdict.fls) cdict.fls = [] // heads as prefixes, compounds, etc
                 let advfls = cdict.fls.filter(flex=> flex.adv)
                 advfls = compactAdvFls(advfls)
                 let fls = cdict.fls.filter(flex=> !flex.adv)

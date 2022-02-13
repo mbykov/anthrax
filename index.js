@@ -4,9 +4,9 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref, stressPosition } from './lib/utils.js'
+/* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref, stressPosition } from './lib/utils.js' */
+import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref, getStress } from './lib/utils.js'
 import { getTerms, getFlexes, getSegments } from './lib/remote.js'
-/* import { filter, simple } from './lib/filters.js' */
 import Debug from 'debug'
 
 const d = Debug('app')
@@ -62,7 +62,8 @@ export async function anthraxChains(wf) {
         dag.aug = parseAug(dag.pcwf) || ''
         dag.pcwf = dag.pcwf.slice(dag.aug.length)
     }
-    dag.stress = stressPosition(dag.cwf)
+    /* dag.stress = stressPosition(dag.cwf) */
+    dag.stress = getStress(dag.cwf)
 
     /* let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-') */
     /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
@@ -100,10 +101,10 @@ export async function anthraxChains(wf) {
 
 function makeChains(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
-    /* log('_ddictids', ddicts) */
+    /* log('_ddictids', ddictids) */
     let chains = []
     for (let br of breaks) {
-        /* log('_BR aug:', dag.aug, '_h:', br.head, '_t:', br.tail, '_term:', br.fls._id) */
+        /* log('_BREAK aug:', dag.aug, '_h:', br.head, '_t:', br.tail, '_term:', br.fls._id) */
         let dhead = ddicts.find(ddict=> ddict._id == br.head)
         if (!dhead) continue
         /* if (br.head.length < 3) continue // FC can not be short */
@@ -133,39 +134,37 @@ function makeChains(breaks, ddicts) {
             } else {
                 tails = tails.filter(dict=> !dict.aug)
             }
+            // компаунды временно отрубил для simple тестов
             /* dictfls = dict2flex(tails, br.fls.docs, true) */
+            if (!dictfls.length) continue
             /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
-            chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id})
+            chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id, cmp: true})
         } else {
             dictfls = dict2flex(heads, br.fls.docs)
             if (!dictfls.length) continue
-            log('_DC-fls', dictfls)
             /* log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
             chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id})
         }
-        if (dictfls.length) log('_CHAIN', chain[0].cdicts)
         if (dictfls.length) chains.push(chain)
     }
-    log('_====!!', chains[0][0])
-    log('_====!!', chains.length)
     return chains
 }
 
 // ================================================= FILTERS ==============
 
 function dict2flex(dicts, fls, compound) {
-    /* log('__DAG.CWF', dag.cwf, dag.aug, dag.stress) */
+    log('__DAG.CWF', dag.cwf, dag.aug, dag.stress)
     let cdicts = []
-    for (let dict of dicts) {
-        /* if (dict.stem != 'κανθ') continue */
-        let cfls = _.clone(fls) // wtf ???
-        /* log('____________________dict', dict.stem) */
-        /* log('____________________cfls', cfls.slice(0,2)) */
+    for (let cdict of dicts) {
+        let dict = _.clone(cdict)
+        log('____________________dict', dict.stem)
         dict.fls = []
-        for (let flex of cfls) {
+        for (let flex of fls) {
+            /* log('_____flex', flex.term, flex.stress) */
             /* if (flex.md5 == '07f403784d0232ed413bd27b0f4e9916' && flex.stress == 2) log('_FLEX MD5', flex.key) */
             let ok = false
-            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress == flex.stress) ok = true
+            // if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5  && dag.stress.type == flex.stress.type && dag.stress.nth == flex.stress.nth) ok = true
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
 
@@ -173,7 +172,7 @@ function dict2flex(dicts, fls, compound) {
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
 
             if (ok) dict.fls.push(flex)
-            if (ok && false) {
+            if (ok) {
                 log('__DAG.CWF', dag.cwf, dag.aug, dag.stress)
                 log('____________________dict', dict.stem)
                 log('____flex', flex)
