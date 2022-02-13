@@ -18,7 +18,7 @@ let dag
 
 export async function anthrax(wf) {
     let chains = []
-    let cwf = comb(wf)
+    let cwf = comb(wf).toLowerCase()
     let termcdicts = await getTerms(cwf)
     let tchains =  [[{cdicts: termcdicts}]]
     if (termcdicts) chains.push(...tchains)
@@ -101,6 +101,8 @@ export async function anthraxChains(wf) {
 function makeChains(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
     /* log('_ddictids', ddictids) */
+    /* log('_breaks', breaks) */
+
     let chains = []
     for (let br of breaks) {
         /* log('_BREAK aug:', dag.aug, '_h:', br.head, '_t:', br.tail, '_term:', br.fls._id) */
@@ -108,6 +110,8 @@ function makeChains(breaks, ddicts) {
         if (!dhead) continue
         /* if (br.head.length < 3) continue // FC can not be short */
         let heads = dhead.docs
+        /* log('_heads', br.head, br.tail, heads.length) */
+
         if (!heads.length) continue
 
         if (dag.prefs) {
@@ -118,6 +122,8 @@ function makeChains(breaks, ddicts) {
         if (dag.aug) {
             heads = heads.filter(dict=> dict.aug == dag.aug)
         }
+
+        /* if (!br.tail) log('_HERE', br) */
 
         let chain = []
         let dictfls = []
