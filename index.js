@@ -152,11 +152,11 @@ function makeChains(breaks, ddicts) {
 // ================================================= FILTERS ==============
 
 function dict2flex(dicts, fls, compound) {
-    log('__DAG.CWF', dag.cwf, dag.aug, dag.stress)
+    /* log('__DAG.CWF', dag.cwf, dag.aug, dag.stress) */
     let cdicts = []
     for (let cdict of dicts) {
         let dict = _.clone(cdict)
-        log('____________________dict', dict.stem)
+        /* log('____________________dict', dict.stem) */
         dict.fls = []
         for (let flex of fls) {
             /* if (flex.form == dag.cwf) log('_FLEX', flex) */
@@ -169,7 +169,7 @@ function dict2flex(dicts, fls, compound) {
             else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
 
             if (ok) dict.fls.push(flex)
-            if (ok) log('_FLEX', flex)
+            /* if (ok) log('_FLEX', flex) */
         }
         if (dict.fls.length) cdicts.push(dict)
     }
