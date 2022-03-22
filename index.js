@@ -64,11 +64,12 @@ export async function anthraxChains(wf) {
     }
     dag.stress = getStress(dag.cwf)
 
+    d(dag)
     /* let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-') */
     /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
 
     let breaks = makeBreaks(dag)
-    /* log('_breaks', breaks.length) */
+    /* log('_breaks', breaks) */
 
     breaks.forEach(br=> {
         if (!br.vow) br.vow = ''
