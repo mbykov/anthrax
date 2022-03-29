@@ -670,7 +670,7 @@ particle: οὕνεκα
 #      To be, exist
 
 num: χίλιοι
-    -thousands
+    - thousands
 
 adj: ἔνιοι
      some,  	adj pl masc nom, voc

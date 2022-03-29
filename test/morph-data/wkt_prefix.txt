@@ -39,7 +39,7 @@ pref: ἀπ- • (apo-)
     Simply emphasizing the meaning of the verb
     because of, owing to
     = ἀφ
-    = π
+#    = π
 
 #pref: ἀρι- • (ari-)
 pref: ἀρ- • (ari-)
@@ -56,7 +56,6 @@ pref: ἀρχ- • (arkhi-)
 #pref: ἀμφι
 pref: ἀμφ
       both, on both sides of, around
-      = ἀμφ
       = ἀμπ
 
 #pref: αὐτο

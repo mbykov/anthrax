@@ -5,13 +5,13 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 /* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref, stressPosition } from './lib/utils.js' */
-import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref, getStress } from './lib/utils.js'
-import { getTerms, getFlexes, getSegments } from './lib/remote.js'
+import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, getStress } from './lib/utils.js'
+import { getTerms, getFlexes, getSegments, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
 const d = Debug('app')
 const g = Debug('dag')
-const m = Debug('more')
+const p = Debug('prefs')
 
 // 1. вопросы: εἰσαγγέλλω
 let dag
@@ -64,7 +64,7 @@ export async function anthraxChains(wf) {
     }
     dag.stress = getStress(dag.cwf)
 
-    d(dag)
+    /* d(dag) */
     /* let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-') */
     /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
 
@@ -167,7 +167,9 @@ function dict2flex(dicts, fls, compound) {
         dict.fls = []
         for (let flex of fls) {
             /* if (flex.form == dag.cwf) log('_FLEX', flex) */
+            /* log('_flex:', flex) */
             let ok = false
+            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend)) ok = true */
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
@@ -211,4 +213,51 @@ function makeBreaks(dag) {
         }
     }
     return breaks
+}
+
+// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
+// πολύτροπος, ψευδολόγος, εὐχαριστία
+// bug  - ἐπεξήγησις - находит ap, а нужно ep - longest туп
+// προσαναμιμνήσκω, προσδιαιρέω = без vow
+// παραγγέλλω = vow
+// ἀμφίβραχυς - adj
+
+export async function findPref(dag, pcwf) {
+    let flakes = scrape(pcwf).reverse()
+    /* p('_flakes', flakes) */
+    /* let headkeys = flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 5) */
+    let headkeys = flakes.map(flake=> flake.head).filter(head=> head.length < 5)
+    p('_headkeys', headkeys)
+    /* let ddicts = await getSegments(headkeys) */
+    let ddicts = await getPrefs(headkeys)
+    p('_ddicts', ddicts.length)
+    let cpref, prefs = []
+    for (let ddict of ddicts) {
+        if (!ddict.docs) p('_NO DOCS_', pcwf, ddict, headkeys, flakes)
+        cpref = ddict.docs.find(dict=> dict.pref)
+        if (cpref) prefs.push(cpref)
+    }
+    /* p('_PREFS', prefs) */
+    if (!prefs.length) return
+    let pref = _.maxBy(prefs, function(pref) { return pref.plain.length; });
+
+    dag.prefs.push({plain: pref.plain, cdicts: [pref], pref: true})
+    // ? === TODO NOW
+    /* dag.prefs.push(pref) */
+
+    let tail = pcwf.replace(pref.plain, '')
+    p('_TAIL', tail)
+    let nextpref = await findPref(dag, tail)
+    if (nextpref) return
+
+    let vowel = tail[0]
+    tail = tail.slice(1)
+    if (!tail) return
+    p('_vowel', vowel)
+    if (!vowels.includes(vowel)) return
+    let vow = {plain: vowel, vowel: true}
+    dag.prefs.push(vow)
+    nextpref = await findPref(dag, tail)
+
+    return pref
 }
