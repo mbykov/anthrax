@@ -21,7 +21,7 @@ export async function anthrax(wf) {
     let cwf = comb(wf).toLowerCase()
     let termcdicts = await getTerms(cwf)
     let tchains =  [[{cdicts: termcdicts}]]
-    if (termcdicts) chains.push(...tchains)
+    if (termcdicts.length) chains.push(...tchains)
 
     let dchains = await anthraxChains(wf)
     if (dchains) chains.push(...dchains)
@@ -31,7 +31,6 @@ export async function anthrax(wf) {
 export async function anthraxChains(wf) {
     dag = new Map();
     dag.chains = []
-    /* dag.cache = {} */
     dag.cwf = comb(wf)
     let flakes = scrape(dag.cwf).reverse()
     /* d('_flakes', flakes) */
@@ -67,7 +66,7 @@ export async function anthraxChains(wf) {
     }
     dag.stress = getStress(dag.cwf)
 
-    d(dag)
+    g(dag)
     // breaks - [head, tail, fls]
     let breaks = makeBreaks(dag)
     /* log('_breaks', breaks) */
@@ -98,27 +97,20 @@ function makeChains(breaks, ddicts) {
 
     let chains = []
     for (let br of breaks) {
-        /* log('_BREAK aug:', dag.aug, '_h:', br.head, '_t:', br.tail, '_term:', br.fls._id) */
         let dhead = ddicts.find(ddict=> ddict._id == br.head)
         if (!dhead) continue
         /* if (br.head.length < 3) continue // FC can not be short */
         let heads = dhead.docs
-        log('_heads', br.head, br.tail, heads.length)
+        /* log('_heads', br.head, br.tail, heads.length) */
 
         if (!heads.length) continue
-
         if (dag.prefs) {
             let connect = dag.prefs[dag.prefs.length-1]
             if (connect && connect.vowel) heads = heads.filter(dict=> aug2vow(connect.plain, dict.aug))
         }
 
-        log('_dag.aug', br.head, dag.aug)
-
-        /* if (dag.aug) { */
-            /* heads = heads.filter(dict=> dict.aug == dag.aug) */
-        /* } */
-
-        log('___heads_2', br.head, br.tail, heads.length)
+        /* log('_dag.aug', br.head, dag.aug) */
+        /* log('___heads_2', br.head, br.tail, heads.length) */
 
         let chain = []
         let dictfls = []
@@ -128,7 +120,6 @@ function makeChains(breaks, ddicts) {
             let tails = dtail.docs
             chain.push({plain: br.head, cdicts: heads})
             if (br.vow) {
-                /* log('____________________B', br.head, br.vow, br.tail, br.fls._id) */
                 chain.push({plain: br.vow, vowel: true})
                 tails = tails.filter(dict=> aug2vow(br.vow, dict.aug))
             } else {
