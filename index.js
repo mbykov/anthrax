@@ -20,7 +20,6 @@ export async function anthrax(wf) {
     let chains = []
     let cwf = comb(wf).toLowerCase()
     let termcdicts = await getTerms(cwf)
-    log('_TERM DICTS', termcdicts)
     let tchains =  [[{cdicts: termcdicts}]]
     if (termcdicts) chains.push(...tchains)
 
@@ -47,6 +46,8 @@ export async function anthraxChains(wf) {
 
     dag.prefs = []
     await findPref(dag, dag.pcwf)
+    g('_dag.prefs', dag.prefs)
+
     if (dag.prefs.length) {
         /* log('_PREFS', dag.prefs.map(pref=> pref.plain)) */
         let lastpref = _.last(dag.prefs)
@@ -72,11 +73,6 @@ export async function anthraxChains(wf) {
     let breaks = makeBreaks(dag)
     /* log('_breaks', breaks) */
 
-    breaks.forEach(br=> {
-        if (!br.vow) br.vow = ''
-        /* log('_br', br.head, br.vow, br.tail, br.fls._id) */
-    })
-
     let headkeys = _.uniq(breaks.map(br=> br.head))
     /* log('_headkeys', headkeys) */
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
@@ -87,22 +83,18 @@ export async function anthraxChains(wf) {
     /* log('_ddicts', ddicts) */
     /* log('_ddicts', ddicts[0].docs) */
     dag.ddictids = ddicts.map(ddict=> ddict._id)
-    /* log('_ddictids', dag.ddictids) */
+    g('_ddictids', dag.ddictids)
 
     let chains = makeChains(breaks, ddicts)
     /* log('_chains', chains) */
 
     if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
-
-    /* delete dag.flexes */
-    /* log('_DAG', dag) */
-
     return chains
 }
 
 function makeChains(breaks, ddicts) {
     let ddictids = ddicts.map(ddict=> ddict._id)
-    /* log('_ddictids', ddictids) */
+    /* log('_ddictids_', ddictids) */
     /* log('_breaks', breaks) */
 
     let chains = []
@@ -112,7 +104,7 @@ function makeChains(breaks, ddicts) {
         if (!dhead) continue
         /* if (br.head.length < 3) continue // FC can not be short */
         let heads = dhead.docs
-        /* log('_heads', br.head, br.tail, heads.length) */
+        log('_heads', br.head, br.tail, heads.length)
 
         if (!heads.length) continue
 
@@ -121,11 +113,13 @@ function makeChains(breaks, ddicts) {
             if (connect && connect.vowel) heads = heads.filter(dict=> aug2vow(connect.plain, dict.aug))
         }
 
-        if (dag.aug) {
-            heads = heads.filter(dict=> dict.aug == dag.aug)
-        }
+        log('_dag.aug', br.head, dag.aug)
 
-        /* if (!br.tail) log('_HERE', br) */
+        /* if (dag.aug) { */
+            /* heads = heads.filter(dict=> dict.aug == dag.aug) */
+        /* } */
+
+        log('___heads_2', br.head, br.tail, heads.length)
 
         let chain = []
         let dictfls = []
@@ -147,9 +141,10 @@ function makeChains(breaks, ddicts) {
             /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
             chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id, cmp: true})
         } else {
-            dictfls = dict2flex(heads, br.fls.docs)
+            log('_no_tail_', br.head, heads.length, br.fls.docs.length)
+            dictfls = dict2flex(heads, br.fls.docs, dag)
             if (!dictfls.length) continue
-            /* log('____________________SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
+            /* log('___SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
             chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id})
         }
         if (dictfls.length) chains.push(chain)
@@ -159,7 +154,12 @@ function makeChains(breaks, ddicts) {
 
 // ================================================= FILTERS ==============
 
-function dict2flex(dicts, fls, compound) {
+/*
+   filter: пока бардак. simple работает, но prefs и compounds все ломают в лапшу. Нужна общая схема
+
+*/
+
+function dict2flex(dicts, fls, dag) {
     /* log('__DAG.CWF', dag.cwf, dag.aug, dag.stress) */
     let cdicts = []
     for (let cdict of dicts) {
@@ -170,13 +170,16 @@ function dict2flex(dicts, fls, compound) {
             /* if (flex.form == dag.cwf) log('_FLEX', flex) */
             /* log('_flex:', flex) */
             let ok = false
-            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend)) ok = true */
-            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true
-            else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
-            else if (dict.part && flex.part ) ok = true
-
-            else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
-            else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds
+            // dag.prefs: ἀμφίβραχυς
+            if (dag.prefs.length) {
+                if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend)) ok = true
+            } else {
+                if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true
+                else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
+                else if (dict.part && flex.part ) ok = true
+                else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
+                /* else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
+            }
 
             if (ok) dict.fls.push(flex)
             /* if (ok) log('_FLEX', flex) */
@@ -201,7 +204,7 @@ function makeBreaks(dag) {
             /* if (head.length < 3) continue // в компаундах FC не короткие, нов simple м.б. */
             tail = phead.slice(pos)
             /* if (tail && tail.length < 2) continue // в компаундах fc не короткие, нов simple м.б. */
-            vow = tail[0]
+            vow = tail[0] || ''
             if (vowels.includes(vow)) {
                 tail = tail.slice(1)
                 if (!tail) continue
@@ -225,36 +228,34 @@ function makeBreaks(dag) {
 
 export async function findPref(dag, pcwf) {
     let flakes = scrape(pcwf).reverse()
+    p('____________find_pref:', pcwf)
     /* p('_flakes', flakes) */
     /* let headkeys = flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 5) */
     let headkeys = flakes.map(flake=> flake.head).filter(head=> head.length < 5)
     p('_headkeys', headkeys)
     /* let ddicts = await getSegments(headkeys) */
     let prefs = await getPrefs(headkeys)
-    p('_PREFS', prefs)
+    p('_prefs', pcwf, prefs)
     if (!prefs.length) return
     let pref = _.maxBy(prefs, function(pref) { return pref.term.length; });
+    pref.plain = plain(pref.term)
 
-    dag.prefs.push({plain: pref.plain, cdicts: [pref], pref: true})
-    p('_DAG', dag.prefs)
-    // ? === TODO NOW
     /* dag.prefs.push(pref) */
-
-    return pref
+    dag.prefs.push({plain: pref.plain, cdicts: [pref], pref: true})
+    p('_DAG.prefs', dag.prefs)
 
     let tail = pcwf.replace(pref.plain, '')
     p('_TAIL', tail)
-    let nextpref = await findPref(dag, tail)
-    if (nextpref) return
+    /* let nextpref = await findPref(dag, tail) */
+    /* if (nextpref) return */
 
     let vowel = tail[0]
     tail = tail.slice(1)
     if (!tail) return
     p('_vowel', vowel)
     if (!vowels.includes(vowel)) return
-    let vow = {plain: vowel, vowel: true}
+    let vow = {plain: vowel, vowel: true, pref: true}
     dag.prefs.push(vow)
-    nextpref = await findPref(dag, tail)
+    /* await findPref(dag, tail) */
 
-    return pref
 }

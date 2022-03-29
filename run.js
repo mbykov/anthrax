@@ -16,6 +16,8 @@ for (let chain of chains) {
     log('\n_chain:', chain)
     if (!true)  continue
 
+    let result = chain.map(seg=> [seg.plain, seg.flex].join('-')).join('-')
+    log('_result:_', result)
     chain.forEach(seg=> {
         if (seg.cdicts) {
             /* let rdicts = seg.cdicts.map(cdict=> cdict.rdict) */
@@ -31,7 +33,7 @@ for (let chain of chains) {
                 if (advfls.length) d('_adv', advfls)
             })
         } else {
-            log('_seg_no_cdicts:', seg)
+            /* log('_seg_no_cdicts:', seg) */
         }
     })
 }
