@@ -34,8 +34,9 @@ export async function anthraxChains(wf) {
     /* dag.cache = {} */
     dag.cwf = comb(wf)
     let flakes = scrape(dag.cwf).reverse()
-    d('_flakes', flakes)
+    /* d('_flakes', flakes) */
     if (!flakes.length) return
+    dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
@@ -66,10 +67,8 @@ export async function anthraxChains(wf) {
     }
     dag.stress = getStress(dag.cwf)
 
-    /* d(dag) */
-    /* let prefstr_ = dag.prefs.map(pref=> pref.plain).join('-') */
-    /* log('_PREF+TAIL_', dag.cwf, '=', prefstr_, '+', dag.pcwf) */
-
+    d(dag)
+    // breaks - [head, tail, fls]
     let breaks = makeBreaks(dag)
     /* log('_breaks', breaks) */
 
@@ -221,21 +220,18 @@ function makeBreaks(dag) {
 
 // ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, εὐχαριστία
-// bug  - ἐπεξήγησις - находит ap, а нужно ep - longest туп
 // προσαναμιμνήσκω, προσδιαιρέω = без vow
 // παραγγέλλω = vow
 // ἀμφίβραχυς - adj
 
 export async function findPref(dag, pcwf) {
-    let flakes = scrape(pcwf).reverse()
+    /* let flakes = scrape(pcwf).reverse() */
     p('____________find_pref:', pcwf)
-    /* p('_flakes', flakes) */
     /* let headkeys = flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 5) */
-    let headkeys = flakes.map(flake=> flake.head).filter(head=> head.length < 5)
+    let headkeys = dag.flakes.map(flake=> flake.head).filter(head=> head.length < 5)
     p('_headkeys', headkeys)
-    /* let ddicts = await getSegments(headkeys) */
     let prefs = await getPrefs(headkeys)
-    p('_prefs', pcwf, prefs)
+    /* p('_prefs', pcwf, prefs) */
     if (!prefs.length) return
     let pref = _.maxBy(prefs, function(pref) { return pref.term.length; });
     pref.plain = plain(pref.term)
