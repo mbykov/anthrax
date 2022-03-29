@@ -4,7 +4,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-/* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, findPref, stressPosition } from './lib/utils.js' */
+/* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, stressPosition } from './lib/utils.js' */
 import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, getStress } from './lib/utils.js'
 import { getTerms, getFlexes, getSegments, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
@@ -20,6 +20,7 @@ export async function anthrax(wf) {
     let chains = []
     let cwf = comb(wf).toLowerCase()
     let termcdicts = await getTerms(cwf)
+    log('_TERM DICTS', termcdicts)
     let tchains =  [[{cdicts: termcdicts}]]
     if (termcdicts) chains.push(...tchains)
 
@@ -229,21 +230,17 @@ export async function findPref(dag, pcwf) {
     let headkeys = flakes.map(flake=> flake.head).filter(head=> head.length < 5)
     p('_headkeys', headkeys)
     /* let ddicts = await getSegments(headkeys) */
-    let ddicts = await getPrefs(headkeys)
-    p('_ddicts', ddicts.length)
-    let cpref, prefs = []
-    for (let ddict of ddicts) {
-        if (!ddict.docs) p('_NO DOCS_', pcwf, ddict, headkeys, flakes)
-        cpref = ddict.docs.find(dict=> dict.pref)
-        if (cpref) prefs.push(cpref)
-    }
-    /* p('_PREFS', prefs) */
+    let prefs = await getPrefs(headkeys)
+    p('_PREFS', prefs)
     if (!prefs.length) return
-    let pref = _.maxBy(prefs, function(pref) { return pref.plain.length; });
+    let pref = _.maxBy(prefs, function(pref) { return pref.term.length; });
 
     dag.prefs.push({plain: pref.plain, cdicts: [pref], pref: true})
+    p('_DAG', dag.prefs)
     // ? === TODO NOW
     /* dag.prefs.push(pref) */
+
+    return pref
 
     let tail = pcwf.replace(pref.plain, '')
     p('_TAIL', tail)
