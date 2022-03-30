@@ -219,10 +219,12 @@ export async function findPref(dag, pcwf) {
     /* let flakes = scrape(pcwf).reverse() */
     p('____________find_pref:', pcwf)
     /* let headkeys = flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 5) */
-    let headkeys = dag.flakes.map(flake=> flake.head).filter(head=> head.length < 5)
+    let headkeys = dag.flakes.map(flake=> plain(flake.head)).filter(head=> head.length < 6)
     p('_headkeys', headkeys)
+    /* headkeys = [ 'π', 'πα', 'παρα', 'παραγ' ] */
+    /* p('_headkeys_2', headkeys) */
     let prefs = await getPrefs(headkeys)
-    /* p('_prefs', pcwf, prefs) */
+    p('_prefs', pcwf, prefs)
     if (!prefs.length) return
     let pref = _.maxBy(prefs, function(pref) { return pref.term.length; });
     pref.plain = plain(pref.term)
