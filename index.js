@@ -28,7 +28,7 @@ export async function anthrax(wf) {
     return chains
 }
 
-export async function anthraxChains(wf) {
+async function anthraxChains(wf) {
     dag = new Map();
     dag.chains = []
     dag.cwf = comb(wf)
@@ -209,6 +209,7 @@ function makeBreaks(dag) {
     return breaks
 }
 
+// συγκαθαιρέω
 // ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, εὐχαριστία
 // προσαναμιμνήσκω, προσδιαιρέω = без vow
