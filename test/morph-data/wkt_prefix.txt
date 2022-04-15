@@ -15,23 +15,23 @@
 # pref: ἀν- • (an-)
 #     Alternative form of ἀ- (a-) used before a vowel.
 
-pref: ἀνα- • (ana-)
-# pref: ἀν- • (ana-)
+# pref: ἀνα- • (ana-)
+pref: ἀν- • (ana-)
     up to, upwards, up
     (intensifier) thoroughly
     indicating repetition or improvement: re-, again
     back, backwards
    = αν
 
-pref: ἀντι- • (anti-)
-# pref: ἀντ- • (anti-)
+# pref: ἀντι- • (anti-)
+pref: ἀντ- • (anti-)
     anti-, against
     = ἀνθ
    = ἀνθο
    = ἀντ᾽
 
-pref: ἀπο- • (apo-)
-# pref: ἀπ- • (apo-)
+# pref: ἀπο- • (apo-)
+pref: ἀπ- • (apo-)
     Indicating movement: away, from, off
     Indicating breaking one part from another: un-, asunder, apart, off
     Indicating ending or finishing, or almost like the negative ἀ- (a-, “not”), especially in adjectives
@@ -41,36 +41,36 @@ pref: ἀπο- • (apo-)
     = ἀφ
 #    = π
 
-pref: ἀρι- • (ari-)
-# pref: ἀρ- • (ari-)
+# pref: ἀρι- • (ari-)
+pref: ἀρ- • (ari-)
     (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
 
-pref: ἐρι- • (eri-)
-# pref: ἐρ- • (eri-)
+# pref: ἐρι- • (eri-)
+pref: ἐρ- • (eri-)
      (ari-) - (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
 
-pref: ἀρχι- • (arkhi-)
-# pref: ἀρχ- • (arkhi-)
+# pref: ἀρχι- • (arkhi-)
+pref: ἀρχ- • (arkhi-)
     denotes primary importance or authority.
 
-pref: ἀμφι
-# pref: ἀμφ
+# pref: ἀμφι
+pref: ἀμφ
       both, on both sides of, around
       = ἀμπι
 
-pref: αὐτο
-# pref: αὐτ
+# pref: αὐτο
+pref: αὐτ
       auto-
       = αὐθο
 
-# pref: ἀνισ
-pref: ἀνισο
+pref: ἀνισ
+# pref: ἀνισο
       not equal
 
 # =============================D =================
 
-pref: δια- • (dia-)
-# pref: δι- • (dia-)
+# pref: δια- • (dia-)
+pref: δι- • (dia-)
     through, right through, across, over
     in different directions
         of separation: asunder, apart
@@ -80,29 +80,27 @@ pref: δια- • (dia-)
     of completion: to the end, utterly, out
     to add strength: thoroughly, out and out
     of mixture: between, partly, somewhat
-     = διε
-     = διεκ
 
 
 pref: δυσ- • (dus-)
     bad, hard, unfortunate
 
-pref: διχο- • (dixo-)
-# pref: διχ- • (dixo-)
+# pref: διχο- • (dixo-)
+pref: διχ- • (dixo-)
     in two
 
 pref: δίσ-
       twice, doubly, again
       = δίχ
 
-pref: δύο
-# pref: δύ
+# pref: δύο
+pref: δύ
      (cardinal): two
       = δύ'
       = δύω
 
-pref: δώδεκα
-# pref: δώδεκ
+# pref: δώδεκα
+pref: δώδεκ
           (cardinal) twelve
 
 # =========================================== E =======================
@@ -114,15 +112,14 @@ pref: ἐκ- • (ek-)
       (With a sense of removal): out, away, off
       (Expressing completion or totality): utterly
       = ἐξ
-      = εξ
 
-pref: ἑξα- • (hexa-)
-# pref: ἑξ- • (hexa-)
+# pref: ἑξα- • (hexa-)
+pref: ἑξ- • (hexa-)
     Forming compound words with the sense of "six"
-    = ἐσα
+    = ἐσ
 
-pref: ἐπι- • (epi-)
-# pref: ἐπ- • (epi-)
+# pref: ἐπι- • (epi-)
+pref: ἐπ- • (epi-)
     (place) on, upon, on top of, all over, covering
     (motion) on, over
     (addition, accompaniment) in addition to, as interest on, with
@@ -132,8 +129,6 @@ pref: ἐπι- • (epi-)
     against
     on, for the purpose of, because of
     on. at
-#      = π
-#    = ἐπ
 
 pref: εὐ- • (eu-)
     good, well
@@ -147,43 +142,41 @@ pref: ἐν •
 pref: ἐφ •
       translation?
 
-pref: φιλο
-# pref: φιλ-
+# pref: φιλο
+pref: φιλ-
       fond of ...
 
 # ============================================= H =======================
 
-pref: ἡμι- • (hēmi-)
-# pref: ἡμ- • (hēmi-)
+# pref: ἡμι- • (hēmi-)
+pref: ἡμ- • (hēmi-)
     half
 
 # ============================================= I =======================
 
-pref: ἰσο
-# pref: ἰσ-
+# pref: ἰσο
+pref: ἰσ-
       the same
 
-pref: ἱππ •
-      translation absent ? ἱππαναβάτης
 
 # ============================================= K =======================
 
-pref: κατά • (katá)
-# pref: κατ- • (katá)
+# pref: κατά • (katá)
+pref: κατ- • (katá)
     back
     downwards
     against
     fully, completely
     = καθά
 
-pref: κακά
-# pref: κακ
+# pref: κακά
+pref: κακ
       bad
 
 # ============================================= M =======================
 
-pref: μετα- • (meta-)
-# pref: μετ- • (meta-)
+# pref: μετα- • (meta-)
+pref: μετ- • (meta-)
     concerning community or participation
         concerning action in common with another
     in the midst of
@@ -197,40 +190,40 @@ pref: μετα- • (meta-)
 
 # ============================================= N =======================
 
-pref: νεκρο- • (nekro-)
-# pref: νεκρ- • (nekro-)
+# pref: νεκρο- • (nekro-)
+pref: νεκρ- • (nekro-)
     Used to derive words relating to death or the dead; necro-
 
-# pref: να- • (nā-)
-pref: ν- • (nā-)
+pref: να- • (nā-)
+# pref: ν- • (nā-)
     Alternative form of ἀ- (a-)
 
-pref: νη- • (nē-)
-# pref: ν- • (nē-)
+# pref: νη- • (nē-)
+pref: ν- • (nē-)
     Alternative form of ἀ- (a-)
 
-pref: νω- • (nō-)
-# pref: ν- • (nō-)
+# pref: νω- • (nō-)
+pref: ν- • (nō-)
     Alternative form of ἀ- (a-)
 
-pref: νεά
-# pref: νε-
+# pref: νεά
+pref: νε-
      new
 
 # ============================================= O =======================
 
-pref: ὀκτα- • (okta-)
-# pref: ὀκτ- • (okta-)
+# pref: ὀκτα- • (okta-)
+pref: ὀκτ- • (okta-)
     eight
 
-pref: ὀλιγο
-# pref: ὀλιγ-
+# pref: ὀλιγο
+pref: ὀλιγ-
       not many
 
 # ============================================= P =======================
 
-pref: προ- • (pro-)
-# pref: πρ- • (pro-)
+# pref: προ- • (pro-)
+pref: πρ- • (pro-)
     (with prepositions)
         (strengthener)
         (adds the notion of forward, forth)
@@ -254,29 +247,29 @@ pref: προσ- • (pros-)
        motion towards, accession to, or nearness to
 #       = ποτι
 
-pref: παρα
-# pref: παρ-
+# pref: παρα
+pref: παρ-
       from
      = παρ
 
-pref: περι
-# pref: περ-
+# pref: περι
+pref: περ-
       about
 
-pref: πολυ
-# pref: πολ-
+# pref: πολυ
+pref: πολ-
       many
 
-pref: παθο
-# pref: παθ-
+# pref: παθο
+pref: παθ-
       bad
 
-pref: παντο
-# pref: παντ-
+# pref: παντο
+pref: παντ-
       full
 
-pref: ψευδο
-# pref: ψευδ-
+# pref: ψευδο
+pref: ψευδ-
       false, unauthentic, counterfeit
 
 # ============================================= S =======================
@@ -291,18 +284,18 @@ pref: συν- • (sun-)
 
 # ============================================= T =======================
 
-pref: τρι- • (tri-)
-# pref: τρι • (tri-)
+# pref: τρι- • (tri-)
+pref: τρι • (tri-)
     tri- (three, thrice)
 
-pref: τοπο
+# pref: τοπο
 # pref: τοπ-
-      place
+      # place
 
 # ============================================= U =======================
 
-pref: ὑπο- • (hupo-)
-# pref: ὑπ- • (hupo-)
+# pref: ὑπο- • (hupo-)
+pref: ὑπ- • (hupo-)
     under, sub-, hypo-
         of the casing or covering
         of the agency or influence
@@ -330,3 +323,136 @@ pref: ὑπερ
 
 # aug: ἐ-
       # aug-e
+
+#
+  - ἀν-
+  - ἀν-εῖ-πον - long aug
+  - ἀν-αντ-vow
+  - ἀν-ευ-θύνω - ἀνευθύνω
+  - ἀν-ιάομαι - ? aug
+  - ἀν-ιατρεύω - ? aug
+  - ἀν-ισο-κρατέω - ἀνισοκρατέω
+  - ἀν-οί-γνυμι - ἀνοίγνυμι
+  - ἀν-ολο-φύρομαι - ἀνολοφύρομαι - ?
+  - ἀν-α- φορέω
+  - ἀν-ω - φορέω
+
+  -
+  - ἀντ- / ἀνθ
+  - ἀντ-επ-ι
+  - ἀντ-ι-συμ-
+  - ἀντ-ι-δια-
+  - ἀντ-ι-μεθ-
+  - ἀντ-ι-περ-ι-έ- vow+aug
+  - ἀντ-εν-δύομαι - ἀντενδύομαι ?
+  - ἀντ-εξ-ί-σταμαι - ἀντεξίσταμαι
+  - ἀντ-επ-ι-λαμβάνομαι - ἀντεπιλαμβάνομαι
+  - ἀντ-εφ-ίστημι  - ἀντ-εφ-ήδομαι
+  - ἀνθ-ά-πτομαι
+  - ἀνθ-ο-κρατέω
+  - ἀντ-ι-καθ-ί-στημι
+  - ἀντ-ι-κατ-α-λαμβάνω
+  - ἀντ-οι-κέω - ἀντοικέω
+  - ἀντ-απ-ό-λλυμι - ἀνταπόλλυμι
+  - ἀντ-ι-περ-ι-σπαστός
+  - ἀντ-εκ-τρέφω - ἀντεκτρέφω
+  - ἀν-αγκο-φορέω - ἀναγκοφορέω - compound?
+  -
+  - ἀπ - ἀπ-ουσία - ἀπουσία - ἀπεῖπον
+  - ἀπ-α- γορεύω - ἀπαγορεύω
+  - ἀπ-ο-δείκνυμι - ἀποδείκνυμι / ἀποδίδωμι
+  - ἀπ-ά-ρχομαι - ἀπάρχομαι
+  - ἀπ-εκ-βιόω - ἀπεκβιόω
+  - ἀπ-ο-συμ-βουλεύω - ἀποσυμβουλεύω
+  - ἀπ-ο-δια-γράφω - ἀποδιαγράφω
+  - ἀπ-ευ-θύνω - ἀπευθύνω
+  - ἀπ-ι-θύνω - ἀπιθύνω
+  - ἀπο-κατα-λαμβάνω
+  - ἀπ-οικέω - ἀποικέω -===> выбрать длиннейший префикс нельзя - ἀπο / ἀπόλλυμι
+  - ἀπ-αι-δευσία - ἀπαιδευσία
+  - ἀ-πληθυντός - ἀπληθυντός ==> пример, где ложный ἀπ / ἀπρακτέω
+  - ἀπριγδό-πληκτος - ἀπριγδόπληκτος - ??
+  - ἀπ-ορ-ροφέω - ἀπορροφέω - ορ - дублируется
+  - ἀποπρο - τέμνω - ἀποπροτέμνω
+  - ἀπεκ-φορέω - ἀπεκφορέω
+  -
+  - ἀφ-
+  - ἀφ-ά-πτω - ἀφάπτω
+  - ἀφ-αι-ρέω - ἀφαιρέω
+  - ἁφή - не pref
+  - ἀφ-έ-λκω - ἀφέλκω
+  - ἀφευ-ρίσκω - ἀφευρίσκω - ?
+  - ἀφ-η-γέομαι - ἀφηγέομαι
+  - ἀφ-ι-δρόω - ἀφιδρόω
+  - ἀφ-ο-μοιόω - ἀφομοιόω
+  -
+  - ἀρ- // много ложных
+  - ἀρ-ίγνωτος - ἀρίγνωτος
+  - ἐρ - // тоже много ложных на er-
+  - ἐριο-πωλέω - ἐριοπωλέω
+  - ἐρρη-φορέω - ἐρρηφορέω
+  -
+  - ἀρχ-η-γός - ἀρχηγός
+  -
+  - ἀμφ-
+  - ἀμφι-λέγω - ἀμφιλέγω
+  - ἀμφο-τερογνώμων - ἀμφοτερογνώμων
+  - ἀμφ-ελελίζω - ἀμφελελίζω
+  - ἀμφι-ζέω - ἀμφιζέω
+  - ἀμφ-ορίζω - ἀμφορίζω
+  - ἀμφιρ-ρήγνυμι - ἀμφιρρήγνυμι // double RR
+  - ἀμφ-ορεα-φορέω - ἀμφορεαφορέω
+  -
+  - αὐτο
+  - αὐτο-γνώμων - αὐτογνώμων
+  - αὐτο-ουσία - αὐτοουσία
+  - αὐτό-λαβος - αὐτόλαβος
+  -
+  - ἀνισ-
+  - ἀνισο-κρατέω - ἀνισοκρατέω
+  - δι-
+  - δι-αγγελλω - διαγγελλω
+  - δι-αγορεύω - διαγορεύω
+  - δι-αιρέω - διαιρέω
+  - δια-βάλλω - διαβάλλω
+  - δι-γνώμων - διγνώμων
+  - δια-γράφω - διαγράφω
+  - δι-εγείρω
+  - διεπι-στέλλω
+  - διευ-θύνω - διευθύνω
+  - δι-ηθέω
+  - διεκ-θέω
+  - δι-ιδρόω // δι-ϊδρόω // two dots
+  - δι-ΐημι
+  - δι-εξ-ικνέομαι
+  - δι-εφι-κνέομαι
+  - διεξ-οίγνυμι
+  - δι-οίγνυμι
+  - διαπ-όλλυμι
+  - διαπαρ-ίστημι
+  - διαπερι-πατέω
+  - δικαιο-πραγέω - fake? δικαιο ? // δικαιοθέτης
+  - διαρ-ραίνω // double RR
+  - διχο-ρ-ραγής // ??
+  - διεκ-τέμνω
+  - διαφορέω, διφορέω - both
+  - διχο-φορέω, διχο-φωνέω
+  -
+  - δυσ-
+  - δυσαής - from ago
+  - δυσανά-βατος
+  - δυσ-εμέω
+  - δυσκατά-στατος
+  - δυσκολό-καμπτος // κολό - это pref?
+  - δυσ-χείρωτος
+  -
+  - διχ-
+  - διχο-γνώμων, διχο-νοέω
+  - διχο-ρ-ραγής // double RR
+  -
+  - δισ-
+  - δύσ-γνωστος, δύσ-πληκτος
+  - δι-στεφής // fake
+  -
+  - εἰσ
+  - εἰσ-αγγέλλω
