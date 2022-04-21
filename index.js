@@ -32,6 +32,7 @@ async function anthraxChains(wf) {
     dag = new Map();
     dag.chains = []
     dag.cwf = comb(wf)
+    dag.stress = getStress(dag.cwf)
     let flakes = scrape(dag.cwf).reverse()
     /* d('_flakes', flakes) */
     if (!flakes.length) return
@@ -43,18 +44,40 @@ async function anthraxChains(wf) {
     dag.pcwf = plain(dag.cwf)
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
-    dag.stress = getStress(dag.cwf)
+    dag.aug = parseAug(dag.pcwf)
+    if (dag.aug) {
+        dag.pcwf = dag.pcwf.replace(dag.aug, '')
+    }
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
+    dag.prefs.push({plain: '', cdicts: [], pref: true})
+
 
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
     // === HERE ==  prefs = findPref  => цикл по pref - сразу видно неэффективность - вычисляются одни и те же breaks. Тут и нужен бы dag
+    for await (let pref of dag.prefs) {
+        let re = new RegExp('^' + pref.plain)
+        let pcwf = dag.pcwf.replace(re, '')
+        log('_PREF', dag.pcwf, pref.plain, pcwf)
+        let connection = findConnection(dag.pcwf)
+        if (connection.conn) {
+            let re = new RegExp('^' + connection.conn)
+            pcwf = pcwf.replace(re, '')
+        }
+        let breaks = makeBreaks(pcwf, dag.flexes)
+        log('_breaks', breaks.length)
+        let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id])
+        if (connection.conn) breaksids.unshift(connection.conn)
+        if (dag.aug) breaksids.unshift(dag.aug)
+        breaksids = breaksids.join('-')
+        log('_breaks-ids', breaksids)
 
-    dag.prefs.forEach(pref=> {
-        log('_PREF', pref.plain)
-    })
-
+        let ddicts = await findDdicts(breaks)
+        dag.ddictids = ddicts.map(ddict=> ddict._id)
+        /* log('_ddictids', dag.ddictids) */
+    }
+    return []
 
     if (dag.prefs.length) {
         let lastpref = _.last(dag.prefs)
@@ -74,15 +97,52 @@ async function anthraxChains(wf) {
     log('_DAG.PCWF', dag.pcwf)
     let breaks = makeBreaks(dag)
     log('_breaks', breaks.length)
-    let headtails = breaks.map(br=> [dag.aug, br.head, br.conn, br.tail, br.fls._id].join('-'))
-    log('_breaks-ids', headtails)
+    let breaksids = breaks.map(br=> [dag.aug, br.head, br.conn, br.tail, br.fls._id].join('-'))
+    log('_breaks-ids', breaksids)
 
     let chains = await combineChains(breaks)
     /* log('_chains', chains) */
 
     if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
-
     return chains
+}
+
+
+function findConnection(str) {
+    let vow = str[0]
+    let conn = ''
+    while(vowels.includes(vow)) {
+        str = str.slice(1)
+        conn += vow
+        vow = str[0]
+    }
+    return {conn, tail: str}
+}
+
+function makeBreaks(pcwf, flexes) {
+    let breaks = []
+    for (let fls of flexes) {
+        let pterm = plain(fls._id)
+        let phead = pcwf.slice(0, -pterm.length)
+        let pos = phead.length + 1
+        let head, tail, vow, connection, res
+        while (pos > 0) {
+            pos--
+            head = phead.slice(0, pos)
+            if (!head || vowels.includes(_.last(head))) continue
+            tail = phead.slice(pos)
+            connection = findConnection(tail)
+            if (connection) {
+                res = {head, conn: connection.conn, tail: connection.tail, fls}
+            } else {
+                res = {head, tail, fls}
+            }
+            if (!tail) continue
+            if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
+            breaks.push(res)
+        }
+    }
+    return breaks
 }
 
 async function findDdicts(breaks) {
@@ -191,42 +251,6 @@ function dict2flex(dicts, fls, dag) {
     return cdicts
 }
 
-function makeBreaks(dag) {
-    let breaks = []
-    for (let fls of dag.flexes) {
-        let pterm = plain(fls._id)
-        let phead = dag.pcwf.slice(0, -pterm.length)
-        let pos = phead.length + 1
-        let head, tail, vow, conn, res
-        while (pos > 0) {
-            pos--
-            head = phead.slice(0, pos)
-            if (!head) continue
-            tail = phead.slice(pos)
-            conn = findConnection(tail)
-            if (conn) {
-                res = {head, conn: conn.vows, tail: conn.tail, fls}
-            } else {
-                res = {head, tail, fls}
-            }
-            if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
-            breaks.push(res)
-        }
-    }
-    return breaks
-}
-
-function findConnection(str) {
-    let vow = str[0]
-    let vows = ''
-    while(vowels.includes(vow)) {
-        str = str.slice(1)
-        vows += vow
-        vow = str[0]
-    }
-    return {vows, tail: str}
-}
-
 // συγκαθαιρέω
 // ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, εὐχαριστία
@@ -243,4 +267,26 @@ export async function findPrefs(dag, pcwf) {
     prefs.forEach(pref=> pref.plain = plain(pref.term))
     prefs = prefs.map(pref=> {return {plain: pref.plain, cdicts: [pref], pref: true}})
     return prefs
+}
+
+// ===================================== REMOVE ===================
+
+function makeBreaks_wo_conn(pcwf, flexes) {
+    let breaks = []
+    for (let fls of flexes) {
+        let pterm = plain(fls._id)
+        let phead = pcwf.slice(0, -pterm.length)
+        let pos = phead.length + 1
+        let head, tail, vow, conn, res
+        while (pos > 0) {
+            pos--
+            head = phead.slice(0, pos)
+            if (!head || vowels.includes(_.last(head))) continue
+            tail = phead.slice(pos)
+            res = {head, tail, fls}
+            if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
+            breaks.push(res)
+        }
+    }
+    return breaks
 }
