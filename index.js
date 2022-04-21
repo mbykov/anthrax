@@ -51,37 +51,44 @@ async function anthraxChains(wf) {
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
-    dag.prefs.push({plain: '', cdicts: [], raw: true})
+    // ZERO
+    /* dag.prefs.push({plain: '', cdicts: [], raw: true}) */
 
 
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
-    // === HERE ==  prefs = findPref  => цикл по pref - сразу видно неэффективность - вычисляются одни и те же breaks. Тут и нужен бы dag
+    // === prefs = findPref  => цикл по pref - сразу видно неэффективность - вычисляются одни и те же breaks. Тут и нужен бы dag
     for await (let pref of dag.prefs) {
         let re = new RegExp('^' + pref.plain)
         let pcwf = dag.pcwf.replace(re, '')
         log('_PREF', dag.pcwf, pref.plain, pcwf)
         let augconn = ''
         if (!pref.raw) {
-            augconn = findConnection(dag.pcwf)
+            augconn = findConnection(pcwf)
             if (augconn.conn) {
                 let re = new RegExp('^' + augconn.conn)
                 pcwf = pcwf.replace(re, '')
             }
+            log('_pcwf_raw', pcwf)
         }
-        log('_pcwf_raw', pcwf)
 
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
+
+        // todo: del - только инфо
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-'))
         /* log('_breaksids-XXX', breaksids) */
-        if (augconn.conn) breaksids.unshift(connection.conn)
+        if (augconn.conn) breaksids.unshift(augconn.conn)
         if (dag.aug) breaksids.unshift(dag.aug)
         /* breaksids = breaksids.join('-') */
         log('_breaks-ids', breaksids)
 
+        // todo: comm - очевидный недостаток - много обращений к базе
         let ddicts = await findDdicts(breaks)
         dag.ddictids = ddicts.map(ddict=> ddict._id)
-        log('_ddictids', dag.ddictids)
+        log('_ddictids:', pref.plain, augconn.conn, dag.ddictids)
+
+        // HERE // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза. Не страшно, но вызовет вопросы
+        // этого не будет в случае, если в словаре не будет составной части καθαιρέω
     }
     return []
 
@@ -162,7 +169,7 @@ async function findDdicts(breaks) {
     /* log('_ddicts', ddicts) */
     /* log('_ddicts', ddicts[0].docs) */
     dag.ddictids = ddicts.map(ddict=> ddict._id)
-    p('_ddictids', dag.ddictids)
+    /* p('_ddictids', dag.ddictids) */
     return ddicts
 }
 
