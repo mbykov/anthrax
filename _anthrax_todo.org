@@ -1,8 +1,22 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
-* TODO 16 апр
-  - [ ] ==== короче,
+* Apache
+  - groups: mbykov, common, alise, bob
+  - apache видит три последние
+  - apache не видит mbykov
+  - both: common.html - mbykov:common
+  - only bob: bob.html - mbykov:bob
+  - only alice: alice.html - mbykov:alice
+
+
+
+* TODO 16 апр - схема:
+  - убрать глобальный dag ?
+  - prefs - цикл, в цикле
+    - находим tail и beg
+    - если beg=vow, то aug
+    - combineChain
 
 * 15 апреля
   - добавил compound-prefs, определяет - ἀντιπαρα-γράφω - длиннейший

@@ -4,8 +4,8 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-/* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, stressPosition } from './lib/utils.js' */
-import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, breakByTwoParts, getStress } from './lib/utils.js'
+/* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, stressPosition } from './lib/utils.js' */
+import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, getStress } from './lib/utils.js'
 import { getTerms, getFlexes, getSegments, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
@@ -14,7 +14,7 @@ const g = Debug('dag')
 const p = Debug('prefs')
 
 // 1. вопросы: εἰσαγγέλλω
-let dag
+let dag = {}
 
 export async function anthrax(wf) {
     let chains = []
@@ -43,34 +43,41 @@ async function anthraxChains(wf) {
     dag.pcwf = plain(dag.cwf)
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
+    dag.stress = getStress(dag.cwf)
 
-    dag.prefs = []
-    await findPref(dag, dag.pcwf)
-    g('_dag.prefs', dag.prefs)
+    dag.prefs = await findPrefs(dag, dag.pcwf)
+    p('_dag.prefs', dag.prefs)
 
+    // === HERE ==  prefs = findPref  => цикл по pref - сразу видно неэффективность - вычисляются одни и те же breaks. Тут и нужен бы dag
+
+    // todo: а если pref = a-привативум найден, а на самом деле просто aug?
     if (dag.prefs.length) {
-        /* log('_PREFS', dag.prefs.map(pref=> pref.plain)) */
         let lastpref = _.last(dag.prefs)
         if (lastpref.vowel) dag.aug = lastpref.plain
         let prefstr = dag.prefs.map(pref=> pref.plain).join('')
-        dag.pcwf = dag.pcwf.replace(prefstr, '')
-        let beg = dag.pcwf[0]
-        if (vowels.includes(beg)) {
-            dag.pcwf = dag.pcwf.slice(1)
-            lastpref.plain = lastpref.plain + beg
-            dag.aug = lastpref.plain
-        }
-    } else {
-        dag.aug = parseAug(dag.pcwf) || ''
-        dag.pcwf = dag.pcwf.slice(dag.aug.length)
-    }
-    dag.stress = getStress(dag.cwf)
+        dag.pcwf = dag.pcwf.replace(prefstr, '') || ''
+        // найти vow или connect
 
-    g(dag)
+    } else {
+        dag.aug = parseAug(dag.pcwf)
+        if (dag.aug) dag.pcwf = dag.pcwf.slice(dag.aug.length)
+    }
+
     // breaks - [head, tail, fls]
     let breaks = makeBreaks(dag)
-    /* log('_breaks', breaks) */
+    log('_breaks', breaks.length)
+    let headtails = breaks.map(br=> [dag.aug, br.head, br.conn, br.tail, br.fls._id].join('-'))
+    log('_breaks-ids', headtails)
 
+    let chains = await combineChains(breaks)
+    /* log('_chains', chains) */
+
+    if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
+
+    return chains
+}
+
+async function findDdicts(breaks) {
     let headkeys = _.uniq(breaks.map(br=> br.head))
     /* log('_headkeys', headkeys) */
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
@@ -81,16 +88,12 @@ async function anthraxChains(wf) {
     /* log('_ddicts', ddicts) */
     /* log('_ddicts', ddicts[0].docs) */
     dag.ddictids = ddicts.map(ddict=> ddict._id)
-    g('_ddictids', dag.ddictids)
-
-    let chains = makeChains(breaks, ddicts)
-    /* log('_chains', chains) */
-
-    if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain))
-    return chains
+    p('_ddictids', dag.ddictids)
+    return ddicts
 }
 
-function makeChains(breaks, ddicts) {
+async function combineChains(breaks) {
+    let ddicts = await findDdicts(breaks)
     let ddictids = ddicts.map(ddict=> ddict._id)
     /* log('_ddictids_', ddictids) */
     /* log('_breaks', breaks) */
@@ -154,7 +157,7 @@ function dict2flex(dicts, fls, dag) {
     let cdicts = []
     for (let cdict of dicts) {
         let dict = _.clone(cdict)
-        /* log('____________________dict', dict.stem) */
+        /* log('____________________dict', dict.stem, dict.rdict) */
         dict.fls = []
         for (let flex of fls) {
             /* if (flex.form == dag.cwf) log('_FLEX', flex) */
@@ -186,27 +189,35 @@ function makeBreaks(dag) {
         let pterm = plain(fls._id)
         let phead = dag.pcwf.slice(0, -pterm.length)
         let pos = phead.length + 1
-        let head, tail, vow, res
+        let head, tail, vow, conn, res
         while (pos > 0) {
             pos--
             head = phead.slice(0, pos)
             if (!head) continue
-            /* if (head.length < 3) continue // в компаундах FC не короткие, нов simple м.б. */
             tail = phead.slice(pos)
-            /* if (tail && tail.length < 2) continue // в компаундах fc не короткие, нов simple м.б. */
-            vow = tail[0] || ''
-            if (vowels.includes(vow)) {
-                tail = tail.slice(1)
-                if (!tail) continue
-                res = {head, vow, tail, fls}
+            conn = findConnection(tail)
+            if (conn) {
+                log('_CONN', head, conn.vows, conn.tail)
+                res = {head, conn: conn.vows, tail: conn.tail, fls}
             } else {
                 res = {head, tail, fls}
             }
-            if (tail && head.length < 3) continue // в компаундах FC не короткие, нов simple м.б.
+            if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
             breaks.push(res)
         }
     }
     return breaks
+}
+
+function findConnection(str) {
+    let vow = str[0]
+    let vows = ''
+    while(vowels.includes(vow)) {
+        str = str.slice(1)
+        vows += vow
+        vow = str[0]
+    }
+    return {vows, tail: str}
 }
 
 // συγκαθαιρέω
@@ -216,33 +227,13 @@ function makeBreaks(dag) {
 // παραγγέλλω = vow
 // ἀμφίβραχυς - adj
 
-export async function findPref(dag, pcwf) {
+export async function findPrefs(dag, pcwf) {
     /* let flakes = scrape(pcwf).reverse() */
-    p('____________find_pref:', pcwf)
+    p('___find_pref:', pcwf)
     let headkeys = dag.flakes.map(flake=> plain(flake.head)) // .filter(head=> head.length < 6) // compound can be longer
     p('_headkeys', headkeys)
     let prefs = await getPrefs(headkeys)
-    p('_prefs', pcwf, prefs)
-    if (!prefs.length) return
-    let pref = _.maxBy(prefs, function(pref) { return pref.term.length; });
-    pref.plain = plain(pref.term)
-
-    /* dag.prefs.push(pref) */
-    dag.prefs.push({plain: pref.plain, cdicts: [pref], pref: true})
-    p('_DAG.prefs', dag.prefs)
-
-    let tail = pcwf.replace(pref.plain, '')
-    p('_TAIL', tail)
-    /* let nextpref = await findPref(dag, tail) */
-    /* if (nextpref) return */
-
-    let vowel = tail[0]
-    tail = tail.slice(1)
-    if (!tail) return
-    p('_vowel', vowel)
-    if (!vowels.includes(vowel)) return
-    let vow = {plain: vowel, vowel: true, pref: true}
-    dag.prefs.push(vow)
-    /* await findPref(dag, tail) */
-
+    prefs.forEach(pref=> pref.plain = plain(pref.term))
+    prefs = prefs.map(pref=> {return {plain: pref.plain, cdicts: [pref], pref: true}})
+    return prefs
 }
