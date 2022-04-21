@@ -46,16 +46,23 @@ async function anthraxChains(wf) {
     dag.stress = getStress(dag.cwf)
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
-    p('_dag.prefs', dag.prefs)
-
-    // === HERE ==  prefs = findPref  => цикл по pref - сразу видно неэффективность - вычисляются одни и те же breaks. Тут и нужен бы dag
+    log('_dag.prefs', dag.prefs)
 
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
+    // === HERE ==  prefs = findPref  => цикл по pref - сразу видно неэффективность - вычисляются одни и те же breaks. Тут и нужен бы dag
+
+    dag.prefs.forEach(pref=> {
+        log('_PREF', pref.plain)
+    })
+
+
     if (dag.prefs.length) {
         let lastpref = _.last(dag.prefs)
         if (lastpref.vowel) dag.aug = lastpref.plain
         let prefstr = dag.prefs.map(pref=> pref.plain).join('')
+        log('_prefstr', prefstr)
         dag.pcwf = dag.pcwf.replace(prefstr, '') || ''
+        log('_dag.pcwf', dag.pcwf)
         // найти vow или connect
 
     } else {
@@ -64,6 +71,7 @@ async function anthraxChains(wf) {
     }
 
     // breaks - [head, tail, fls]
+    log('_DAG.PCWF', dag.pcwf)
     let breaks = makeBreaks(dag)
     log('_breaks', breaks.length)
     let headtails = breaks.map(br=> [dag.aug, br.head, br.conn, br.tail, br.fls._id].join('-'))
@@ -197,7 +205,6 @@ function makeBreaks(dag) {
             tail = phead.slice(pos)
             conn = findConnection(tail)
             if (conn) {
-                log('_CONN', head, conn.vows, conn.tail)
                 res = {head, conn: conn.vows, tail: conn.tail, fls}
             } else {
                 res = {head, tail, fls}
