@@ -51,7 +51,7 @@ async function anthraxChains(wf) {
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
-    dag.prefs.push({plain: '', cdicts: [], pref: true})
+    dag.prefs.push({plain: '', cdicts: [], raw: true})
 
 
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
@@ -60,22 +60,28 @@ async function anthraxChains(wf) {
         let re = new RegExp('^' + pref.plain)
         let pcwf = dag.pcwf.replace(re, '')
         log('_PREF', dag.pcwf, pref.plain, pcwf)
-        let connection = findConnection(dag.pcwf)
-        if (connection.conn) {
-            let re = new RegExp('^' + connection.conn)
-            pcwf = pcwf.replace(re, '')
+        let augconn = ''
+        if (!pref.raw) {
+            augconn = findConnection(dag.pcwf)
+            if (augconn.conn) {
+                let re = new RegExp('^' + augconn.conn)
+                pcwf = pcwf.replace(re, '')
+            }
         }
+        log('_pcwf_raw', pcwf)
+
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
-        let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id])
-        if (connection.conn) breaksids.unshift(connection.conn)
+        let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-'))
+        /* log('_breaksids-XXX', breaksids) */
+        if (augconn.conn) breaksids.unshift(connection.conn)
         if (dag.aug) breaksids.unshift(dag.aug)
-        breaksids = breaksids.join('-')
+        /* breaksids = breaksids.join('-') */
         log('_breaks-ids', breaksids)
 
         let ddicts = await findDdicts(breaks)
         dag.ddictids = ddicts.map(ddict=> ddict._id)
-        /* log('_ddictids', dag.ddictids) */
+        log('_ddictids', dag.ddictids)
     }
     return []
 
@@ -137,7 +143,7 @@ function makeBreaks(pcwf, flexes) {
             } else {
                 res = {head, tail, fls}
             }
-            if (!tail) continue
+            /* if (!tail) continue */ // нельзя, если simple
             if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
             breaks.push(res)
         }
