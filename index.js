@@ -36,7 +36,7 @@ export async function anthrax(wf) {
 // προσαναμιμνήσκω, προσδιαιρέω
 // παραγγέλλω = vow
 // ἀμφίβραχυς - adj
-//
+// προσδιαγράφω, προσ-δια-φορέω, προσ-επ-εισ-φορέω
 
 // теперь: prefs-no-prefs / conn-no-conn / tail-no-tail / conn-no-conn -> flex
 
@@ -77,7 +77,7 @@ async function anthraxChains(wf) {
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
     // ZERO
-    dag.prefs.push({seg: '', cdicts: [], nopref: true})
+    /* dag.prefs.push({seg: '', cdicts: [], nopref: true}) */
 
     let chains = []
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
@@ -95,19 +95,20 @@ async function anthraxChains(wf) {
         }
 
         let breaks = makeBreaks(pcwf, dag.flexes)
+        log('_pcwf', pcwf)
         log('_breaks', breaks.length)
 
         // todo: del - только инфо:
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-'))
         /* log('_breaksids-XXX', breaksids) */
-        if (augconn.conn) breaksids.unshift(augconn.conn)
-        if (dag.aug) breaksids.unshift(dag.aug)
+        /* if (augconn.conn) breaksids.unshift(augconn.conn) */
+        /* if (dag.aug) breaksids.unshift(dag.aug) */
         /* breaksids = breaksids.join('-') */
         log('_breaks-ids', breaksids)
 
         // HERE // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза. Не страшно, но вызовет вопросы
 
-        let prefchains = await combineChains(breaks, pref.nopref)
+        let prefchains = await combineChains(breaks, pref, augconn)
         /* prefchains.forEach(chain=> chain.unshift(pref)) */
         /* log('_prefchains', prefchains) */
         chains.push(...prefchains)
@@ -115,7 +116,7 @@ async function anthraxChains(wf) {
     return chains
 }
 
-async function combineChains(breaks, nopref) {
+async function combineChains(breaks, pref, augconn) {
     let ddicts = await findDdicts(breaks)
     let ddictids = ddicts.map(ddict=> ddict._id)
     log('_ddictids:', ddictids)
@@ -125,15 +126,15 @@ async function combineChains(breaks, nopref) {
         /* log('_BREAK', br.head, 'conn:', br.conn,  'tail:', br.tail) */
         let dicthead = ddicts.find(ddict=> ddict._id == br.head)
         if (!dicthead) continue
-        if (dicthead._id == 'καθαιρ') log('_CHAIN HEAD', dicthead._id)
+
         let headdicts = dicthead.docs
-        /* log('_headdicts.docs', br.head, 'tail:', br.tail, 'docs:', headdicts.length) */
+        log('_headdicts.docs', br.head, headdicts.length)
         if (!headdicts.length) continue
-        headdicts = headdicts.filter(dict=> dict.aug == dag.aug)
+        /* headdicts = headdicts.filter(dict=> dict.aug == dag.aug) */
 
         let chain = []
         let dictfls = []
-        if (nopref) {
+        if (pref.nopref) {
             if (br.tail) {
                 let dtail = ddicts.find(ddict=> ddict._id == br.tail)
                 if (!dtail) continue
@@ -149,7 +150,7 @@ async function combineChains(breaks, nopref) {
                     chain = [{seg: br.head, dicts: headdicts}, {seg: br.conn}, {seg: br.tail, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
                 } else { // compound без коннектора
                     taildicts = taildicts.filter(dict=> !dict.aug)
-
+                    log('_CMB_NO_PREF_NO_CONN_TAIL')
                 }
 
             } else {
@@ -162,10 +163,15 @@ async function combineChains(breaks, nopref) {
                     log('_CMB_PREF_TAIL_CONN')
                 } else {
                     log('_CMB_PREF_TAIL')
-
                 }
             } else {
-                log('_CMB_PREF_NO_TAIL_SIMPLE')
+                /* log('_AUGCONN', augconn) */
+                /* log('_PREF', pref) */
+                log('_CMB_PREF_NO_TAIL_SIMPLE', br.head)
+                dictfls = await dict2flexFilter(headdicts, br.fls.docs)
+                if (!dictfls.length) continue
+                chain = [{seg: pref.seg, pref: true}, {seg: augconn.conn, augconn: true}, {seg: br.head, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
+                log('_AUGCHAIN', chain)
             }
         }
         if (dictfls.length) chains.push(chain)
@@ -299,8 +305,6 @@ export async function findPrefs(dag, pcwf) {
 
     prefs.forEach(pref=> pref.plain = plain(pref.term))
     prefs = prefs.map(pref=> {return {seg: pref.plain, cdicts: [pref], pref: true}})
-
-
     return prefs
 }
 
