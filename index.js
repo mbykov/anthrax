@@ -159,7 +159,7 @@ async function combineChains(breaks, pref, augconn) {
 
         } else { // PREFS
             if (br.tail) {
-                if (br.conn) { pref+comp+conn - προσδιαιρέω, προσ-δια-γράφω
+                if (br.conn) {
                     log('_CMB_PREF_TAIL_CONN')
                 } else {
                     log('_CMB_PREF_TAIL')
@@ -167,7 +167,11 @@ async function combineChains(breaks, pref, augconn) {
             } else {
                 /* log('_AUGCONN', augconn) */
                 /* log('_PREF', pref) */
+                // προσδι-α-γράφω
+                // здесь -x- м.б. аугментом, а м.б. конектором
+                // и случай - коннектор, а затем еще аугмент
                 log('_CMB_PREF_NO_TAIL_SIMPLE', br.head)
+                if (augconn) headdicts = headdicts.filter(dict=> aug2vow(augconn.conn, dict.aug))
                 dictfls = await dict2flexFilter(headdicts, br.fls.docs)
                 if (!dictfls.length) continue
                 chain = [{seg: pref.seg, pref: true}, {seg: augconn.conn, augconn: true}, {seg: br.head, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
