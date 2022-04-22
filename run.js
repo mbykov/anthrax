@@ -16,7 +16,8 @@ for (let chain of chains) {
     log('\n_chain:', chain)
     if (!true)  continue
 
-    let result = chain.map(seg=> [seg.aug, seg.plain, seg.flex].join('-')).join('-')
+    let result = chain.map(seg=> seg.seg).join('-')
+
     log('_result:_', result)
 
     continue

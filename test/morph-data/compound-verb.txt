@@ -1425,7 +1425,7 @@ dict: ἐμέω
     ἐξ-εμέω (exeméō)
     κατ-εμέω (kateméō)
 
-    πρ-οεμέω (proeméō)
+    πρ-ο-εμέω (proeméō)
     συν-εμέω (suneméō)
     ὑπερ-εμέω (hupereméō)
 
@@ -2694,7 +2694,7 @@ dict: κρατέω
 
     ἐπι-κρατέω (epikratéō)
 
-# ============== HERE NAMES
+# ============== HERE NAMES compound
    θαλασσοκρατέω (thalassokratéō)
    ἱπποκρατέω (hippokratéō)
    λαοκρατέομαι (laokratéomai)

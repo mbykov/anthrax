@@ -28,6 +28,31 @@ export async function anthrax(wf) {
     return chains
 }
 
+// αἱρέω
+// συγκαθαιρέω
+// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
+// πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
+// εὐχαριστία,
+// προσαναμιμνήσκω, προσδιαιρέω = без vow
+// παραγγέλλω = vow
+// ἀμφίβραχυς - adj
+//
+
+// теперь: prefs-no-prefs / conn-no-conn / tail-no-tail / conn-no-conn -> flex
+
+// head - αἱρέω
+// head - tail
+// head - conn - tail
+
+// prefs - head
+// prefs - head - tail
+// prefs - head - conn - tail
+// prefs - conn - head
+// prefs - conn - head - tail
+// prefs - conn - head - conn - tail
+
+// и - разные требования к компаундам - если есть tail, то simple
+
 async function anthraxChains(wf) {
     dag = new Map();
     dag.chains = []
@@ -52,18 +77,16 @@ async function anthraxChains(wf) {
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
     // ZERO
-    dag.prefs.push({plain: '', cdicts: [], raw: true})
-
+    dag.prefs.push({plain: '', cdicts: [], nopref: true})
 
     let chains = []
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
-    // === prefs = findPref  => цикл по pref - сразу видно неэффективность - вычисляются одни и те же breaks. Тут и нужен бы dag
     for await (let pref of dag.prefs) {
         let re = new RegExp('^' + pref.plain)
         let pcwf = dag.pcwf.replace(re, '')
         log('\n_PREF_', dag.pcwf, ':', pref.plain, '-', pcwf)
-        let augconn = ''
-        if (!pref.raw) {
+        let augconn = {}
+        if (!pref.zero) {
             augconn = findConnection(pcwf)
             if (augconn.conn) {
                 let re = new RegExp('^' + augconn.conn)
@@ -74,7 +97,7 @@ async function anthraxChains(wf) {
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
 
-        // todo: del - только инфо
+        // todo: del - только инфо:
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-'))
         /* log('_breaksids-XXX', breaksids) */
         if (augconn.conn) breaksids.unshift(augconn.conn)
@@ -83,67 +106,95 @@ async function anthraxChains(wf) {
         log('_breaks-ids', breaksids)
 
         // HERE // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза. Не страшно, но вызовет вопросы
-        // этого не будет в случае, если в словаре не будет составной части καθαιρέω
-        // CCC
-        let prefchains = await combineChains(breaks)
+
+        let prefchains = await combineChains(breaks, pref.nopref)
         /* prefchains.forEach(chain=> chain.unshift(pref)) */
-        log('_prefchains', prefchains)
+        /* log('_prefchains', prefchains) */
         chains.push(...prefchains)
     }
     return chains
 }
 
-// συγκαθαιρέω
-// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
-// πολύτροπος, ψευδολόγος, εὐχαριστία
-// προσαναμιμνήσκω, προσδιαιρέω = без vow
-// παραγγέλλω = vow
-// ἀμφίβραχυς - adj
-
-// CCC
-async function combineChains(breaks) {
+async function combineChains(breaks, nopref) {
     let ddicts = await findDdicts(breaks)
     let ddictids = ddicts.map(ddict=> ddict._id)
     log('_ddictids:', ddictids)
 
     let chains = []
-    for (let br of breaks) {
+    for await (let br of breaks) {
         /* log('_BREAK', br.head, 'conn:', br.conn,  'tail:', br.tail) */
         let dicthead = ddicts.find(ddict=> ddict._id == br.head)
         if (!dicthead) continue
         if (dicthead._id == 'καθαιρ') log('_CHAIN HEAD', dicthead._id)
-        let heads = dicthead.docs
-        log('_heads.docs', br.head, 'tail:', br.tail, 'docs:', heads.length)
-        if (!heads.length) continue
+        let headdicts = dicthead.docs
+        /* log('_headdicts.docs', br.head, 'tail:', br.tail, 'docs:', headdicts.length) */
+        if (!headdicts.length) continue
+        headdicts = headdicts.filter(dict=> dict.aug == dag.aug)
 
         let chain = []
         let dictfls = []
-        if (br.tail) {
-            let dtail = ddicts.find(ddict=> ddict._id == br.tail)
-            if (!dtail) continue
-            let tails = dtail.docs
-            chain.push({plain: br.head, cdicts: heads})
-            if (br.vow) {
-                chain.push({plain: br.vow, vowel: true})
-                tails = tails.filter(dict=> aug2vow(br.vow, dict.aug))
+        if (nopref) {
+            if (br.tail) {
+                let dtail = ddicts.find(ddict=> ddict._id == br.tail)
+                if (!dtail) continue
+                let taildicts = dtail.docs
+                if (br.conn) { //  πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
+                    /* log('_HEADDICTS', headdicts) */
+                    log('_CMB_NO_PREF_CONN_TAIL', br.head, br.conn, br.tail) // todo: м.б. случай, когда соед. гласная, а затем aug
+                    taildicts = taildicts.filter(dict=> aug2vow(br.conn, dict.aug))
+                    /* log('_TAILDICTS', taildicts) */
+                    dictfls = await dict2flexFilter(taildicts, br.fls.docs)
+                    if (!dictfls.length) continue
+                    log('_DICTFLS', dictfls.length)
+                    chain = [{seg: br.head, dicts: headdicts}, {seg: br.conn}, {seg: br.tail, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
+                } else { //
+                    taildicts = taildicts.filter(dict=> !dict.aug)
+
+                }
             } else {
-                tails = tails.filter(dict=> !dict.aug)
+                log('_CMB_SIMPLE')
             }
-            /* log('___COMPOUND:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id) */
-            /* dictfls = dict2flex(tails, br.fls.docs, true) */
-            if (!dictfls.length) continue
-            /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
-            chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id, cmp: true})
-        } else {
-            log('_chain_no_tail_', br.head, heads.length, br.fls._id)
-            dictfls = dict2flex(heads, br.fls.docs, true)
-            if (!dictfls.length) continue
-            log('___SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length)
-            chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id})
+        } else { // prefs
+            if (br.tail) {
+                if (br.conn) {
+                    log('_CMB_PREF_TAIL_CONN')
+                } else {
+                    log('_CMB_PREF_TAIL')
+
+                }
+            } else {
+                log('_CMB_PREF_NO_TAIL_SIMPLE')
+            }
         }
         if (dictfls.length) chains.push(chain)
+
+        // chain: { { pref: plain, dicts}, ...prefs, {conn:}  {head:, plain:stem (rdicts разные), dicts }, {conn:, plain: conn.conn, но не aug }, {tail:, cdicts: [dict, fls] } }
     }
     return chains
+}
+
+// это для компаунда, стресс не совпадает
+async function dict2flexFilter(dicts, fls) {
+    let cdicts = []
+    for (let cdict of dicts) {
+        let dict = _.clone(cdict)
+        /* log('____________________dict', dict.stem, dict.rdict) */
+        dict.fls = []
+        for await (let flex of fls) {
+            /* log('_flex:', flex) */
+            let ok = false
+            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true */
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
+            else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
+            else if (dict.part && flex.part ) ok = true
+            else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
+            /* else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
+            if (ok) dict.fls.push(flex)
+        }
+        /* if (dict.fls.length) log('____________________dict', dict.stem, dict.rdict) */
+        if (dict.fls.length) cdicts.push(dict)
+    }
+    return cdicts
 }
 
 // ================================================= FILTERS ==============
@@ -169,6 +220,7 @@ function dict2flex(dicts, fls, simple) {
 
             if (ok) dict.fls.push(flex)
         }
+        /* if (dict.fls.length) log('____________________dict', dict.stem, dict.rdict) */
         if (dict.fls.length) cdicts.push(dict)
     }
     return cdicts
@@ -338,5 +390,34 @@ function tmp() {
 
     /* if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain)) */
     /* return chains */
+
+
+    /* continue */
+
+    /* if (br.tail) { */
+    /* let dtail = ddicts.find(ddict=> ddict._id == br.tail) */
+    /* if (!dtail) continue */
+    /* let tails = dtail.docs */
+    /* chain.push({plain: br.head, cdicts: heads}) */
+    /* if (br.vow) { */
+    /* chain.push({plain: br.vow, vowel: true}) */
+    /* tails = tails.filter(dict=> aug2vow(br.vow, dict.aug)) */
+    /* } else { */
+    /* tails = tails.filter(dict=> !dict.aug) */
+    /* } */
+    /* log('___COMPOUND:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id) */
+    /* dictfls = dict2flex(tails, br.fls.docs, true) */
+    /* if (!dictfls.length) continue */
+    /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
+    /* chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id, cmp: true}) */
+    /* } else { */
+    /* log('_chain_no_tail_', br.head, heads.length, br.fls._id) */
+    /* dictfls = dict2flex(heads, br.fls.docs) */
+    /* if (!dictfls.length) continue */
+    /* log('___SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
+    /* chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id}) */
+    /* } */
+    /* if (dictfls.length) chains.push(chain) */
+
 
 }
