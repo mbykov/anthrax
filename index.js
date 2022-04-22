@@ -33,7 +33,7 @@ export async function anthrax(wf) {
 // ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
 // εὐχαριστία,
-// προσαναμιμνήσκω, προσδιαιρέω = без vow
+// προσαναμιμνήσκω, προσδιαιρέω
 // παραγγέλλω = vow
 // ἀμφίβραχυς - adj
 //
@@ -77,14 +77,14 @@ async function anthraxChains(wf) {
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
     // ZERO
-    dag.prefs.push({plain: '', cdicts: [], nopref: true})
+    dag.prefs.push({seg: '', cdicts: [], nopref: true})
 
     let chains = []
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
     for await (let pref of dag.prefs) {
-        let re = new RegExp('^' + pref.plain)
+        let re = new RegExp('^' + pref.seg)
         let pcwf = dag.pcwf.replace(re, '')
-        log('\n_PREF_', dag.pcwf, ':', pref.plain, '-', pcwf)
+        log('\n_PREF_', dag.pcwf, ':', pref.seg, '-', pcwf)
         let augconn = {}
         if (!pref.zero) {
             augconn = findConnection(pcwf)
@@ -138,6 +138,7 @@ async function combineChains(breaks, nopref) {
                 let dtail = ddicts.find(ddict=> ddict._id == br.tail)
                 if (!dtail) continue
                 let taildicts = dtail.docs
+
                 if (br.conn) { //  πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
                     /* log('_HEADDICTS', headdicts) */
                     log('_CMB_NO_PREF_CONN_TAIL', br.head, br.conn, br.tail) // todo: м.б. случай, когда соед. гласная, а затем aug
@@ -145,18 +146,19 @@ async function combineChains(breaks, nopref) {
                     /* log('_TAILDICTS', taildicts) */
                     dictfls = await dict2flexFilter(taildicts, br.fls.docs)
                     if (!dictfls.length) continue
-                    log('_DICTFLS', dictfls.length)
                     chain = [{seg: br.head, dicts: headdicts}, {seg: br.conn}, {seg: br.tail, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
-                } else { //
+                } else { // compound без коннектора
                     taildicts = taildicts.filter(dict=> !dict.aug)
 
                 }
+
             } else {
                 log('_CMB_SIMPLE')
             }
-        } else { // prefs
+
+        } else { // PREFS
             if (br.tail) {
-                if (br.conn) {
+                if (br.conn) { pref+comp+conn - προσδιαιρέω, προσ-δια-γράφω
                     log('_CMB_PREF_TAIL_CONN')
                 } else {
                     log('_CMB_PREF_TAIL')
@@ -167,8 +169,6 @@ async function combineChains(breaks, nopref) {
             }
         }
         if (dictfls.length) chains.push(chain)
-
-        // chain: { { pref: plain, dicts}, ...prefs, {conn:}  {head:, plain:stem (rdicts разные), dicts }, {conn:, plain: conn.conn, но не aug }, {tail:, cdicts: [dict, fls] } }
     }
     return chains
 }
@@ -279,13 +279,28 @@ async function findDdicts(breaks) {
 }
 
 export async function findPrefs(dag, pcwf) {
-    /* let flakes = scrape(pcwf).reverse() */
     p('___find_pref:', pcwf)
-    let headkeys = dag.flakes.map(flake=> plain(flake.head)) // .filter(head=> head.length < 6) // compound can be longer
+    let headkeys = dag.flakes.map(flake=> plain(flake.head))
     p('_headkeys', headkeys)
     let prefs = await getPrefs(headkeys)
+    /* log('_prefs', prefs) */
+    // compound - προσδιαιρέω
+    // выбрать compound-prefs, если есть - найти длиннейший
+    // и забрать исходники
+    let cprefs = prefs.filter(pref=> pref.cpref)
+    if (cprefs.length) {
+        let compound = _.maxBy(cprefs, function(pref) { return pref.term.length; })
+        /* log('_MAX', compound) */
+        prefs = await getPrefs(compound.prefs)
+        prefs.unshift(compound)
+        prefs = prefs.filter(pref=> pref.term[0] == pcwf[0])
+    }
+    /* log('_PREFS', prefs) */
+
     prefs.forEach(pref=> pref.plain = plain(pref.term))
-    prefs = prefs.map(pref=> {return {plain: pref.plain, cdicts: [pref], pref: true}})
+    prefs = prefs.map(pref=> {return {seg: pref.plain, cdicts: [pref], pref: true}})
+
+
     return prefs
 }
 
