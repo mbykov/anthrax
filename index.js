@@ -6,7 +6,7 @@ import {oxia, comb, plain, strip} from 'orthos'
 
 /* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, stressPosition } from './lib/utils.js' */
 import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, getStress } from './lib/utils.js'
-import { getTerms, getFlexes, getSegments, getPrefs } from './lib/remote.js'
+import { getTerms, getFlexes, getDdicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
 const d = Debug('app')
@@ -280,7 +280,7 @@ async function findDdicts(breaks) {
     /* log('_tailkeys', tailkeys) */
     let keys = _.compact(headkeys.concat(tailkeys))
     /* log('_keys', keys.length) */
-    let ddicts = await getSegments(keys)
+    let ddicts = await getDdicts(keys)
     /* log('_ddicts', ddicts) */
     /* log('_ddicts', ddicts[0].docs) */
     dag.ddictids = ddicts.map(ddict=> ddict._id)
