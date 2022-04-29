@@ -742,8 +742,7 @@ dat: ἀετῷ, ἀετοῖν, ἀετοῖς
 acc: ἀετόν, ἀετώ, ἀετούς
 voc: ἀετέ, ἀετώ, ἀετοί
 
-# FAIL-FAIL
-
+# FAIL - term: 'ἀέρα ??? WTF?
 # ----------------------------------
 dict: ἀήρ • (āḗr) m (genitive ἀέρος); third declension
 
@@ -30585,14 +30584,17 @@ dat: ῥαχίᾳ, ῥαχίαιν, ῥαχίαις
 acc: ῥαχίαν, ῥαχία, ῥαχίας
 voc: ῥαχία, ῥαχία, ῥαχίαι
 
-nom: ῥηχίη, ῥηχία, ῥηχίαι
+# ----------------------------------
+dict: ῥηχίη • (rhākhíā) f (genitive ῥαχίας); first declension
 
+    ~ ῥαχία
     flood tide
     the roar of the breakers
     (figuratively) the roar of a crowd
     rocky shore or beach
     Alternative form of ῥάχις (rhákhis, “backbone”)
 
+nom: ῥηχίη, ῥηχία, ῥηχίαι
 gen: ῥηχίης, ῥηχίαιν, ῥηχιέων-ῥηχιῶν
 dat: ῥηχίῃ, ῥηχίαιν, ῥηχίαις
 acc: ῥηχίην, ῥηχία, ῥηχίας

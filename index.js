@@ -77,7 +77,7 @@ async function anthraxChains(wf) {
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
     // ZERO
-    /* dag.prefs.push({seg: '', cdicts: [], nopref: true}) */
+    dag.prefs.push({seg: '', cdicts: [], nopref: true})
 
     let chains = []
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
