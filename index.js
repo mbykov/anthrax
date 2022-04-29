@@ -117,28 +117,37 @@ async function anthraxChains(wf) {
 }
 
 async function combineChains(breaks, pref, augconn) {
-    let ddicts = await findDdicts(breaks)
-    let ddictids = ddicts.map(ddict=> ddict._id)
-    log('_ddictids:', ddictids)
+    /* let ddicts = await findDdicts(breaks) */
+    let dicts = await findDdicts(breaks)
+    /* let ddictids = ddicts.map(ddict=> ddict._id) */
+    let dictstems = _.uniq(dicts.map(dict=> dict.stem))
+    log('_dictstems_uniq:', dictstems)
 
     let chains = []
     for await (let br of breaks) {
         /* log('_BREAK', br.head, 'conn:', br.conn,  'tail:', br.tail) */
-        let dicthead = ddicts.find(ddict=> ddict._id == br.head)
-        if (!dicthead) continue
+        /* let dicthead = ddicts.find(ddict=> ddict._id == br.head) */
+        /* let dicthead = dicts.find(dict=> dict.stem == br.head) */
+        /* if (!dicthead) continue */
+        /* let headdicts = dicthead.docs */
+        /* log('_headdicts.docs', br.head, headdicts.length) */
+        /* if (!headdicts.length) continue */
 
-        let headdicts = dicthead.docs
-        log('_headdicts.docs', br.head, headdicts.length)
+        let headdicts = dicts.filter(dict=> dict.stem == br.head)
         if (!headdicts.length) continue
+
 
         let chain = []
         let dictfls = []
         if (pref.nopref) {
             if (br.tail) {
                 // todo: вообще убрать _id, оставить только docs
-                let dtail = ddicts.find(ddict=> ddict._id == br.tail)
-                if (!dtail) continue
-                let taildicts = dtail.docs
+                /* let dtail = ddicts.find(ddict=> ddict._id == br.tail) */
+                /* let dtail = dicts.find(dict=> dict.stem == br.tail) */
+                /* if (!dtail) continue */
+                /* let taildicts = dtail.docs */
+                let taildicts = dicts.filter(dict=> dict.stem == br.tail)
+                if (!taildicts.length) continue
 
                 if (br.conn) { //  πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
                     /* log('_HEADDICTS', headdicts) */
@@ -284,12 +293,14 @@ async function findDdicts(breaks) {
     /* log('_tailkeys', tailkeys) */
     let keys = _.compact(headkeys.concat(tailkeys))
     /* log('_keys', keys.length) */
-    let ddicts = await getDdicts(keys)
+    /* let ddicts = await getDdicts(keys) */
+    let dicts = await getDdicts(keys)
     /* log('_ddicts', ddicts) */
     /* log('_ddicts', ddicts[0].docs) */
-    dag.ddictids = ddicts.map(ddict=> ddict._id)
+    /* dag.ddictids = ddicts.map(ddict=> ddict._id) */
+    dag.dictids = dicts.map(ddict=> ddict.stem)
     /* p('_ddictids', dag.ddictids) */
-    return ddicts
+    return dicts
 }
 
 export async function findPrefs(dag, pcwf) {
