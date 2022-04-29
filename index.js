@@ -202,6 +202,7 @@ async function dict2flexFilter(dicts, fls) {
     for (let cdict of dicts) {
         let dict = _.clone(cdict)
         log('____________________dict', dict.stem, dict.rdict, dict.dname)
+        if (!dict.keys) log(dict)
         dict.fls = []
         for await (let flex of fls) {
             /* log('_flex:', flex) */
@@ -273,7 +274,7 @@ function makeBreaks(pcwf, flexes) {
             if (!head || vowels.includes(_.last(head))) continue
             tail = phead.slice(pos)
             connection = findConnection(tail)
-            if (connection) {
+            if (connection.conn && connection.tail) {
                 res = {head, conn: connection.conn, tail: connection.tail, fls}
             } else {
                 res = {head, tail, fls}
