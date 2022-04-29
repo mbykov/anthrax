@@ -130,12 +130,12 @@ async function combineChains(breaks, pref, augconn) {
         let headdicts = dicthead.docs
         log('_headdicts.docs', br.head, headdicts.length)
         if (!headdicts.length) continue
-        /* headdicts = headdicts.filter(dict=> dict.aug == dag.aug) */
 
         let chain = []
         let dictfls = []
         if (pref.nopref) {
             if (br.tail) {
+                // todo: вообще убрать _id, оставить только docs
                 let dtail = ddicts.find(ddict=> ddict._id == br.tail)
                 if (!dtail) continue
                 let taildicts = dtail.docs
@@ -155,6 +155,10 @@ async function combineChains(breaks, pref, augconn) {
 
             } else {
                 log('_CMB_SIMPLE')
+                dictfls = await dict2flexFilter(headdicts, br.fls.docs)
+                if (!dictfls.length) continue
+                chain = [{seg: dag.aug, aug: true}, {seg: br.head, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
+                /* log('_SIMPLE CHAIN', chain) */
             }
 
         } else { // PREFS
@@ -188,7 +192,7 @@ async function dict2flexFilter(dicts, fls) {
     let cdicts = []
     for (let cdict of dicts) {
         let dict = _.clone(cdict)
-        /* log('____________________dict', dict.stem, dict.rdict) */
+        log('____________________dict', dict.stem, dict.rdict, dict.dname)
         dict.fls = []
         for await (let flex of fls) {
             /* log('_flex:', flex) */
@@ -208,11 +212,11 @@ async function dict2flexFilter(dicts, fls) {
 }
 
 // ================================================= FILTERS ==============
-function dict2flex(dicts, fls, simple) {
+function dict2flex_(dicts, fls, simple) {
     let cdicts = []
     for (let cdict of dicts) {
         let dict = _.clone(cdict)
-        /* log('____________________dict', dict.stem, dict.rdict) */
+        log('____________________dict', dict.stem, dict.rdict, dict)
         dict.fls = []
         for (let flex of fls) {
             /* log('_flex:', flex) */
@@ -310,137 +314,4 @@ export async function findPrefs(dag, pcwf) {
     prefs.forEach(pref=> pref.plain = plain(pref.term))
     prefs = prefs.map(pref=> {return {seg: pref.plain, cdicts: [pref], pref: true}})
     return prefs
-}
-
-// ===================================== REMOVE ===================
-
-function makeBreaks_wo_conn(pcwf, flexes) {
-    let breaks = []
-    for (let fls of flexes) {
-        let pterm = plain(fls._id)
-        let phead = pcwf.slice(0, -pterm.length)
-        let pos = phead.length + 1
-        let head, tail, vow, conn, res
-        while (pos > 0) {
-            pos--
-            head = phead.slice(0, pos)
-            if (!head || vowels.includes(_.last(head))) continue
-            tail = phead.slice(pos)
-            res = {head, tail, fls}
-            if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
-            breaks.push(res)
-        }
-    }
-    return breaks
-}
-
-async function combineChains_old_copy(breaks) {
-    let ddicts = await findDdicts(breaks)
-    let ddictids = ddicts.map(ddict=> ddict._id)
-    /* log('_ddictids_', ddictids) */
-    /* log('_breaks', breaks) */
-
-    let chains = []
-    for (let br of breaks) {
-        let dhead = ddicts.find(ddict=> ddict._id == br.head)
-        if (!dhead) continue
-        let heads = dhead.docs
-        /* log('_heads', br.head, br.tail, heads.length) */
-
-        if (!heads.length) continue
-        if (dag.prefs) {
-            let connect = dag.prefs[dag.prefs.length-1]
-            if (connect && connect.vowel) heads = heads.filter(dict=> aug2vow(connect.plain, dict.aug))
-        }
-
-        /* log('_dag.aug', br.head, dag.aug) */
-        /* log('___heads_2', br.head, br.tail, heads.length) */
-
-        let chain = []
-        let dictfls = []
-        if (br.tail) {
-            let dtail = ddicts.find(ddict=> ddict._id == br.tail)
-            if (!dtail) continue
-            let tails = dtail.docs
-            chain.push({plain: br.head, cdicts: heads})
-            if (br.vow) {
-                chain.push({plain: br.vow, vowel: true})
-                tails = tails.filter(dict=> aug2vow(br.vow, dict.aug))
-            } else {
-                tails = tails.filter(dict=> !dict.aug)
-            }
-            // компаунды временно отрубил для simple тестов
-            /* dictfls = dict2flex(tails, br.fls.docs, true) */
-            if (!dictfls.length) continue
-            /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
-            chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id, cmp: true})
-        } else {
-            log('_no_tail_', br.head, heads.length, br.fls.docs.length)
-            dictfls = dict2flex(heads, br.fls.docs, dag)
-            if (!dictfls.length) continue
-            /* log('___SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
-            chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id})
-        }
-        if (dictfls.length) chains.push(chain)
-    }
-    return chains
-}
-
-function tmp() {
-    if (dag.prefs.length) {
-        let lastpref = _.last(dag.prefs)
-        if (lastpref.vowel) dag.aug = lastpref.plain
-        let prefstr = dag.prefs.map(pref=> pref.plain).join('')
-        log('_prefstr', prefstr)
-        dag.pcwf = dag.pcwf.replace(prefstr, '') || ''
-        log('_dag.pcwf', dag.pcwf)
-        // найти vow или connect
-
-    } else {
-        dag.aug = parseAug(dag.pcwf)
-        if (dag.aug) dag.pcwf = dag.pcwf.slice(dag.aug.length)
-    }
-
-    // breaks - [head, tail, fls]
-    log('_DAG.PCWF', dag.pcwf)
-    let breaks = makeBreaks(dag)
-    log('_breaks', breaks.length)
-    let breaksids = breaks.map(br=> [dag.aug, br.head, br.conn, br.tail, br.fls._id].join('-'))
-    log('_breaks-ids', breaksids)
-
-    /* let chains = await combineChains(breaks) */
-    /* log('_chains', chains) */
-
-    /* if (dag.prefs.length) chains = chains.map(chain=> dag.prefs.concat(chain)) */
-    /* return chains */
-
-
-    /* continue */
-
-    /* if (br.tail) { */
-    /* let dtail = ddicts.find(ddict=> ddict._id == br.tail) */
-    /* if (!dtail) continue */
-    /* let tails = dtail.docs */
-    /* chain.push({plain: br.head, cdicts: heads}) */
-    /* if (br.vow) { */
-    /* chain.push({plain: br.vow, vowel: true}) */
-    /* tails = tails.filter(dict=> aug2vow(br.vow, dict.aug)) */
-    /* } else { */
-    /* tails = tails.filter(dict=> !dict.aug) */
-    /* } */
-    /* log('___COMPOUND:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id) */
-    /* dictfls = dict2flex(tails, br.fls.docs, true) */
-    /* if (!dictfls.length) continue */
-    /* log('________________tail+fls', br.head, br.tail, br.fls._id, 'fls', dictfls.length) */
-    /* chain.push({plain: br.tail, cdicts: dictfls, flex:br.fls._id, cmp: true}) */
-    /* } else { */
-    /* log('_chain_no_tail_', br.head, heads.length, br.fls._id) */
-    /* dictfls = dict2flex(heads, br.fls.docs) */
-    /* if (!dictfls.length) continue */
-    /* log('___SIMPLE:', br.head, 'heads.length', heads.length, 'tail', br.tail, br.fls._id, 'fls', br.fls.docs.length, dictfls.length) */
-    /* chain.push({plain: br.head, cdicts: dictfls, flex: br.fls._id}) */
-    /* } */
-    /* if (dictfls.length) chains.push(chain) */
-
-
 }
