@@ -13,7 +13,7 @@ const d = Debug('app')
 const g = Debug('dag')
 const p = Debug('prefs')
 
-// 1. вопросы: εἰσαγγέλλω // // // //
+// 1. вопросы: εἰσαγγέλλω // // // // //
 let dag = {}
 
 export async function anthrax(wf) {
