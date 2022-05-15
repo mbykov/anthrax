@@ -1,6 +1,6 @@
 {
   "name": "@mbykov/anthrax",
-  "version": "1.1.13",
+  "version": "1.1.15",
   "description": "simple morphological analyzer of the ancient Greek language",
   "main": "index.js",
   "type": "module",

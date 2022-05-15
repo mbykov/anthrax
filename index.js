@@ -166,7 +166,8 @@ async function combineChains(breaks, pref, augconn) {
                 log('_CMB_SIMPLE')
                 dictfls = await dict2flexFilter(headdicts, br.fls.docs)
                 if (!dictfls.length) continue
-                chain = [{seg: dag.aug, aug: true}, {seg: br.head, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
+                chain = [{seg: br.head, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
+                if (dag.aug) chain.unshift({seg: dag.aug, aug: true})
                 /* log('_SIMPLE CHAIN', chain) */
             }
 
@@ -202,6 +203,10 @@ async function dict2flexFilter(dicts, fls) {
     for (let cdict of dicts) {
         let dict = _.clone(cdict)
         log('____________________dict', dict.stem, dict.rdict, dict.dname)
+        if (dict.dname == 'lsj') {
+            log('____________________dict', dict.stem, dict.rdict, '_LSJ')
+            continue
+        }
         if (!dict.keys) log(dict)
         dict.fls = []
         for await (let flex of fls) {
