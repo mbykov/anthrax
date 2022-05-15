@@ -10,6 +10,8 @@
   - only alice: alice.html - mbykov:alice
 
 
+* 15 мая - сначала simple wkt, потом lsj-s
+
 * 25 апреля, структура dict
   - wkt.keys
   - slj.key

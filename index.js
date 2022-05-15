@@ -125,27 +125,14 @@ async function combineChains(breaks, pref, augconn) {
 
     let chains = []
     for await (let br of breaks) {
-        /* log('_BREAK', br.head, 'conn:', br.conn,  'tail:', br.tail) */
-        /* let dicthead = ddicts.find(ddict=> ddict._id == br.head) */
-        /* let dicthead = dicts.find(dict=> dict.stem == br.head) */
-        /* if (!dicthead) continue */
-        /* let headdicts = dicthead.docs */
-        /* log('_headdicts.docs', br.head, headdicts.length) */
-        /* if (!headdicts.length) continue */
-
+        log('____BREAK____', br.head, 'conn:', br.conn,  'tail:', br.tail)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
         if (!headdicts.length) continue
-
 
         let chain = []
         let dictfls = []
         if (pref.nopref) {
             if (br.tail) {
-                // todo: вообще убрать _id, оставить только docs
-                /* let dtail = ddicts.find(ddict=> ddict._id == br.tail) */
-                /* let dtail = dicts.find(dict=> dict.stem == br.tail) */
-                /* if (!dtail) continue */
-                /* let taildicts = dtail.docs */
                 let taildicts = dicts.filter(dict=> dict.stem == br.tail)
                 if (!taildicts.length) continue
 
@@ -156,21 +143,42 @@ async function combineChains(breaks, pref, augconn) {
                     /* log('_TAILDICTS', taildicts) */
                     dictfls = await dict2flexFilter(taildicts, br.fls.docs)
                     if (!dictfls.length) continue
+
+                    if (dag.aug) headdicts = headdicts.filter(dict=> dict.aug)
+                    else headdicts = headdicts.filter(dict=> !dict.aug)
+
                     chain = [{seg: br.head, dicts: headdicts}, {seg: br.conn}, {seg: br.tail, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
+                    dictfls = []
+
                 } else { // compound без коннектора
                     taildicts = taildicts.filter(dict=> !dict.aug)
-                    log('_CMB_NO_PREF_NO_CONN_TAIL')
+                    log('_CMB_NO_PREF_NO_CONN_TAIL', br.head, br.conn, br.tail)
                 }
 
             } else {
-                log('_CMB_SIMPLE')
+                // simple: strong - это cdicts, т.е. dicts + fls
+                // ищем wkt: если strong есть, выбираем lsj с там же stem, aug, type, присваиваем найденный morphs
+                // если wkt нет, ищем weak, т.е. не по ключам, а только по типу
+                // compound: всегда weak
+                // === todo - dicts сделать объектом - dicts.fls, dicts.jsj, etc
+
+                log('_CMB_SIMPLE_', br.head, br.conn, br.tail)
                 dictfls = await dict2flexFilter(headdicts, br.fls.docs)
                 if (!dictfls.length) continue
                 chain = [{seg: br.head, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
                 if (dag.aug) chain.unshift({seg: dag.aug, aug: true})
+
+                dictfls = []
+                let wkts = headdicts.filter(dict=> dict.dname == 'wkt')
+                let lsjs = headdicts.filter(dict=> dict.dname != 'wkt')
+                let cdicts = await dict2flexStrong(wkts, br.fls.docs)
+                log('_XXXXX_dict2flexStrong', cdicts)
+                for (let cdict of cdicts) {
+                    chain = [{seg: br.head, cdict: cdict.dict}, {seg: br.fls._id, fls: cdict.cfls}]
+                    chains.push(chain)
+                }
                 /* log('_SIMPLE CHAIN', chain) */
             }
-
         } else { // PREFS
             if (br.tail) {
                 if (br.conn) {
@@ -197,14 +205,29 @@ async function combineChains(breaks, pref, augconn) {
     return chains
 }
 
-// это для компаунда, стресс не совпадает
+async function dict2flexStrong(wkts, fls) {
+    let cdicts = []
+    let cfls = []
+    for (let dict of wkts) {
+        for await (let flex of fls) {
+            let ok = false
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true
+            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true */
+
+            if (ok) cfls.push(flex)
+        }
+        if (cfls.length) cdicts.push({dict, cfls})
+    }
+    /* log('_XXXXX_CDICTS', cdicts) */
+    return cdicts
+}
+
 async function dict2flexFilter(dicts, fls) {
     let cdicts = []
     for (let cdict of dicts) {
         let dict = _.clone(cdict)
-        log('____________________dict', dict.stem, dict.rdict, dict.dname)
+        /* log('____________________dict', dict.stem, dict.rdict, dict.dname) */
         if (dict.dname == 'lsj') {
-            log('____________________dict', dict.stem, dict.rdict, '_LSJ')
             continue
         }
         if (!dict.keys) log(dict)
