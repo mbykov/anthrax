@@ -148,7 +148,7 @@ async function combineChains(breaks, pref, augconn) {
                     else headdicts = headdicts.filter(dict=> !dict.aug)
 
                     chain = [{seg: br.head, dicts: headdicts}, {seg: br.conn}, {seg: br.tail, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
-                    dictfls = [] // //
+                    dictfls = [] // // sss
 
                 } else { // compound без коннектора
                     taildicts = taildicts.filter(dict=> !dict.aug)
