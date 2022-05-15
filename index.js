@@ -148,7 +148,7 @@ async function combineChains(breaks, pref, augconn) {
                     else headdicts = headdicts.filter(dict=> !dict.aug)
 
                     chain = [{seg: br.head, dicts: headdicts}, {seg: br.conn}, {seg: br.tail, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
-                    dictfls = [] // // sss
+                    dictfls = [] // <<<============
 
                 } else { // compound без коннектора
                     taildicts = taildicts.filter(dict=> !dict.aug)
@@ -172,8 +172,11 @@ async function combineChains(breaks, pref, augconn) {
                 let wkts = headdicts.filter(dict=> dict.dname == 'wkt')
                 let lsjs = headdicts.filter(dict=> dict.dname != 'wkt')
                 let cdicts = await dict2flexStrong(wkts, br.fls.docs)
-                log('_XXXXX_dict2flexStrong', cdicts)
                 for (let cdict of cdicts) {
+                    log('_XXXXX_dict2flexStrong', cdict.dict.rdict)
+                    log('_XXXXX_DAG.AUG', dag.aug, 'cdict.aug', cdict.dict.aug)
+                    /* if (dag.aug != cdict.dict.aug) continue */
+                    // плохо - может проскочить flex для отброшенного dict.aug
                     chain = [{seg: br.head, cdict: cdict.dict}, {seg: br.fls._id, fls: cdict.cfls}]
                     chains.push(chain)
                 }
@@ -207,11 +210,18 @@ async function combineChains(breaks, pref, augconn) {
 
 async function dict2flexStrong(wkts, fls) {
     let cdicts = []
-    let cfls = []
     for (let dict of wkts) {
+        if (!dict.aug) log('____________________STRONG dict', dict.type, dict.stem, dict.rdict, dict.dname, '_K', dict.keys)
+        let cfls = []
         for await (let flex of fls) {
+            if (!dict.aug) log('____________________STRONG FLEX', flex.key, flex.gend)
             let ok = false
+            let flextype = flex.key.split('-')[0] // ====== TODO: flex.type добавить во flex, и тут flextype убрать
+            // dict.type == flextype && =>
+            // плохо - сейчас keys прилагательных не совпадают с существительными, нужно переделать adjectives согласно плану
+            let keyXXX = dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5)
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true
+            if (!dict.aug) log('_=========keyXXX', dict.rdict, keyXXX, '_OK', ok)
             /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true */
 
             if (ok) cfls.push(flex)

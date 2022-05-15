@@ -10,6 +10,9 @@
   - only alice: alice.html - mbykov:alice
 
 
+* == однокоренные - aug, stem, type
+  - у меня ἀ-δάμ-αντι, в lsjs искать aug ἀ, stem δαμ, type ας
+
 * 15 мая - сначала simple wkt, потом lsj-s
 
 * 25 апреля, структура dict

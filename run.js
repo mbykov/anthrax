@@ -11,9 +11,11 @@ const log = console.log
 let fls = process.argv[3]
 
 let chains = await anthrax(wordform)
+log('\n_RUN: chains:', chains.length)
+/* log('\n_RUN-XXX: OS-FLS:', chains[1][1]) */
 
 for (let chain of chains) {
-    log('\n_chain:', chain)
+    log('\n_chain:', wordform, chain)
     if (!true)  continue
 
     let result = chain.map(seg=> seg.seg).join('-')
