@@ -1,14 +1,28 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
-* Apache
-  - groups: mbykov, common, alise, bob
-  - apache видит три последние
-  - apache не видит mbykov
-  - both: common.html - mbykov:common
-  - only bob: bob.html - mbykov:bob
-  - only alice: alice.html - mbykov:alice
+* TODO 16 мая - verb simple
+  - [ ]
 
+* select dicts  = wkts + lsjs
+  - нет prefs, нет tail, т.е. simple -
+  -
+  - filter by fls - by keys
+  - точные wkts - есть:
+  - каждому wkt - точные lsjs - type, stem, aug, pos, [gends]
+  - однокоренные - cognates - only stem ?
+  -
+  - точных wkts - нет:
+  - wkts+lsjs - stem, type, aug + fls by type
+  -
+  - prefs, нет tail = pref + simple
+  -
+  - compound:
+  - head + tail
+  - prefs + head + tail
+  -
+  - и для head и tail - так же cognates
+  -
 
 * == однокоренные - aug, stem, type
   - у меня ἀ-δάμ-αντι, в lsjs искать aug ἀ, stem δαμ, type ας

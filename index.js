@@ -215,7 +215,7 @@ async function dict2flexStrong(wkts, fls) {
         log('____________________STRONG dict', dict.type, dict.stem, dict.rdict, dict.dname)
         let cfls = []
         for await (let flex of fls) {
-            /* if (!dict.aug) log('____________________STRONG FLEX', flex.key, flex.gend) */
+            if (dict.stem == 'γειρ') log('____STRONG FLEX', flex.key)
             let ok = false
             let flextype = flex.key.split('-')[0] // ====== TODO: flex.type добавить во flex, и тут flextype убрать
             // dict.type == flextype && =>
