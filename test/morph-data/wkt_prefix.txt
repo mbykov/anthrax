@@ -41,12 +41,12 @@ pref: ἀπ- • (apo-)
 
 
 # pref: ἀρι- • (ari-)
-pref: ἀρ- • (ari-)
-    (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
+# pref: ἀρ- • (ari-)
+#    (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
 
 # pref: ἐρι- • (eri-)
-pref: ἐρ- • (eri-)
-     (ari-) - (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
+# pref: ἐρ- • (eri-)
+#     (ari-) - (mostly early Epic and Lyric) strengthening prefix, generally with a sense of goodness, excellence
 
 # pref: ἀρχι- • (arkhi-)
 pref: ἀρχ- • (arkhi-)
@@ -134,16 +134,12 @@ pref: εὐ- • (eu-)
 
 pref: ἐν •
       in
-      = ἐγ
+#      = ἐγ
       = ἐμ
       = ἐλ
 
 pref: ἐφ •
       translation?
-
-# pref: φιλο
-pref: φιλ-
-      fond of ...
 
 # ============================================= H =======================
 
@@ -190,24 +186,25 @@ pref: μετ- • (meta-)
 # ============================================= N =======================
 
 # pref: νεκρο- • (nekro-)
-pref: νεκρ- • (nekro-)
-    Used to derive words relating to death or the dead; necro-
+# pref: νεκρ- • (nekro-)
+#    Used to derive words relating to death or the dead; necro-
 
-pref: να- • (nā-)
+# ν- большой вопрос, префикс-ли ? путается во вторичном префиксе, после удаления ἀ - ἀντλέω
+# pref: να- • (nā-)
 # pref: ν- • (nā-)
-    Alternative form of ἀ- (a-)
+#    Alternative form of ἀ- (a-)
 
 # pref: νη- • (nē-)
-pref: ν- • (nē-)
-    Alternative form of ἀ- (a-)
+# pref: ν- • (nē-)
+#    Alternative form of ἀ- (a-)
 
 # pref: νω- • (nō-)
-pref: ν- • (nō-)
+# pref: ν- • (nō-)
     Alternative form of ἀ- (a-)
 
 # pref: νεά
-pref: νε-
-     new
+# pref: νε-
+#     new
 
 # ============================================= O =======================
 
@@ -290,6 +287,13 @@ pref: τρι • (tri-)
 # pref: τοπο
 # pref: τοπ-
       # place
+
+# ============================================= F ==============================
+# pref: φιλο
+pref: φιλ-
+      fond of ...
+
+
 
 # ============================================= U =======================
 

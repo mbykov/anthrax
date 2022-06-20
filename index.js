@@ -125,7 +125,7 @@ async function combineChains(breaks, pref, augconn) {
 
     let chains = []
     for await (let br of breaks) {
-        log('____BREAK____', br.head, 'conn:', br.conn,  'tail:', br.tail)
+        // log('____BREAK____', br.head, 'conn:', br.conn,  'tail:', br.tail)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
         if (!headdicts.length) continue
 
@@ -163,25 +163,32 @@ async function combineChains(breaks, pref, augconn) {
                 // === todo - dicts сделать объектом - dicts.fls, dicts.jsj, etc
 
                 log('_CMB_SIMPLE_', br.head, br.conn, br.tail)
-                dictfls = await dict2flexFilter(headdicts, br.fls.docs)
-                if (!dictfls.length) continue
-                chain = [{seg: br.head, cdicts: dictfls}, {seg: br.fls._id, flex: true}]
+                let {cdicts, cfls} = dict2flexFilter(dag.aug, headdicts, br.fls.docs)
+                if (!cdicts.length) continue
+
+                chain = [{seg: br.head, cdicts}, {seg: br.fls._id, flex: true, cfls}]
                 if (dag.aug) chain.unshift({seg: dag.aug, aug: true})
 
-                dictfls = []
-                let wkts = headdicts.filter(dict=> dict.dname == 'wkt')
-                let lsjs = headdicts.filter(dict=> dict.dname != 'wkt')
-                let cdicts = await dict2flexStrong(wkts, br.fls.docs)
-                for (let cdict of cdicts) {
-                    /* log('_XXXXX_dict2flexStrong', cdict.dict.rdict) */
-                    /* log('_XXXXX_DAG.AUG', dag.aug, 'cdict.aug', cdict.dict.aug) */
-                    /* if (dag.aug != cdict.dict.aug) continue */
-                    // плохо - может проскочить flex для отброшенного dict.aug
-                    let clsjs = lsjs.filter(lsjdict=> lsjdict.type == cdict.dict.type && lsjdict.aug == cdict.dict.aug && lsjdict.stem == cdict.dict.stem)
-                    chain = [{seg: br.head, wkt: cdict.dict, lsjs: clsjs[0]}, {seg: br.fls._id, fls: cdict.cfls}]
-                    chains.push(chain)
-                }
-                /* log('_SIMPLE CHAIN', chain) */
+                chains.push(chain)
+
+                // dictfls = []
+                // let wkts = headdicts.filter(dict=> dict.dname == 'wkt')
+                // let lsjs = headdicts.filter(dict=> dict.dname != 'wkt')
+
+                // // пока вернулся без Strong
+                // // let cdicts = await dict2flexStrong(wkts, br.fls.docs)
+                // let cdicts = dict2flexFilter(wkts, br.fls.docs)
+
+                // for (let cdict of cdicts) {
+                //     /* log('_XXXXX_dict2flexStrong', cdict.dict.rdict) */
+                //     /* log('_XXXXX_DAG.AUG', dag.aug, 'cdict.aug', cdict.dict.aug) */
+                //     /* if (dag.aug != cdict.dict.aug) continue */
+                //     // плохо - может проскочить flex для отброшенного dict.aug
+                //     let clsjs = lsjs.filter(lsjdict=> lsjdict.type == cdict.dict.type && lsjdict.aug == cdict.dict.aug && lsjdict.stem == cdict.dict.stem)
+                //     chain = [{seg: br.head, wkt: cdict.dict, lsjs: clsjs[0]}, {seg: br.fls._id, fls: cdict.cfls}]
+                //     chains.push(chain)
+                // }
+                // // log('_SIMPLE CHAIN', chain)
             }
         } else { // PREFS
             if (br.tail) {
@@ -233,31 +240,37 @@ async function dict2flexStrong(wkts, fls) {
     return cdicts
 }
 
-async function dict2flexFilter(dicts, fls) {
+function dict2flexFilter(aug, dicts, fls) {
     let cdicts = []
-    for (let cdict of dicts) {
-        let dict = _.clone(cdict)
-        /* log('____________________dict', dict.stem, dict.rdict, dict.dname) */
-        if (dict.dname == 'lsj') {
-            continue
-        }
-        if (!dict.keys) log(dict)
-        dict.fls = []
-        for await (let flex of fls) {
-            /* log('_flex:', flex) */
+    let cfls = []
+    fls = fls.filter(flex=> flex.aug == aug)
+    for (let dict of dicts) {
+        // if (!dict.keys) log('_dict-no-keys',dict)
+        // log('___dict:', dict.rdict)
+        let dfls = []
+        for(let flex of fls) {
+            log('_flex:', flex.numper, flex.tense, flex.term)
             let ok = false
             /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true */
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
-            else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
+            // else if (dict.verb && flex.verb) ok = true
+            // if (dict.verb && flex.verb) ok = true
+            else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense)) ok = true
+            // else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
             /* else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
-            if (ok) dict.fls.push(flex)
+            // if (ok) dict.fls.push(flex)
+            if (ok) dfls.push(flex)
         }
-        /* if (dict.fls.length) log('____________________dict', dict.stem, dict.rdict) */
-        if (dict.fls.length) cdicts.push(dict)
+        if (dfls.length) log('____dict.fls', dict.stem, dict.rdict, cfls.length)
+        if (dfls.length) {
+            cdicts.push(dict)
+            cfls.push(dfls)
+        }
     }
-    return cdicts
+    log('_FLS', cfls)
+    return {cdicts, cfls}
 }
 
 // ================================================= FILTERS ==============
@@ -268,7 +281,7 @@ function dict2flex_(dicts, fls, simple) {
         log('____________________dict', dict.stem, dict.rdict, dict)
         dict.fls = []
         for (let flex of fls) {
-            /* log('_flex:', flex) */
+            // log('_flex:', flex.term)
             let ok = false
             if (simple) {
                 if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend)) ok = true

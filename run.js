@@ -10,11 +10,23 @@ let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 const log = console.log
 let fls = process.argv[3]
 
-let chains = await anthrax(wordform)
-log('\n_RUN: chains:', chains.length)
+async function run() {
+    let chains = await anthrax(wordform)
+    log('\n_RUN: chains:', chains.length)
+    log('\n_wordform:', wordform)
+    for (let chain of chains) {
+        log('\n_chain:', chain)
+
+    }
+}
+
+run(
+)
+// let chains = await anthrax(wordform)
+// log('\n_RUN: chains:', chains.length)
 /* log('\n_RUN-XXX: OS-FLS:', chains[1][1]) */
 
-for (let chain of chains) {
+for (let chain of []) {
     log('\n_chain:', wordform, chain)
     if (!true)  continue
 
