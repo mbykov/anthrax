@@ -69,13 +69,14 @@ async function anthraxChains(wf) {
     dag.pcwf = plain(dag.cwf)
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
-    dag.aug = parseAug(dag.pcwf)
-    if (dag.aug) {
-        dag.pcwf = dag.pcwf.replace(dag.aug, '')
-    }
+    // dag.aug = parseAug(dag.pcwf)
+    // if (dag.aug) {
+        // dag.pcwf = dag.pcwf.replace(dag.aug, '')
+    // }
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
+
     // ZERO
     dag.prefs.push({seg: '', cdicts: [], nopref: true})
 
@@ -84,29 +85,27 @@ async function anthraxChains(wf) {
     for await (let pref of dag.prefs) {
         let re = new RegExp('^' + pref.seg)
         let pcwf = dag.pcwf.replace(re, '')
-        log('\n_PREF_', dag.pcwf, ':', pref.seg, '-', pcwf)
+        log('\n_PREF_', dag.pcwf, ':', pref.seg, '->', pcwf)
         let augconn = {}
-        if (!pref.zero) {
-            augconn = findConnection(pcwf)
-            if (augconn.conn) {
-                let re = new RegExp('^' + augconn.conn)
-                pcwf = pcwf.replace(re, '')
-            }
+        let {conn, tail} = findConnection(pcwf)
+        log('_conn', conn, '_tail', tail)
+        if (conn) {
+            let reconn = new RegExp('^' + conn)
+            pcwf = pcwf.replace(reconn, '')
+            pref.seg = pref.seg + conn
         }
 
-        let breaks = makeBreaks(pcwf, dag.flexes)
         log('_pcwf', pcwf)
+        let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
 
         // todo: del - только инфо:
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-'))
-        /* log('_breaksids-XXX', breaksids) */
-        /* if (augconn.conn) breaksids.unshift(augconn.conn) */
-        /* if (dag.aug) breaksids.unshift(dag.aug) */
-        /* breaksids = breaksids.join('-') */
         log('_breaks-ids', breaksids)
 
         // HERE // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза. Не страшно, но вызовет вопросы
+
+        return []
 
         let prefchains = await combineChains(breaks, pref, augconn)
         /* prefchains.forEach(chain=> chain.unshift(pref)) */
@@ -269,7 +268,7 @@ function dict2flexFilter(aug, dicts, fls) {
             cfls.push(dfls)
         }
     }
-    log('_FLS', cfls)
+    // log('_____filter: cfls', cfls)
     return {cdicts, cfls}
 }
 
@@ -334,7 +333,7 @@ function makeBreaks(pcwf, flexes) {
                 res = {head, conn: connection.conn, tail: connection.tail, fls}
                 // log('_BR_c', head, connection.conn, connection.tail, fls._id)
             } else {
-                log('_BR', head, tail, fls._id)
+                // log('_BR', head, tail, fls._id)
                 res = {head, tail, fls}
             }
             /* if (!tail) continue */ // нельзя, если simple
@@ -367,7 +366,7 @@ export async function findPrefs(dag, pcwf) {
     let headkeys = dag.flakes.map(flake=> plain(flake.head))
     p('_headkeys', headkeys)
     let prefs = await getPrefs(headkeys)
-    /* log('_prefs', prefs) */
+    p('_find_prefs', prefs)
     // compound - προσδιαιρέω
     // выбрать compound-prefs, если есть - найти длиннейший
     // и забрать исходники
