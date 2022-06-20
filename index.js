@@ -317,18 +317,24 @@ function makeBreaks(pcwf, flexes) {
     let breaks = []
     for (let fls of flexes) {
         let pterm = plain(fls._id)
+        // if (pterm != 'εω') continue
         let phead = pcwf.slice(0, -pterm.length)
         let pos = phead.length + 1
         let head, tail, vow, connection, res
         while (pos > 0) {
             pos--
             head = phead.slice(0, pos)
-            if (!head || vowels.includes(_.last(head))) continue
+            if (!head) continue
+            // if (!head || vowels.includes(_.last(head))) continue // зачем я это добавил?
+            // todo: наверное, на след шагу в conn чтобы сразу добавить гласную
+            // но в простейшем ἀγαθοποιέω окончание έω, а head заканчивается на гласную, отбросить гласную здесь нельзя
             tail = phead.slice(pos)
             connection = findConnection(tail)
             if (connection.conn && connection.tail) {
                 res = {head, conn: connection.conn, tail: connection.tail, fls}
+                // log('_BR_c', head, connection.conn, connection.tail, fls._id)
             } else {
+                log('_BR', head, tail, fls._id)
                 res = {head, tail, fls}
             }
             /* if (!tail) continue */ // нельзя, если simple
