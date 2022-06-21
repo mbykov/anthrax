@@ -36,22 +36,10 @@ export async function anthrax(wf) {
 // προσαναμιμνήσκω, προσδιαιρέω
 // παραγγέλλω = vow
 // ἀμφίβραχυς - adj
-// προσδιαγράφω, προσ-δια-φορέω, προσ-επ-εισ-φορέω
+// προσδιαγράφω, προσδιαφορέω, προσεπεισφορέω
 
-// теперь: prefs-no-prefs / conn-no-conn / tail-no-tail / conn-no-conn -> flex
+// TODO: использовать dict.type - если έω, то не нужен ω
 
-// head - αἱρέω
-// head - tail
-// head - conn - tail
-
-// prefs - head
-// prefs - head - tail
-// prefs - head - conn - tail
-// prefs - conn - head
-// prefs - conn - head - tail
-// prefs - conn - head - conn - tail
-
-// и - разные требования к компаундам - если есть tail, то simple
 
 async function anthraxChains(wf) {
     dag = new Map();
@@ -98,7 +86,7 @@ async function anthraxChains(wf) {
 
     for (let pref of dag.prefs) {
         let {aug, conn, pcwf} = schemePref(pref, dag.pcwf)
-        log('_SOURCE_', aug, pref.seg, conn, pcwf)
+        log('\n_SOURCE_', aug, pref.seg, conn, pcwf)
 
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
@@ -132,6 +120,8 @@ async function anthraxChains(wf) {
         let cleandictstems = _.uniq(dicts.map(dict=> dict.stem))
         log('_cleandictstems_:', cleandictstems)
 
+        breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
+        log('_breaks-ids', breaksids)
     }
 
     return
