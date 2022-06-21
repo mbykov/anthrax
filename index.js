@@ -69,41 +69,81 @@ async function anthraxChains(wf) {
     dag.pcwf = plain(dag.cwf)
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
-    // dag.aug = parseAug(dag.pcwf)
-    // if (dag.aug) {
-        // dag.pcwf = dag.pcwf.replace(dag.aug, '')
-    // }
+    // == TODO ==
+    // аккуратно найти prefs / aug
+    // в prefs-цикле найти breaks
+    // найти значимые dicts, i.e. head-tail, кроме conn и flex
+    // полные breaks - > chails
+    // связки - bundles - анализ
+    // aug во flex - глупо, перенести в dict
+    // теперь связка может быть сложной, vows+pref+vows
+    // то есть в breaks я не знаю, где dict, а где pref
+    // анализ br-line начинать с конца - выбор dicts в зависимости от bundle - если vow+pref+vow, то сл. dict пропустить, это pref
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
 
     // ZERO
-    dag.prefs.push({seg: '', cdicts: [], nopref: true})
+    // dag.prefs.push({seg: '', cdicts: []})
+
+    // branches => breaks = > chains
+    let whole = {seg: '', cdicts: []}
+    let branches = [whole]
+    branches.push(...dag.prefs)
+
+    for (let branche of branches) {
+        let {aug, conn, pcwf} = schemePref(branche, dag.pcwf)
+        log('_A_', aug, branche.seg, conn, pcwf)
+    }
+
+    function schemePref(pref, pcwf) {
+        let aug = ''
+        if (!pref.seg) {
+            let aug = parseAug(dag.pcwf)
+            if (aug) pcwf = pcwf.replace(aug, '')
+            return {aug, conn: '', pcwf}
+        }
+        let re = new RegExp('^' + pref.seg)
+        pcwf = pcwf.replace(re, '')
+        let {conn, tail} = findConnection(pcwf)
+        // log('_pref:', dag.pcwf, ':', pref.seg, conn, tail)
+        if (conn) {
+            let reconn = new RegExp('^' + conn)
+            pcwf = pcwf.replace(reconn, '')
+        }
+        // log('_pcwf', pcwf)
+        return {aug, conn, pcwf}
+    }
+
+    return
 
     let chains = []
     // todo: а если pref = a-привативум найден, а на самом деле просто aug?
     for await (let pref of dag.prefs) {
         let re = new RegExp('^' + pref.seg)
         let pcwf = dag.pcwf.replace(re, '')
-        log('\n_PREF_', dag.pcwf, ':', pref.seg, '->', pcwf)
-        let augconn = {}
         let {conn, tail} = findConnection(pcwf)
-        log('_conn', conn, '_tail', tail)
+        log('_pref:', dag.pcwf, ':', pref.seg, conn, tail)
         if (conn) {
             let reconn = new RegExp('^' + conn)
             pcwf = pcwf.replace(reconn, '')
             pref.seg = pref.seg + conn
         }
-
         log('_pcwf', pcwf)
+
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
-
-        // todo: del - только инфо:
+        // todo: del - только инфо for log:
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-'))
         log('_breaks-ids', breaksids)
 
-        // HERE // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза. Не страшно, но вызовет вопросы
+        // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза. Не страшно, но вызовет вопросы
+
+        let dicts = await findDdicts(breaks)
+        /* let ddictids = ddicts.map(ddict=> ddict._id) */
+        let dictstems = _.uniq(dicts.map(dict=> dict.stem))
+        log('_dictstems_uniq_:', dictstems)
+
 
         return []
 
