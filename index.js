@@ -105,18 +105,32 @@ async function anthraxChains(wf) {
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
         log('_breaks-ids', breaksids)
 
+        // dicts - те, что есть в словарях
         let dicts = await findDdicts(breaks)
         /* let ddictids = ddicts.map(ddict=> ddict._id) */
         let dictstems = _.uniq(dicts.map(dict=> dict.stem))
         log('_dictstems_uniq_:', dictstems)
 
+        // только те, которые состоят из обнаруженных в словарях stems
         breaks = breaks.filter(brk=> {
             let ok = true
             if (brk.head && !dictstems.includes(brk.head)) ok = false
             if (brk.tail && !dictstems.includes(brk.tail)) ok = false
             return ok
         })
-        log('_breaks_clean', breaks)
+        log('_breaks_clean', breaks.length)
+
+        let heads = _.uniq(breaks.map(br=> br.head))
+        let tails = _.uniq(breaks.map(br=> br.tail))
+        let cstems = _.compact(heads.concat(tails))
+
+        dicts = dicts.filter(dict=> {
+            return cstems.includes(dict.stem)
+        })
+        log('_clean dicts', dicts.length)
+
+        let cleandictstems = _.uniq(dicts.map(dict=> dict.stem))
+        log('_cleandictstems_:', cleandictstems)
 
     }
 
