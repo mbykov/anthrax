@@ -86,22 +86,37 @@ async function anthraxChains(wf) {
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
 
-    // ZERO
-    // dag.prefs.push({seg: '', cdicts: []})
+    // remove pref or aug
+    // breaks to chains
+    if (!dag.prefs.length) {
+        let aug = parseAug(dag.pcwf)
+        if (aug) dag.pcwf = dag.pcwf.replace(aug, '')
+        // здесь м.б. aug + pref !
+        let zero = {seg: aug, cdicts: []}
+        dag.prefs.push(zero)
+    }
 
-    // branches => breaks = > chains
-    // let whole = {seg: '', cdicts: []}
-    let branches = []
-    branches.push(...dag.prefs)
-
-    for (let branche of branches) {
-        let {aug, conn, pcwf} = schemePref(branche, dag.pcwf)
-        log('_SOURCE_', aug, branche.seg, conn, pcwf)
+    for (let pref of dag.prefs) {
+        let {aug, conn, pcwf} = schemePref(pref, dag.pcwf)
+        log('_SOURCE_', aug, pref.seg, conn, pcwf)
 
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
         log('_breaks-ids', breaksids)
+
+        let dicts = await findDdicts(breaks)
+        /* let ddictids = ddicts.map(ddict=> ddict._id) */
+        let dictstems = _.uniq(dicts.map(dict=> dict.stem))
+        log('_dictstems_uniq_:', dictstems)
+
+        breaks = breaks.filter(brk=> {
+            let ok = true
+            if (brk.head && !dictstems.includes(brk.head)) ok = false
+            if (brk.tail && !dictstems.includes(brk.tail)) ok = false
+            return ok
+        })
+        log('_breaks_clean', breaks)
 
     }
 
