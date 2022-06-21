@@ -80,6 +80,9 @@ async function anthraxChains(wf) {
     // то есть в breaks я не знаю, где dict, а где pref
     // анализ br-line начинать с конца - выбор dicts в зависимости от bundle - если vow+pref+vow, то сл. dict пропустить, это pref
 
+    // в словаре pref отдельно. То есть искать длинный стем pref+stem не имеет смысла
+    // если stem не найден, то и pref+stem не будет найден
+
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
 
@@ -87,32 +90,19 @@ async function anthraxChains(wf) {
     // dag.prefs.push({seg: '', cdicts: []})
 
     // branches => breaks = > chains
-    let whole = {seg: '', cdicts: []}
-    let branches = [whole]
+    // let whole = {seg: '', cdicts: []}
+    let branches = []
     branches.push(...dag.prefs)
 
     for (let branche of branches) {
         let {aug, conn, pcwf} = schemePref(branche, dag.pcwf)
-        log('_A_', aug, branche.seg, conn, pcwf)
-    }
+        log('_SOURCE_', aug, branche.seg, conn, pcwf)
 
-    function schemePref(pref, pcwf) {
-        let aug = ''
-        if (!pref.seg) {
-            let aug = parseAug(dag.pcwf)
-            if (aug) pcwf = pcwf.replace(aug, '')
-            return {aug, conn: '', pcwf}
-        }
-        let re = new RegExp('^' + pref.seg)
-        pcwf = pcwf.replace(re, '')
-        let {conn, tail} = findConnection(pcwf)
-        // log('_pref:', dag.pcwf, ':', pref.seg, conn, tail)
-        if (conn) {
-            let reconn = new RegExp('^' + conn)
-            pcwf = pcwf.replace(reconn, '')
-        }
-        // log('_pcwf', pcwf)
-        return {aug, conn, pcwf}
+        let breaks = makeBreaks(pcwf, dag.flexes)
+        log('_breaks', breaks.length)
+        let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
+        log('_breaks-ids', breaksids)
+
     }
 
     return
@@ -154,6 +144,26 @@ async function anthraxChains(wf) {
     }
     return chains
 }
+
+function schemePref(pref, pcwf) {
+    let aug = ''
+    if (!pref.seg) {
+        let aug = parseAug(dag.pcwf)
+        if (aug) pcwf = pcwf.replace(aug, '')
+        return {aug, conn: '', pcwf}
+    }
+    let re = new RegExp('^' + pref.seg)
+    pcwf = pcwf.replace(re, '')
+    let {conn, tail} = findConnection(pcwf)
+    // log('_pref:', dag.pcwf, ':', pref.seg, conn, tail)
+    if (conn) {
+        let reconn = new RegExp('^' + conn)
+        pcwf = pcwf.replace(reconn, '')
+    }
+    // log('_pcwf', pcwf)
+    return {aug, conn, pcwf}
+}
+
 
 async function combineChains(breaks, pref, augconn) {
     /* let ddicts = await findDdicts(breaks) */
