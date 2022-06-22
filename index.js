@@ -87,8 +87,9 @@ async function anthraxChains(wf) {
     }
 
     for (let pref of dag.prefs) {
-        let {aug, conn, pcwf} = schemePref(pref, dag.pcwf)
-        log('_SOURCE_', aug, pref.seg, conn, pcwf)
+        let {conn, pcwf} = schemePref(pref, dag.pcwf)
+        log('_SOURCE_', pref.seg, conn, pcwf)
+        pref.seg = pref.seg + conn // д.б. равно flex.aug
 
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
@@ -109,7 +110,9 @@ async function anthraxChains(wf) {
             if (brk.tail && !dictstems.includes(brk.tail)) ok = false
             return ok
         })
+
         log('_breaks_clean', breaks.length)
+        log('_breaks-IDs_', prettyBeakIDs(breaks))
 
         // clean dicts:
         let heads = _.uniq(breaks.map(br=> br.head))
@@ -122,32 +125,37 @@ async function anthraxChains(wf) {
         for (let dict of dicts) {
             // log('_clean dict', dict)
         }
-
         let cleandictstems = _.uniq(dicts.map(dict=> dict.stem))
         log('_cleandictstems_:', cleandictstems)
-        breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-        log('_breaks-ids', breaksids)
 
         // = FILTERS =
         for (let brk of breaks) {
-            log('\n_CLEANBR:', brk.head, brk.conn, brk.tail, brk.fls._id)
+            // log('_____BRK____================================', brk.head, brk.tail)
+            // let peris = brk.fls.docs.filter(flex=> flex.aug == 'περι')
+            // log('_PERIS', peris)
+            // continue
+
+
+            if (!brk.conn) brk.conn = ''
+            log('\n_CLEANBR head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, brk.fls._id)
             let headdicts = dicts.filter(dict=> dict.stem == brk.head)
             let taildicts = dicts.filter(dict=> dict.stem == brk.tail)
-            // if (!headdicts.length) continue
-            if (taildicts.length) {
-                // здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
-                let conn = 'ο'
-                if (conn == 'ο') conn = ''
-                let {cdicts, cfls} = dict2flexFilter(conn, taildicts, brk.fls.docs)
-                log('_TAIL C-DICTS', cdicts.length)
-                let idx = 0
-                for (let cdict of cdicts) {
-                    log('_cdict', cdict.rdict)
-                    let fls = cfls[idx]
-                    let prettys = prettyFLS(fls)
-                    log('_c-fls', prettys)
-                    idx++
-                }
+            taildicts = (brk.tail) ? taildicts : headdicts
+
+            // здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
+            // let conn = 'ο'
+            // if (conn == 'ο') conn = ''
+            let conn = (brk.tail) ? brk.conn : pref.seg
+
+            let {cdicts, cfls} = dict2flexFilter(conn, taildicts, brk.fls.docs)
+            log('_TAIL C-DICTS', cdicts.length)
+            let idx = 0
+            for (let cdict of cdicts) {
+                log('_cdict', cdict.rdict)
+                let fls = cfls[idx]
+                let prettys = prettyFLS(fls)
+                log('_c-fls', prettys)
+                idx++
             }
         }
     }
@@ -155,30 +163,6 @@ async function anthraxChains(wf) {
     let chains = []
     return chains
 }
-
-function prettyFLS(fls) {
-    return fls.map(flex=> [flex.tense, flex.numper].join(', '))
-}
-
-function schemePref(pref, pcwf) {
-    let aug = ''
-    if (!pref.seg) {
-        let aug = parseAug(dag.pcwf)
-        if (aug) pcwf = pcwf.replace(aug, '')
-        return {aug, conn: '', pcwf}
-    }
-    let re = new RegExp('^' + pref.seg)
-    pcwf = pcwf.replace(re, '')
-    let {conn, tail} = findConnection(pcwf)
-    // log('_pref:', dag.pcwf, ':', pref.seg, conn, tail)
-    if (conn) {
-        let reconn = new RegExp('^' + conn)
-        pcwf = pcwf.replace(reconn, '')
-    }
-    // log('_pcwf', pcwf)
-    return {aug, conn, pcwf}
-}
-
 
 // filters. В lsjs нет keys. Грубо: сначала wkts, затем выбрать аналоги и lsjs, затем filter lsjs без keys. Очень сложно и некрасиво
 // names: type, wkts-lsjs-key, gend, aug?
@@ -189,19 +173,22 @@ function schemePref(pref, pcwf) {
 
 // ================================================= FILTERS ==============
 
+// BUG περισπάω - περιέσπαντο - aug высчитывается неверно, пропадает ударение
+
 function dict2flexFilter(aug, dicts, fls) {
-    log('_________filter-aug_________:', aug)
+    // log('_________filter-aug_________', aug)
     let cdicts = []
     let cfls = []
-    fls = fls.filter(flex=> !!flex.aug == !!aug)
+    // fls = fls.filter(flex=> !!flex.aug == !!aug)
+    fls = fls.filter(flex=> flex.aug == aug)
     // fls = fls.filter(flex=> !flex.aug)
     for (let dict of dicts) {
         // if (!dict.keys) log('_dict-no-keys',dict)
         if (!dict.rdict) continue // TODO WTF?
-        log('___dict:', dict.rdict)
+        // log('_____dict____:', dict.rdict)
         let dfls = []
         for(let flex of fls) {
-            // log('_flex:', flex.numper, flex.tense, flex.term)
+            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug)
             let ok = false
             /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true */
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
@@ -209,13 +196,13 @@ function dict2flexFilter(aug, dicts, fls) {
             else if (dict.part && flex.part ) ok = true
             // else if (dict.verb && flex.verb) ok = true
             // else if (dict.verb && flex.verb) ok = true
-            else if (dict.verb && flex.verb && dict.tenses.find(tense=> tense == flex.tense)) ok = true
+            else if (dict.verb && flex.verb && dict.keys.find(key=> key == [flex.tense, flex.aug].join('-'))) ok = true
             // else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
             /* else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
             // if (ok) dict.fls.push(flex)
             if (ok) dfls.push(flex)
         }
-        if (dfls.length) log('____dict.fls', dict.stem, dict.rdict, cfls.length)
+        if (dfls.length) log('____dict.fls', dict.stem, dict.rdict)
         if (dfls.length) {
             cdicts.push(dict)
             cfls.push(dfls) // each dict has array of fls
@@ -224,6 +211,36 @@ function dict2flexFilter(aug, dicts, fls) {
     // log('_________filter_________: cfls', cfls.length)
     return {cdicts, cfls}
 }
+
+function prettyBeakIDs(breaks) {
+    return breaks.map(br=> {
+        let strs = []
+        if (br.head) strs.push(br.head)
+        if (br.conn) strs.push(br.conn)
+        if (br.tail) strs.push(br.tail)
+        strs.push(br.fls._id)
+        return strs.join('-')
+    }) // todo: del
+}
+
+function prettyFLS(fls) {
+    return fls.map(flex=> [flex.tense, flex.numper].join(', '))
+}
+
+function schemePref(pref, pcwf) {
+    let re = new RegExp('^' + pref.seg)
+    pcwf = pcwf.replace(re, '')
+    let {conn, tail} = findConnection(pcwf)
+    // log('_pref:', dag.pcwf, ':', pref.seg, conn, tail)
+    if (conn) {
+        let reconn = new RegExp('^' + conn)
+        pcwf = pcwf.replace(reconn, '')
+    }
+    // log('_pcwf', pcwf)
+    return {conn, pcwf}
+}
+
+
 
 function findConnection(str) {
     let vow = str[0]
@@ -253,12 +270,13 @@ function makeBreaks(pcwf, flexes) {
             // но в простейшем ἀγαθοποιέω окончание έω, а head заканчивается на гласную, отбросить гласную здесь нельзя
             tail = phead.slice(pos)
             connection = findConnection(tail)
+            // let {conn, tail} = findConnection(tail)
             if (connection.conn && connection.tail) {
                 res = {head, conn: connection.conn, tail: connection.tail, fls}
                 // log('_BR_c', head, connection.conn, connection.tail, fls._id)
             } else {
                 // log('_BR', head, tail, fls._id)
-                res = {head, tail, fls}
+                res = {head, conn: '', tail, fls}
             }
             /* if (!tail) continue */ // нельзя, если simple
             if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
