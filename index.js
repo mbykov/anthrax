@@ -9,9 +9,9 @@ import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, getStres
 import { getTerms, getFlexes, getDdicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
-const d = Debug('app')
-const g = Debug('dag')
-const p = Debug('prefs')
+const d = Debug('dag')
+const p = Debug('pref')
+const g = Debug('filter')
 
 // 1. вопросы: εἰσαγγέλλω // // // // // // // //
 let dag = {}
@@ -64,8 +64,6 @@ async function anthraxChains(wf) {
     // связки - bundles - анализ
     // aug во flex - глупо, перенести в dict
     // теперь связка может быть сложной, vows+pref+vows
-    // то есть в breaks я не знаю, где dict, а где pref
-    // анализ br-line начинать с конца - выбор dicts в зависимости от bundle - если vow+pref+vow, то сл. dict пропустить, это pref
 
     // в словаре pref отдельно. То есть искать длинный стем pref+stem не имеет смысла
     // если stem не найден, то и pref+stem не будет найден
@@ -74,7 +72,7 @@ async function anthraxChains(wf) {
     //  περισπάω - augs: [ 'περι', 'περιε' ]
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
-    log('_dag.prefs', dag.prefs)
+    p('_dag.prefs', dag.prefs)
 
     // remove pref or aug
     // breaks to chains
@@ -88,22 +86,20 @@ async function anthraxChains(wf) {
 
     for (let pref of dag.prefs) {
         let {conn, pcwf} = schemePref(pref, dag.pcwf)
-        log('_SOURCE_', pref.seg, conn, pcwf)
+        p('_scheme pref_ seg:', pref.seg, 'conn:', conn, 'pcwf', pcwf)
         pref.seg = pref.seg + conn // д.б. равно flex.aug
 
         let breaks = makeBreaks(pcwf, dag.flexes)
-        log('_breaks', breaks.length)
+        p('_breaks', breaks.length)
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
         // log('_breaks-ids', breaksids)
 
         // dicts - те, что есть в словарях
-        let dicts = await findDdicts(breaks)
-        /* let ddictids = ddicts.map(ddict=> ddict._id) */
+        let dicts = await findDicts(breaks)
         let dictstems = _.uniq(dicts.map(dict=> dict.stem))
-        log('_dictstems_uniq_:', dictstems)
+        p('_dictstems_uniq_:', dictstems)
 
-        // только те, которые состоят из обнаруженных в словарях stems
-        // clean breaks
+        // clean breaks - только те, которые состоят из обнаруженных в словарях stems
         breaks = breaks.filter(brk=> {
             let ok = true
             if (brk.head && !dictstems.includes(brk.head)) ok = false
@@ -111,8 +107,8 @@ async function anthraxChains(wf) {
             return ok
         })
 
-        log('_breaks_clean', breaks.length)
-        log('_breaks-IDs_', prettyBeakIDs(breaks))
+        p('_breaks_clean', breaks.length)
+        p('_breaks-IDs_', prettyBeakIDs(breaks))
 
         // clean dicts:
         let heads = _.uniq(breaks.map(br=> br.head))
@@ -121,93 +117,82 @@ async function anthraxChains(wf) {
         dicts = dicts.filter(dict=> {
             return cstems.includes(dict.stem)
         })
-        log('_clean dicts', dicts.length)
-        for (let dict of dicts) {
-            // log('_clean dict', dict)
-        }
+        p('_clean dicts', dicts.length)
         let cleandictstems = _.uniq(dicts.map(dict=> dict.stem))
-        log('_cleandictstems_:', cleandictstems)
+        p('_cleandictstems_:', cleandictstems)
 
         // = FILTERS =
         for (let brk of breaks) {
             if (!brk.conn) brk.conn = ''
-            log('\n_CLEANBR head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, brk.fls._id)
+            g('\n_CLEANBR pref:', pref.seg, 'head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, brk.fls._id)
             let headdicts = dicts.filter(dict=> dict.stem == brk.head)
             let taildicts = dicts.filter(dict=> dict.stem == brk.tail)
             let pdicts = (brk.tail) ? taildicts : headdicts
 
             // здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
-            // let conn = 'ο'
-            // if (conn == 'ο') conn = ''
             let aucon = (brk.tail) ? brk.conn : pref.seg
+            if (aucon == 'ο') aucon = ''
+            g('_aucon', aucon)
 
-            pdicts = pdicts.filter(dict=> !dict.augs || dict.augs.includes(aucon))
+            pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
             let pfls = brk.fls.docs.filter(flex=> flex.aug == aucon)
-
+            g('_pdicts', pdicts.length)
+            g('_pfls', pfls.length)
 
             let {cdicts, cfls} = dict2flexFilter(aucon, pdicts, pfls)
-            // let {cdicts, cfls} = dict2flexFilter(aucon, taildicts, brk.fls.docs)
-            log('_TAIL C-DICTS', cdicts.length)
-            let idx = 0
-            for (let cdict of cdicts) {
-                log('_cdict', cdict.rdict)
-                let fls = cfls[idx]
-                let prettys = prettyFLS(fls)
-                log('_c-fls', prettys)
-                idx++
+
+            g('_after_filter_ cdicts:', cdicts.length, 'cfls:', cfls.length)
+
+            if (cdicts.length) {
+                const chain = []
+                let idx = 0
+                for (let cdict of cdicts) {
+                    g('_cdict', cdict.rdict)
+                    let fls = cfls[idx]
+                    let prettys = prettyFLS(fls)
+                    g('_c-fls', prettys)
+                    idx++
+                }
             }
+
         }
-    }
+    } // pref
 
     let chains = []
     return chains
 }
 
 // filters. В lsjs нет keys. Грубо: сначала wkts, затем выбрать аналоги и lsjs, затем filter lsjs без keys. Очень сложно и некрасиво
-// names: type, wkts-lsjs-key, gend, aug?
-// verbs: type, wkts-tense, aug
+// names: wkts-lsjs-key, gend, aug?
+// verbs: wkts-tense, aug
 // verb.dict.augs - в словаре нет полной формы стема, а истинный стем
-//
 
 // ================================================= FILTERS ==============
 
 // BUG περισπάω - περιέσπαντο - aug высчитывается неверно, пропадает ударение
 
 function dict2flexFilter(aug, dicts, fls) {
-    // log('_________filter-aug_________', aug)
     let cdicts = []
     let cfls = []
-    // fls = fls.filter(flex=> !!flex.aug == !!aug)
-    // fls = fls.filter(flex=> flex.aug == aug)
-    // fls = fls.filter(flex=> !flex.aug)
     for (let dict of dicts) {
-        // if (!dict.keys) log('_dict-no-keys',dict)
-        if (!dict.rdict) continue // TODO WTF?
-        log('_____dict____:', dict.rdict)
+        // log('_____dict____:', dict.verb, dict.rdict)
         let dfls = []
         for(let flex of fls) {
-            log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug)
+            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug)
             let ok = false
-            /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true */
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
             // else if (dict.verb && flex.verb) ok = true
             else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
-            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense) && dict.augs.includes(aug)) ok = true
-            // else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
-            /* else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
-            // if (ok) dict.fls.push(flex)
             if (ok) dfls.push(flex)
         }
-        if (dfls.length) log('____dict.fls', dict.stem, dict.rdict)
+        // if (dfls.length) log('____dict.fls', dict.stem, dict.rdict)
         if (dfls.length) {
             cdicts.push(dict)
-            // log('__filter.dict', dict)
             cfls.push(dfls) // each dict has array of fls
         }
     }
-    // log('_________filter_________: cfls', cfls.length)
     return {cdicts, cfls}
 }
 
@@ -230,16 +215,12 @@ function schemePref(pref, pcwf) {
     let re = new RegExp('^' + pref.seg)
     pcwf = pcwf.replace(re, '')
     let {conn, tail} = findConnection(pcwf)
-    // log('_pref:', dag.pcwf, ':', pref.seg, conn, tail)
     if (conn) {
         let reconn = new RegExp('^' + conn)
         pcwf = pcwf.replace(reconn, '')
     }
-    // log('_pcwf', pcwf)
     return {conn, pcwf}
 }
-
-
 
 function findConnection(str) {
     let vow = str[0]
@@ -285,36 +266,26 @@ function makeBreaks(pcwf, flexes) {
     return breaks
 }
 
-async function findDdicts(breaks) {
+async function findDicts(breaks) {
     let headkeys = _.uniq(breaks.map(br=> br.head))
-    /* log('_headkeys', headkeys) */
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
-    /* log('_tailkeys', tailkeys) */
     let keys = _.compact(headkeys.concat(tailkeys))
-    /* log('_keys', keys.length) */
-    /* let ddicts = await getDdicts(keys) */
     let dicts = await getDdicts(keys)
-    /* log('_ddicts', ddicts) */
-    /* log('_ddicts', ddicts[0].docs) */
-    /* dag.ddictids = ddicts.map(ddict=> ddict._id) */
     dag.dictids = dicts.map(ddict=> ddict.stem)
-    /* p('_ddictids', dag.ddictids) */
     return dicts
 }
 
 export async function findPrefs(dag, pcwf) {
-    p('___find_pref:', pcwf)
     let headkeys = dag.flakes.map(flake=> plain(flake.head))
-    p('_headkeys', headkeys)
+    // log('_headkeys', headkeys)
     let prefs = await getPrefs(headkeys)
-    p('_find_prefs', prefs)
+    // log('_find_prefs', prefs)
     // compound - προσδιαιρέω
     // выбрать compound-prefs, если есть - найти длиннейший
     // и забрать исходники
     let cprefs = prefs.filter(pref=> pref.cpref)
     if (cprefs.length) {
         let compound = _.maxBy(cprefs, function(pref) { return pref.term.length; })
-        /* log('_MAX', compound) */
         prefs = await getPrefs(compound.prefs)
         prefs.unshift(compound)
         prefs = prefs.filter(pref=> pref.term[0] == pcwf[0])
