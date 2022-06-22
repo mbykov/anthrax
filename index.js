@@ -44,18 +44,23 @@ async function anthraxChains(wf) {
     dag = new Map();
     dag.chains = []
     dag.cwf = comb(wf)
-    dag.stress = getStress(dag.cwf)
+    // dag.stress = getStress(dag.cwf)
     let flakes = scrape(dag.cwf).reverse()
-    /* d('_flakes', flakes) */
+    log('_flakes', flakes)
+
     if (!flakes.length) return
     dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
+
+    log('_T', tails)
+
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
     d('_flexids', dag.flexids)
     dag.pcwf = plain(dag.cwf)
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
+
     // == TODO ==
     // аккуратно найти prefs / aug
     // в prefs-цикле найти breaks
@@ -134,8 +139,8 @@ async function anthraxChains(wf) {
             if (aucon == 'ο') aucon = ''
             g('_aucon', aucon)
 
-            pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
-            let pfls = brk.fls.docs.filter(flex=> flex.aug == aucon)
+            // pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
+            let pfls = brk.fls.docs // .filter(flex=> flex.aug == aucon)
             g('_pdicts', pdicts.length)
             g('_pfls', pfls.length)
 
@@ -175,17 +180,21 @@ function dict2flexFilter(aug, dicts, fls) {
     let cdicts = []
     let cfls = []
     for (let dict of dicts) {
-        // log('_____dict____:', dict.verb, dict.rdict)
+        // log('_____dict____:', dict.verb, dict.rdict, dict.stem, dict.keys)
         let dfls = []
         for(let flex of fls) {
-            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug)
+            if (!flex.verb) continue
+            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
             let ok = false
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
+
             // else if (dict.verb && flex.verb) ok = true
-            else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
+            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
+            else if (dict.verb && flex.verb && dict.keys.includes(flex.key)) ok = true
             if (ok) dfls.push(flex)
+            // if (ok) log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
         }
         // if (dfls.length) log('____dict.fls', dict.stem, dict.rdict)
         if (dfls.length) {
