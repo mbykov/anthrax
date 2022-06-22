@@ -29,7 +29,7 @@ export async function anthrax(wf) {
 }
 
 // αἱρέω
-// συγκαθαιρέω
+// συγκαθαιρέω, καθαιρέω
 // ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
 // εὐχαριστία,
@@ -37,6 +37,8 @@ export async function anthrax(wf) {
 // παραγγέλλω = vow
 // ἀμφίβραχυς - adj
 // προσδιαγράφω, προσδιαφορέω, προσεπεισφορέω
+// note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза.
+
 
 // TODO: использовать dict.type - если έω, то не нужен ω
 
@@ -86,7 +88,7 @@ async function anthraxChains(wf) {
 
     for (let pref of dag.prefs) {
         let {aug, conn, pcwf} = schemePref(pref, dag.pcwf)
-        log('\n_SOURCE_', aug, pref.seg, conn, pcwf)
+        log('_SOURCE_', aug, pref.seg, conn, pcwf)
 
         let breaks = makeBreaks(pcwf, dag.flexes)
         log('_breaks', breaks.length)
@@ -100,6 +102,7 @@ async function anthraxChains(wf) {
         log('_dictstems_uniq_:', dictstems)
 
         // только те, которые состоят из обнаруженных в словарях stems
+        // clean breaks
         breaks = breaks.filter(brk=> {
             let ok = true
             if (brk.head && !dictstems.includes(brk.head)) ok = false
@@ -108,20 +111,39 @@ async function anthraxChains(wf) {
         })
         log('_breaks_clean', breaks.length)
 
+        // clean dicts:
         let heads = _.uniq(breaks.map(br=> br.head))
         let tails = _.uniq(breaks.map(br=> br.tail))
         let cstems = _.compact(heads.concat(tails))
-
         dicts = dicts.filter(dict=> {
             return cstems.includes(dict.stem)
         })
         log('_clean dicts', dicts.length)
+        for (let dict of dicts) {
+            // log('_clean dict', dict)
+        }
 
         let cleandictstems = _.uniq(dicts.map(dict=> dict.stem))
         log('_cleandictstems_:', cleandictstems)
-
         breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
         log('_breaks-ids', breaksids)
+
+        // = FILTERS =
+        for (let brk of breaks) {
+            log('_CLEANBR:', brk.head, brk.conn, brk.tail, brk.fls._id)
+            let headdicts = dicts.filter(dict=> dict.stem == brk.head)
+            let taildicts = dicts.filter(dict=> dict.stem == brk.tail)
+            // if (!headdicts.length) continue
+            if (taildicts.length) {
+                let conn = 'ο'
+                if (conn == 'ο') conn = ''
+                let {cdicts, cfls} = dict2flexFilter(conn, taildicts, brk.fls.docs)
+                log('_TAIL C-DICTS', cdicts.length)
+                log('_TAIL C-FLS', cfls.length)
+            }
+
+        }
+
     }
 
     return
@@ -145,8 +167,6 @@ async function anthraxChains(wf) {
         // todo: del - только инфо for log:
         let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-'))
         log('_breaks-ids', breaksids)
-
-        // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза. Не страшно, но вызовет вопросы
 
         let dicts = await findDdicts(breaks)
         /* let ddictids = ddicts.map(ddict=> ddict._id) */
@@ -308,24 +328,34 @@ async function dict2flexStrong(wkts, fls) {
     return cdicts
 }
 
+// filters. В lsjs нет keys. Грубо: сначала wkts, затем выбрать аналоги и lsjs, затем filter lsjs без keys. Очень сложно и некрасиво
+// names: type, wkts-lsjs-key, gend, aug?
+// verbs: type, wkts-tense, aug
+// verb.flex.key = {aug, tense} ? aug из формы, в lsj tense нет,
+// verb.dict.aug = aug = 'x', augmented для impf, aor, unaugmented=true для исключений?
+// augs в dict не имеет значения, aug берется из формы. А во flex очень даже, но только своим наличием, есть / нет
+
 function dict2flexFilter(aug, dicts, fls) {
+    log('_________filter-aug_________:', aug)
     let cdicts = []
     let cfls = []
-    fls = fls.filter(flex=> flex.aug == aug)
+    // fls = fls.filter(flex=> flex.aug == aug)
+    fls = fls.filter(flex=> !flex.aug)
     for (let dict of dicts) {
         // if (!dict.keys) log('_dict-no-keys',dict)
-        // log('___dict:', dict.rdict)
+        if (!dict.rdict) continue // TODO WTF?
+        log('___dict:', dict.rdict)
         let dfls = []
         for(let flex of fls) {
-            log('_flex:', flex.numper, flex.tense, flex.term)
+            // log('_flex:', flex.numper, flex.tense, flex.term)
             let ok = false
             /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true */
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
             // else if (dict.verb && flex.verb) ok = true
-            // if (dict.verb && flex.verb) ok = true
-            else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense)) ok = true
+            else if (dict.verb && flex.verb) ok = true
+            else if (dict.verb && flex.verb && dict.tenses.find(tense=> tense == flex.tense)) ok = true
             // else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
             /* else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
             // if (ok) dict.fls.push(flex)
@@ -334,10 +364,10 @@ function dict2flexFilter(aug, dicts, fls) {
         if (dfls.length) log('____dict.fls', dict.stem, dict.rdict, cfls.length)
         if (dfls.length) {
             cdicts.push(dict)
-            cfls.push(dfls)
+            cfls.push(...dfls)
         }
     }
-    // log('_____filter: cfls', cfls)
+    // log('_________filter_________: cfls', cfls.length)
     return {cdicts, cfls}
 }
 
