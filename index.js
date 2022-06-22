@@ -40,9 +40,6 @@ export async function anthrax(wf) {
 // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза.
 
 
-// TODO: использовать dict.type - если έω, то не нужен ω
-
-
 async function anthraxChains(wf) {
     dag = new Map();
     dag.chains = []
@@ -72,6 +69,9 @@ async function anthraxChains(wf) {
 
     // в словаре pref отдельно. То есть искать длинный стем pref+stem не имеет смысла
     // если stem не найден, то и pref+stem не будет найден
+
+    // д.б. четкие правила вычисления aug, и общий модуль.
+    //  περισπάω - augs: [ 'περι', 'περιε' ]
 
     dag.prefs = await findPrefs(dag, dag.pcwf)
     log('_dag.prefs', dag.prefs)
@@ -130,24 +130,23 @@ async function anthraxChains(wf) {
 
         // = FILTERS =
         for (let brk of breaks) {
-            // log('_____BRK____================================', brk.head, brk.tail)
-            // let peris = brk.fls.docs.filter(flex=> flex.aug == 'περι')
-            // log('_PERIS', peris)
-            // continue
-
-
             if (!brk.conn) brk.conn = ''
             log('\n_CLEANBR head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, brk.fls._id)
             let headdicts = dicts.filter(dict=> dict.stem == brk.head)
             let taildicts = dicts.filter(dict=> dict.stem == brk.tail)
-            taildicts = (brk.tail) ? taildicts : headdicts
+            let pdicts = (brk.tail) ? taildicts : headdicts
 
             // здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
             // let conn = 'ο'
             // if (conn == 'ο') conn = ''
-            let conn = (brk.tail) ? brk.conn : pref.seg
+            let aucon = (brk.tail) ? brk.conn : pref.seg
 
-            let {cdicts, cfls} = dict2flexFilter(conn, taildicts, brk.fls.docs)
+            pdicts = pdicts.filter(dict=> !dict.augs || dict.augs.includes(aucon))
+            let pfls = brk.fls.docs.filter(flex=> flex.aug == aucon)
+
+
+            let {cdicts, cfls} = dict2flexFilter(aucon, pdicts, pfls)
+            // let {cdicts, cfls} = dict2flexFilter(aucon, taildicts, brk.fls.docs)
             log('_TAIL C-DICTS', cdicts.length)
             let idx = 0
             for (let cdict of cdicts) {
@@ -167,9 +166,8 @@ async function anthraxChains(wf) {
 // filters. В lsjs нет keys. Грубо: сначала wkts, затем выбрать аналоги и lsjs, затем filter lsjs без keys. Очень сложно и некрасиво
 // names: type, wkts-lsjs-key, gend, aug?
 // verbs: type, wkts-tense, aug
-// verb.flex.key = {aug, tense} ? aug из формы, в lsj tense нет,
-// verb.dict.aug = aug = 'x', augmented для impf, aor, unaugmented=true для исключений?
-// augs в dict не имеет значения, aug берется из формы. А во flex очень даже, но только своим наличием, есть / нет
+// verb.dict.augs - в словаре нет полной формы стема, а истинный стем
+//
 
 // ================================================= FILTERS ==============
 
@@ -180,23 +178,23 @@ function dict2flexFilter(aug, dicts, fls) {
     let cdicts = []
     let cfls = []
     // fls = fls.filter(flex=> !!flex.aug == !!aug)
-    fls = fls.filter(flex=> flex.aug == aug)
+    // fls = fls.filter(flex=> flex.aug == aug)
     // fls = fls.filter(flex=> !flex.aug)
     for (let dict of dicts) {
         // if (!dict.keys) log('_dict-no-keys',dict)
         if (!dict.rdict) continue // TODO WTF?
-        // log('_____dict____:', dict.rdict)
+        log('_____dict____:', dict.rdict)
         let dfls = []
         for(let flex of fls) {
-            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug)
+            log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug)
             let ok = false
             /* if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug && dag.stress.md5 == flex.stress.md5) ok = true */
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
             else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
             else if (dict.part && flex.part ) ok = true
             // else if (dict.verb && flex.verb) ok = true
-            // else if (dict.verb && flex.verb) ok = true
-            else if (dict.verb && flex.verb && dict.keys.find(key=> key == [flex.tense, flex.aug].join('-'))) ok = true
+            else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
+            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense) && dict.augs.includes(aug)) ok = true
             // else if (dict.verb && flex.verb && dict.keys.find(dkey=> dkey.tense == flex.tense && dkey.key == flex.key)) ok = true
             /* else if (compound && dict.verb && flex.name && vnTerms.includes(key)) ok = true // heads.length - compounds */
             // if (ok) dict.fls.push(flex)
@@ -205,6 +203,7 @@ function dict2flexFilter(aug, dicts, fls) {
         if (dfls.length) log('____dict.fls', dict.stem, dict.rdict)
         if (dfls.length) {
             cdicts.push(dict)
+            // log('__filter.dict', dict)
             cfls.push(dfls) // each dict has array of fls
         }
     }
