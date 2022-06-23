@@ -5,7 +5,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 /* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, stressPosition } from './lib/utils.js' */
-import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, getStress } from './lib/utils.js'
+import { scrape, vowels, parseAug } from './lib/utils.js'
 import { getTerms, getFlexes, getDdicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
@@ -80,14 +80,14 @@ async function anthraxChains(wf) {
     // remove pref or aug
     // breaks to chains
     if (!dag.prefs.length) {
-        let aug = parseAug(dag.pcwf)
+        let aug = parseAug(dag.pcwf) || ''
         if (aug) dag.pcwf = dag.pcwf.replace(aug, '')
         // здесь м.б. aug + pref !
         let zero = {seg: aug, cdicts: []}
         dag.prefs.push(zero)
     }
 
-    const chains = []
+    let chains = []
     for (let pref of dag.prefs) {
         let {conn, pcwf} = schemePref(pref, dag.pcwf)
         p('_scheme pref_ seg:', pref.seg, 'conn:', conn, 'pcwf', pcwf)
@@ -128,53 +128,50 @@ async function anthraxChains(wf) {
         // = FILTERS =
         for (let brk of breaks) {
             if (!brk.conn) brk.conn = ''
-            g('\n_CLEANBR pref:', pref.seg, 'head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, brk.fls._id)
             let headdicts = dicts.filter(dict=> dict.stem == brk.head)
             let taildicts = dicts.filter(dict=> dict.stem == brk.tail)
             let pdicts = (brk.tail) ? taildicts : headdicts
             let mainseg = (brk.tail) ? (brk.tail) : (brk.head)
 
-            // здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
+            // conn: здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
             let aucon = (brk.tail) ? brk.conn : pref.seg
             if (aucon == 'ο') aucon = ''
-            g('_aucon', aucon)
 
             // !dict.augs - names, etc
             // dict.augs.includes(aucon) - ἀδικέω - odd δικάζω
             pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
             let pfls = brk.fls.docs // .filter(flex=> flex.aug == aucon)
-            g('_pdicts', pdicts.length)
-            g('_pfls', pfls.length)
 
             let {cdicts, cfls} = dict2flexFilter(aucon, pdicts, pfls)
-
-            g('_after_filter_ cdicts:', cdicts.length, 'cfls:', cfls.length)
+            g('\n_CLEANBR pref:', pref.seg, 'head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, brk.fls._id)
+            g('_aucon', aucon)
+            g('_pdicts:', pdicts.length, '_pfls:', pfls.length)
+            g('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
 
             if (cdicts.length) {
+                // let chain = makeChain(pref, aucon, brk, mainseg, cdicts, cfls, headdicts)
                 let flsseg = {seg: brk.fls._id, fls: cfls}
-                let tailseg = {seg: mainseg, cdicts}
-                let chain = [tailseg, flsseg]
+                let chain = [flsseg]
+                if (taildicts.length) {
+                    let tailseg = {seg: mainseg, cdicts}
+                    chain.unshift(tailseg)
+                }
                 let connseg = {seg: brk.conn, conn: true}
                 if (brk.conn) chain.unshift(connseg)
-                if (headdicts) {
+                if (headdicts.length) {
                     let headseg = {seg: brk.head, cdicts: headdicts}
                     chain.unshift(headseg)
                 }
                 chains.push(chain)
-
-                let idx = 0
-                for (let cdict of cdicts) {
-                    g('_cdict', cdict.rdict)
-                    let fls = cfls[idx]
-                    let prettys = prettyFLS(fls)
-                    g('_c-fls', prettys)
-                    idx++
-                }
             }
 
         }
     } // pref
 
+    let shorts = chains.find(chain=> chain.length == 2)
+    if (shorts) {
+        chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
+    }
     // let chains = []
     return chains
 }
@@ -203,8 +200,9 @@ function dict2flexFilter(aug, dicts, fls) {
             else if (dict.part && flex.part ) ok = true
 
             // else if (dict.verb && flex.verb) ok = true
-            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
             else if (dict.verb && flex.verb && dict.keys.includes(flex.key)) ok = true
+            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
+
             if (ok) dfls.push(flex)
             // if (ok) log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
         }
@@ -215,6 +213,10 @@ function dict2flexFilter(aug, dicts, fls) {
         }
     }
     return {cdicts, cfls}
+}
+
+function makeChain(pref, aucon, brk, mainseg, cdicts, cfls, headdicts) {
+    return chain
 }
 
 function prettyBeakIDs(breaks) {
