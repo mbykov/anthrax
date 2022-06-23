@@ -146,6 +146,7 @@ async function anthraxChains(wf) {
                 // log('_D', pdict.rdict, pdict.augs)
             })
 
+            // TODO: HERE в dict, кроме dict.aug, dict.augs добавить dict.conn, после pref который, stripped
             pdicts = pdicts.filter(dict=> !aucon || !dict.augs || strip(dict.aug) == strip(aucon))
             // pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
 

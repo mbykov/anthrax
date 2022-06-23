@@ -14,8 +14,16 @@ async function run() {
     let chains = await anthrax(wordform)
     log('\n_run chains:', wordform, chains.length)
     for (let chain of chains) {
-        log('chain:', chain)
+        log('_chain:', chain)
 
+        for (let seg of chain) {
+            if (seg.cdicts) {
+                let rdicts = seg.cdicts.map(cdict=> cdict.rdict)
+                log('_rdicts', rdicts)
+            }
+        }
+
+        // log('_', chain[1])
         // let idx = 0
         // for (let cdict of cdicts) {
         //     g('_cdict', cdict.rdict)
