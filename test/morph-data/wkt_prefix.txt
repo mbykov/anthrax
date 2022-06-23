@@ -162,7 +162,7 @@ pref: κατ- • (katá)
     downwards
     against
     fully, completely
-    = καθ́
+    = καθ
 
 # pref: κακά
 pref: κακ

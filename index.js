@@ -28,8 +28,9 @@ export async function anthrax(wf) {
     return chains
 }
 
-// αἱρέω
-// συγκαθαιρέω, καθαιρέω
+// ἀδικέω - здесь δι не префикс
+// αἱρέω,
+// συγκαθαιρέω, καθαιρέω - нет в словаре, есть καθαίρω
 // ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
 // εὐχαριστία,
@@ -46,13 +47,10 @@ async function anthraxChains(wf) {
     dag.cwf = comb(wf)
     // dag.stress = getStress(dag.cwf)
     let flakes = scrape(dag.cwf).reverse()
-    log('_flakes', flakes)
 
     if (!flakes.length) return
     dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
-
-    log('_T', tails)
 
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
@@ -68,7 +66,7 @@ async function anthraxChains(wf) {
     // полные breaks - > chails
     // связки - bundles - анализ
     // aug во flex - глупо, перенести в dict
-    // теперь связка может быть сложной, vows+pref+vows
+    // теперь связка может быть сложной, aug+pref+vows, но ἀδικέω
 
     // в словаре pref отдельно. То есть искать длинный стем pref+stem не имеет смысла
     // если stem не найден, то и pref+stem не будет найден
@@ -76,7 +74,7 @@ async function anthraxChains(wf) {
     // д.б. четкие правила вычисления aug, и общий модуль.
     //  περισπάω - augs: [ 'περι', 'περιε' ]
 
-    dag.prefs = await findPrefs(dag, dag.pcwf)
+    dag.prefs = await findPrefs(dag)
     p('_dag.prefs', dag.prefs)
 
     // remove pref or aug
@@ -284,11 +282,11 @@ async function findDicts(breaks) {
     return dicts
 }
 
-export async function findPrefs(dag, pcwf) {
+export async function findPrefs(dag) {
     let headkeys = dag.flakes.map(flake=> plain(flake.head))
     // log('_headkeys', headkeys)
     let prefs = await getPrefs(headkeys)
-    // log('_find_prefs', prefs)
+    log('_find_prefs=', prefs)
     // compound - προσδιαιρέω
     // выбрать compound-prefs, если есть - найти длиннейший
     // и забрать исходники
@@ -297,7 +295,7 @@ export async function findPrefs(dag, pcwf) {
         let compound = _.maxBy(cprefs, function(pref) { return pref.term.length; })
         prefs = await getPrefs(compound.prefs)
         prefs.unshift(compound)
-        prefs = prefs.filter(pref=> pref.term[0] == pcwf[0])
+        prefs = prefs.filter(pref=> pref.term[0] == dag.pcwf[0])
     }
     /* log('_PREFS', prefs) */
 

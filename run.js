@@ -12,16 +12,15 @@ let fls = process.argv[3]
 
 async function run() {
     let chains = await anthrax(wordform)
-    log('\n_RUN: chains:', chains.length)
-    log('\n_wordform:', wordform)
+    log('\n_run chains:', wordform, chains.length)
     for (let chain of chains) {
-        log('\n_chain:', chain)
+        log('chain:', chain)
 
     }
 }
 
-run(
-)
+run()
+
 // let chains = await anthrax(wordform)
 // log('\n_RUN: chains:', chains.length)
 /* log('\n_RUN-XXX: OS-FLS:', chains[1][1]) */
