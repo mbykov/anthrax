@@ -245,7 +245,7 @@ function prettyFLS(fls) {
 function schemePref(pref, pcwf) {
     let re = new RegExp('^' + pref.seg)
     pcwf = pcwf.replace(re, '')
-    let {conn, tail} = findConnection(pcwf)
+    let conn = findConnection(pcwf)
     if (conn) {
         let reconn = new RegExp('^' + conn)
         pcwf = pcwf.replace(reconn, '')
@@ -253,15 +253,15 @@ function schemePref(pref, pcwf) {
     return {conn, pcwf}
 }
 
-function findConnection(str) {
-    let vow = str[0]
+function findConnection(pstr) {
+    let vow = pstr[0]
     let conn = ''
     while(vowels.includes(vow)) {
-        str = str.slice(1)
+        pstr = pstr.slice(1)
         conn += vow
-        vow = str[0]
+        vow = pstr[0]
     }
-    return {conn, tail: str}
+    return conn
 }
 
 function makeBreaks(pcwf, flexes) {
