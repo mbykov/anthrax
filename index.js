@@ -4,8 +4,8 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-/* import { accents, scrape, vowels, stresses, parseAug, vnTerms, aug2vow, stressPosition } from './lib/utils.js' */
-import { scrape, vowels, parseAug } from './lib/utils.js'
+/* import { accents, scrape, vowels, stresses, parseAug, vnTerms, stressPosition } from './lib/utils.js' */
+import { scrape, vowels, parseAug, aug2vow } from './lib/utils.js'
 import { getTerms, getFlexes, getDdicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
@@ -59,39 +59,33 @@ async function anthraxChains(wf) {
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
-    // == TODO ==
-    // аккуратно найти prefs / aug
-    // в prefs-цикле найти breaks
-    // найти значимые dicts, i.e. head-tail, кроме conn и flex
-    // полные breaks - > chails
-    // связки - bundles - анализ
-    // aug во flex - глупо, перенести в dict
     // теперь связка может быть сложной, aug+pref+vows, но ἀδικέω
-
     // в словаре pref отдельно. То есть искать длинный стем pref+stem не имеет смысла
     // если stem не найден, то и pref+stem не будет найден
 
-    // д.б. четкие правила вычисления aug, и общий модуль.
-    //  περισπάω - augs: [ 'περι', 'περιε' ]
 
     dag.prefs = await findPrefs(dag)
     p('_dag.prefs', dag.prefs)
 
-    // remove pref or aug
-    // breaks to chains
+    // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
+    let aug = parseAug(dag.pcwf)
+    let zero = {seg: aug, cdicts: []}
+    dag.prefs.push(zero)
+
     if (!dag.prefs.length) {
-        let aug = parseAug(dag.pcwf) || ''
-        if (aug) dag.pcwf = dag.pcwf.replace(aug, '')
+        // let aug = parseAug(dag.pcwf)
+        // if (aug) dag.pcwf = dag.pcwf.replace(aug, '')
         // здесь м.б. aug + pref !
-        let zero = {seg: aug, cdicts: []}
-        dag.prefs.push(zero)
+        // let zero = {seg: aug, cdicts: []}
+        // dag.prefs.push(zero)
     }
 
     let chains = []
     for (let pref of dag.prefs) {
         let {conn, pcwf} = schemePref(pref, dag.pcwf)
         p('_scheme pref_ seg:', pref.seg, 'conn:', conn, 'pcwf', pcwf)
-        pref.seg = pref.seg + conn // д.б. равно flex.aug
+        // pref.seg = pref.seg + conn // д.б. равно aug
+        pref.conn = conn
 
         let breaks = makeBreaks(pcwf, dag.flexes)
         p('_breaks', breaks.length)
@@ -134,22 +128,38 @@ async function anthraxChains(wf) {
             let mainseg = (brk.tail) ? (brk.tail) : (brk.head)
 
             // conn: здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
-            let aucon = (brk.tail) ? brk.conn : pref.seg
-            if (aucon == 'ο') aucon = ''
+            // pref: περισπάω, καθαίρω, παραγράφω, παραβάλλω
+            // χρονοκρατέω, ἀδικέω
+            // все случаи:
+            // aug - ἀδικέω
+            // aug+pref
+            // pref - head - conn - tail
+            // aug - head - conn - tail
 
+            let aucon = (brk.tail) ? brk.conn : pref.conn ? pref.conn : pref.seg
+            if (aucon == 'ο') aucon = ''
+            log('_AUCON pref.seg:', pref.seg, '_aucon:', aucon)
             // !dict.augs - names, etc
             // dict.augs.includes(aucon) - ἀδικέω - odd δικάζω
-            pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
-            let pfls = brk.fls.docs // .filter(flex=> flex.aug == aucon)
+
+            pdicts.forEach(pdict=> {
+                // log('_D', pdict.rdict, pdict.augs)
+            })
+
+            pdicts = pdicts.filter(dict=> !aucon || !dict.augs || strip(dict.aug) == strip(aucon))
+            // pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
+
+            // сравниваю по первой букве connector и flex.aug
+            let pfls = brk.fls.docs
+            if (aucon && aucon !=pref.seg) pfls = pfls.filter(flex=> aug2vow(aucon, flex.aug))
 
             let {cdicts, cfls} = dict2flexFilter(aucon, pdicts, pfls)
-            g('\n_CLEANBR pref:', pref.seg, 'head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, brk.fls._id)
-            g('_aucon', aucon)
-            g('_pdicts:', pdicts.length, '_pfls:', pfls.length)
-            g('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
+            g('\n_CLEANBR aucon:', aucon, 'head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, 'fls:', brk.fls._id)
 
             if (cdicts.length) {
-                // let chain = makeChain(pref, aucon, brk, mainseg, cdicts, cfls, headdicts)
+                g('_aucon', aucon)
+                g('_pdicts:', pdicts.length, '_pfls:', pfls.length)
+                g('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
                 let flsseg = {seg: brk.fls._id, fls: cfls}
                 let chain = [flsseg]
                 if (taildicts.length) {
@@ -162,29 +172,30 @@ async function anthraxChains(wf) {
                     let headseg = {seg: brk.head, cdicts: headdicts}
                     chain.unshift(headseg)
                 }
+                if (pref.seg) {
+                    let seg = pref.seg
+                    if (pref.conn) seg = [seg, pref.conn].join('')
+                    let prefseg
+                    if (pref.cdicts.length) prefseg = {seg: seg, cdicts: pref.cdicts, pref: true}
+                    else prefseg = {seg: seg, aug: true}
+                    chain.unshift(prefseg)
+                }
                 chains.push(chain)
             }
 
         }
     } // pref
 
-    let shorts = chains.find(chain=> chain.length == 2)
-    if (shorts) {
+    // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1
+    // let shorts = chains.find(chain=> chain.length == 2)
+    if (chains.length > 1) {
         chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
     }
     // let chains = []
     return chains
 }
 
-// filters. В lsjs нет keys. Грубо: сначала wkts, затем выбрать аналоги и lsjs, затем filter lsjs без keys. Очень сложно и некрасиво
-// names: wkts-lsjs-key, gend, aug?
-// verbs: wkts-tense, aug
-// verb.dict.augs - в словаре нет полной формы стема, а истинный стем
-
 // ================================================= FILTERS ==============
-
-// BUG περισπάω - περιέσπαντο - aug высчитывается неверно, пропадает ударение
-
 function dict2flexFilter(aug, dicts, fls) {
     let cdicts = []
     let cfls = []
@@ -213,10 +224,6 @@ function dict2flexFilter(aug, dicts, fls) {
         }
     }
     return {cdicts, cfls}
-}
-
-function makeChain(pref, aucon, brk, mainseg, cdicts, cfls, headdicts) {
-    return chain
 }
 
 function prettyBeakIDs(breaks) {
@@ -302,7 +309,7 @@ export async function findPrefs(dag) {
     let headkeys = dag.flakes.map(flake=> plain(flake.head))
     // log('_headkeys', headkeys)
     let prefs = await getPrefs(headkeys)
-    log('_find_prefs=', prefs)
+    // log('_find_prefs=', prefs)
     // compound - προσδιαιρέω
     // выбрать compound-prefs, если есть - найти длиннейший
     // и забрать исходники
