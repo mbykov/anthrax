@@ -43,7 +43,7 @@ export async function anthrax(wf) {
 
 async function anthraxChains(wf) {
     dag = new Map();
-    dag.chains = []
+    // dag.chains = []
     dag.cwf = comb(wf)
     // dag.stress = getStress(dag.cwf)
     let flakes = scrape(dag.cwf).reverse()
@@ -87,6 +87,7 @@ async function anthraxChains(wf) {
         dag.prefs.push(zero)
     }
 
+    const chains = []
     for (let pref of dag.prefs) {
         let {conn, pcwf} = schemePref(pref, dag.pcwf)
         p('_scheme pref_ seg:', pref.seg, 'conn:', conn, 'pcwf', pcwf)
@@ -131,13 +132,16 @@ async function anthraxChains(wf) {
             let headdicts = dicts.filter(dict=> dict.stem == brk.head)
             let taildicts = dicts.filter(dict=> dict.stem == brk.tail)
             let pdicts = (brk.tail) ? taildicts : headdicts
+            let mainseg = (brk.tail) ? (brk.tail) : (brk.head)
 
             // здесь д.б. сложная довольно функция определения соответствия conn и наличия aug во flex-е.
             let aucon = (brk.tail) ? brk.conn : pref.seg
             if (aucon == 'ο') aucon = ''
             g('_aucon', aucon)
 
-            // pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
+            // !dict.augs - names, etc
+            // dict.augs.includes(aucon) - ἀδικέω - odd δικάζω
+            pdicts = pdicts.filter(dict=> !aucon || !dict.augs || dict.augs.includes(aucon))
             let pfls = brk.fls.docs // .filter(flex=> flex.aug == aucon)
             g('_pdicts', pdicts.length)
             g('_pfls', pfls.length)
@@ -147,7 +151,17 @@ async function anthraxChains(wf) {
             g('_after_filter_ cdicts:', cdicts.length, 'cfls:', cfls.length)
 
             if (cdicts.length) {
-                const chain = []
+                let flsseg = {seg: brk.fls._id, fls: cfls}
+                let tailseg = {seg: mainseg, cdicts}
+                let chain = [tailseg, flsseg]
+                let connseg = {seg: brk.conn, conn: true}
+                if (brk.conn) chain.unshift(connseg)
+                if (headdicts) {
+                    let headseg = {seg: brk.head, cdicts: headdicts}
+                    chain.unshift(headseg)
+                }
+                chains.push(chain)
+
                 let idx = 0
                 for (let cdict of cdicts) {
                     g('_cdict', cdict.rdict)
@@ -161,7 +175,7 @@ async function anthraxChains(wf) {
         }
     } // pref
 
-    let chains = []
+    // let chains = []
     return chains
 }
 

@@ -16,6 +16,15 @@ async function run() {
     for (let chain of chains) {
         log('chain:', chain)
 
+        // let idx = 0
+        // for (let cdict of cdicts) {
+        //     g('_cdict', cdict.rdict)
+        //     let fls = cfls[idx]
+        //     let prettys = prettyFLS(fls)
+        //     g('_c-fls', prettys)
+        //     idx++
+        // }
+
     }
 }
 
