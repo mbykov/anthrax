@@ -17,6 +17,7 @@ let tests = {
     'διαγγέλλω': ['δι-α-γγελ'],
     'ἀναδείκνυμι': ['ἀν-α-δεικν'],
     'ἀποδείκνυμι': ['ἀπ-ο-δεικν'],
+    'δείκνυμι': ['δεικν'],
     '': [''],
     '': [''],
     '': [''],
@@ -28,8 +29,8 @@ async function yank(tests) {
         let chains = await anthrax(wf)
         // log('_chains', chains)
         for (let chain of chains) {
-            let str = chain.map(seg=> seg.seg).join('-')
-            log('_____res:', str)
+            let segs = chain.map(seg=> seg.seg).join('-')
+            log('_____segs:', segs)
         }
     }
 }
