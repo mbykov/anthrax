@@ -15,7 +15,6 @@ async function run() {
     log('\n_run chains:', wordform, chains.length)
     for (let chain of chains) {
         log('_chain:', chain)
-
         for (let seg of chain) {
             if (seg.cdicts) {
                 let rdicts = seg.cdicts.map(cdict=> cdict.rdict)
