@@ -63,10 +63,10 @@ async function anthraxChains(wf) {
     // в словаре pref отдельно. То есть искать длинный стем pref+stem не имеет смысла
     // если stem не найден, то и pref+stem не будет найден
 
-
     dag.prefs = await findPrefs(dag)
     p('_dag.prefs', dag.prefs)
 
+    // ἀδικέω - odd δικάζω
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
     let aug = parseAug(dag.pcwf)
     let zero = {seg: aug, cdicts: [], default: true} // whole wordform
@@ -77,14 +77,16 @@ async function anthraxChains(wf) {
 
     let chains = []
     for (let pref of dag.prefs) {
-        let {conn, pcwf} = schemePref(pref, dag.pcwf)
-        p('\n_scheme pref_ seg:', pref.seg, 'conn:', conn, 'pcwf', pcwf)
-        // pref.seg = pref.seg + conn // д.б. равно aug
-        pref.conn = conn
+        let re = new RegExp('^' + pref.seg)
+        let pcwf = dag.pcwf.replace(re, '')
+        pref.conn = findConnection(pcwf)
+        re = new RegExp('^' + pref.conn)
+        pcwf = pcwf.replace(re, '')
+
+        // let {conn, pcwf} = schemePref(pref, dag.pcwf)
+        p('_\n==scheme pref== seg:', dag.pcwf, pref.seg, 'conn:', pref.conn, 'pcwf', pcwf)
 
         let {breaks, dicts} = await cleanBreacks(pcwf, dag)
-
-        // == FILTERS ==
 
         for (let brk of breaks) {
             if (!brk.conn) brk.conn = ''
@@ -92,25 +94,19 @@ async function anthraxChains(wf) {
             let taildicts = dicts.filter(dict=> dict.stem == brk.tail)
             let pdicts = (brk.tail) ? taildicts : headdicts
             let mainseg = (brk.tail) ? (brk.tail) : (brk.head)
+            let conn = (brk.tail) ? brk.conn : pref.conn ? pref.conn : '' // или pref.seg ?
 
-            let aucon = (brk.tail) ? brk.conn : pref.conn ? pref.conn : pref.seg
-            if (aucon == 'ο') aucon = ''
-            b('\n_BRK:', 'head:', brk.head, 'conn:', brk.conn, 'tail:', brk.tail, 'fls:', brk.fls._id)
-            b('_BRK pref.seg:', pref.seg, '_aucon:', aucon, '_mainseg:', mainseg)
-            // !dict.augs - names, etc
-            // dict.augs.includes(aucon) - ἀδικέω - odd δικάζω
+            if (conn == 'ο') conn = ''
+            b('\n_==BRK==', 'head:', brk.head, 'br.conn:', brk.conn, 'tail:', brk.tail, 'fls:', brk.fls._id, '_mainseg:', mainseg)
+            b('_brk pref.seg:', pref.seg, '_conn:', conn)
 
-            // TODO: HERE в dict, кроме dict.aug, dict.augs добавить dict.conn, после pref который, stripped
-            // pdicts = pdicts.filter(dict=> !aucon || !dict.augs || strip(dict.aug) == strip(aucon))
-            // log('_PDICTS', pdicts.length)
+            // == PRE FILTERS ==
             let pfls = brk.fls.docs
-
             pdicts = pdicts.filter(pdict=> {
-                // p('_AUG DICT', mainseg, pdict.rdict, pdict.aug, pdict.augs, aucon, strip(pdict.aug) == strip(aucon), 444, pref.seg, pdict.pref)
+                // p('_pdicts_filter', mainseg, pdict.rdict, pdict.aug, pdict.augs, conn, strip(pdict.aug) == strip(aucon), 444, pref.seg, pdict.pref)
                 // return true
-                if (!aucon) return true
-                // if (pref.default && pdict.pref) return false // default branch wo pref and preffed dict
-                if (pref.seg && pdict.pref && pref.seg != pdict.aug) return false
+                if (!pdict.pref) return true // compound
+                if (pdict.pref && pref.seg != pdict.aug) return false
 
                 // два разных случая - pref.seg и dict без pref, pref как часть chain
                 // и - pref.seg и dict с pref, тогда они должны совпадать
@@ -118,14 +114,14 @@ async function anthraxChains(wf) {
 
                 // if (!pdict.augs) return true
                 // if (!pdict.aug) return true
-                if (pdict.aug && strip(pdict.aug) == strip(aucon)) return true
+                if (pdict.aug && strip(pdict.aug) == strip(conn)) return true
             })
             // log('_PDICTS_2', pdicts.length)
 
             // сравниваю по первой букве connector и flex.aug
-            // if (aucon && aucon !=pref.seg) pfls = pfls.filter(flex=> aug2vow(aucon, flex.aug))
+            // if (conn && conn !=pref.seg) pfls = pfls.filter(flex=> aug2vow(conn, flex.aug))
 
-            let {cdicts, cfls} = dict2flexFilter(aucon, pdicts, pfls)
+            let {cdicts, cfls} = dict2flexFilter(conn, pdicts, pfls)
 
             b('_pdicts:', pdicts.length, '_pfls:', pfls.length)
             b('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
@@ -155,8 +151,6 @@ async function anthraxChains(wf) {
                 chain.unshift(prefseg)
             }
             chains.push(chain)
-
-
         }
     } // pref
 
@@ -254,6 +248,7 @@ function prettyFLS(fls) {
     return fls.map(flex=> [flex.tense, flex.numper].join(', '))
 }
 
+// return словарное значение pref.term и коннектор до stem
 function schemePref(pref, pcwf) {
     let re = new RegExp('^' + pref.seg)
     pcwf = pcwf.replace(re, '')
