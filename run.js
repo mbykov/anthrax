@@ -17,25 +17,30 @@ async function run() {
         log('_chain:', chain)
         for (let seg of chain) {
             if (seg.cdicts) {
-                let rdicts = seg.cdicts.map(cdict=> cdict.rdict)
+                let rdicts = seg.cdicts.map(cdict=> cdict.rdict || cdict.term)
                 log('_rdicts', rdicts)
             }
         }
 
-        // log('_', chain[1])
-        // let idx = 0
-        // for (let cdict of cdicts) {
-        //     g('_cdict', cdict.rdict)
-        //     let fls = cfls[idx]
-        //     let prettys = prettyFLS(fls)
-        //     g('_c-fls', prettys)
-        //     idx++
-        // }
+        let cdicts = chain.slice(-2)[0].cdicts
+        let cfls = chain.slice(-1)[0].fls
+        let idx = 0
+        for (let cdict of cdicts) {
+            let fls = cfls[idx]
+            let prettys = prettyFLS(fls)
+            log(prettys)
+            idx++
+        }
 
     }
 }
 
 run()
+
+function prettyFLS(fls) {
+    return fls.map(flex=> [flex.tense, flex.numper].join(', '))
+}
+
 
 // let chains = await anthrax(wordform)
 // log('\n_RUN: chains:', chains.length)

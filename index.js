@@ -99,7 +99,8 @@ async function anthraxChains(wf) {
             b('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
 
             if (!cdicts.length) continue
-            let chain = makeChain(br, cdicts, cfls, mainseg, headdicts, {})
+            let augseg = (aug) ? {seg: aug} : {}
+            let chain = makeChain(br, cdicts, cfls, mainseg, headdicts, augseg)
             // log('_C', chain)
             chains.push(chain)
         }
@@ -185,7 +186,7 @@ function makeChain(br, cdicts, cfls, mainseg, headdicts, pref) {
         let seg = pref.seg
         if (pref.conn) seg = [seg, pref.conn].join('')
         let prefseg
-        if (pref.cdicts.length) prefseg = {seg: seg, cdicts: pref.cdicts, pref: true}
+        if (pref.cdicts) prefseg = {seg: seg, cdicts: pref.cdicts, pref: true}
         else prefseg = {seg: seg, aug: true}
         chain.unshift(prefseg)
     }
@@ -270,10 +271,6 @@ function prettyBeakIDs(breaks) {
         strs.push(br.fls._id)
         return strs.join('-')
     }) // todo: del
-}
-
-function prettyFLS(fls) {
-    return fls.map(flex=> [flex.tense, flex.numper].join(', '))
 }
 
 // return словарное значение pref.term и коннектор до stem
