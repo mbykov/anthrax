@@ -8,36 +8,34 @@ const d = Debug('dicts')
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 
 const log = console.log
-let fls = process.argv[3]
+// let fls = process.argv[3]
 
 async function run() {
+    let res = []
     let chains = await anthrax(wordform)
     log('\n_run chains:', wordform, chains.length)
     for (let chain of chains) {
-        log('_chain:', chain)
-        for (let seg of chain) {
-            if (seg.cdicts) {
-                let rdicts = seg.cdicts.map(cdict=> cdict.rdict || cdict.term)
-                log('_rdicts', rdicts)
-            }
-        }
-
-        let cdicts = chain.slice(-2)[0].cdicts
-        let cfls = chain.slice(-1)[0].fls
-        let idx = 0
-        for (let cdict of cdicts) {
-            let fls = cfls[idx]
-            let prettys = prettyFLS(fls)
-            log(prettys)
-            idx++
-        }
-
+        // log('_chain:', chain)
+        let prettyres = prettyVerbRes(chain)
+        // log('_r:', prettyres)
+        res.push(prettyres)
     }
+    log('_res:', res)
 }
 
 run()
 
-function prettyFLS(fls) {
+function prettyVerbRes(chain) {
+    let prettyres = {}
+    prettyres.segs = chain.map(seg=> seg.seg).join('-')
+    let mainseg = chain.slice(-2)[0]
+    prettyres.mainseg = mainseg.cdict.rdict
+    let flsseg = chain.slice(-1)[0]
+    prettyres.fls = prettyVerbFLS(flsseg.fls)
+    return prettyres
+}
+
+function prettyVerbFLS(fls) {
     return fls.map(flex=> [flex.tense, flex.numper].join(', '))
 }
 
@@ -49,13 +47,9 @@ function prettyFLS(fls) {
 for (let chain of []) {
     log('\n_chain:', wordform, chain)
     if (!true)  continue
-
     let result = chain.map(seg=> seg.seg).join('-')
-
     log('_result:_', result)
-
     continue
-
     chain.forEach(seg=> {
         if (seg.cdicts) {
             /* let rdicts = seg.cdicts.map(cdict=> cdict.rdict) */

@@ -100,9 +100,9 @@ async function anthraxChains(wf) {
 
             if (!cdicts.length) continue
             let augseg = (aug) ? {seg: aug} : {}
-            let chain = makeChain(br, cdicts, cfls, mainseg, headdicts, augseg)
+            let brchains = makeChains(br, cdicts, cfls, mainseg, headdicts, augseg)
             // log('_C', chain)
-            chains.push(chain)
+            chains.push(...brchains)
         }
     }
 
@@ -135,15 +135,11 @@ async function anthraxChains(wf) {
             let pfls = br.fls.docs
             pdicts = pdicts.filter(pdict=> {
                 // return true
-                if (!pdict.pref) return true // compound
+                // if (!pdict.pref) return true // compound
                 if (pdict.pref && pref.seg != pdict.aug) return false
-
-                if (pdict.aug && strip(pdict.aug) == strip(conn)) return true
+                // if (pdict.aug && strip(pdict.aug) == strip(conn)) return true
             })
             // log('_PDICTS_2', pdicts.length)
-
-            // сравниваю по первой букве connector и flex.aug
-            // if (conn && conn !=pref.seg) pfls = pfls.filter(flex=> aug2vow(conn, flex.aug))
 
             let {cdicts, cfls} = dict2flexFilter(conn, pdicts, pfls)
 
@@ -151,8 +147,8 @@ async function anthraxChains(wf) {
             b('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
 
             if (!cdicts.length) continue
-            let chain = makeChain(br, cdicts, cfls, mainseg, headdicts, pref)
-            chains.push(chain)
+            let brchains = makeChains(br, cdicts, cfls, mainseg, headdicts, pref)
+            chains.push(...brchains)
         } // br
     } // pref
 
@@ -165,7 +161,43 @@ async function anthraxChains(wf) {
     return chains
 }
 
-function makeChain(br, cdicts, cfls, mainseg, headdicts, pref) {
+
+function makeChains(br, cdicts, cfls, mainseg, headdicts, pref) {
+    let chains = []
+    let idx = 0
+    for (let cdict of cdicts) {
+        let chain = []
+        let fls = cfls[idx]
+        idx++
+        let flsseg = {seg: br.fls._id, fls: fls}
+        chain.push(flsseg)
+
+        let tailseg = {seg: mainseg, cdict, mainseg: true}
+        chain.unshift(tailseg)
+
+        if (br.head && br.tail) {
+            let connseg = {seg: br.conn, conn: true}
+            if (br.conn) chain.unshift(connseg)
+            if (headdicts.length) {
+                let headseg = {seg: br.head, cdicts: headdicts, head: true}
+                chain.unshift(headseg)
+            }
+        }
+
+        if (pref.seg) {
+            let seg = pref.seg
+            if (pref.conn) seg = [seg, pref.conn].join('')
+            let prefseg
+            if (pref.cdicts) prefseg = {seg: seg, cdicts: pref.cdicts, pref: true}
+            else prefseg = {seg: seg, aug: true}
+            chain.unshift(prefseg)
+        }
+        chains.push(chain)
+    }
+    return chains
+}
+
+function makeChain_old(br, cdicts, cfls, mainseg, headdicts, pref) {
     let chain = []
     let flsseg = {seg: br.fls._id, fls: cfls}
     chain.push(flsseg)
@@ -192,6 +224,7 @@ function makeChain(br, cdicts, cfls, mainseg, headdicts, pref) {
     }
     return chain
 }
+
 
 // ================================================= FILTERS ==============
 function dict2flexFilter(aug, dicts, fls) {
