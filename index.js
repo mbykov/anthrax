@@ -130,9 +130,9 @@ async function anthraxChains(wf) {
             // if (conn == 'ο') conn = ''
             b('\n_==BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg)
             b('_br pref.seg:', pref.seg, '_conn:', conn)
-            let rdicts = pdicts.map(pdict=> pdict.pref)
-            rdicts = _.compact(rdicts)
-            log('_rdicts', rdicts, pdicts.length, pref.seg)
+            // let rdicts = pdicts.map(pdict=> pdict.pref)
+            // rdicts = _.compact(rdicts)
+            // log('_rdicts', rdicts, pdicts.length, pref.seg)
 
             // == PRE FILTERS ==
             let pfls = br.fls.docs
@@ -143,9 +143,9 @@ async function anthraxChains(wf) {
                 // if (pdict.aug && strip(pdict.aug) == strip(conn)) return true
             })
             let cognates = _.differenceBy(pdicts, cpdicts)
-            log('_pdicts', pdicts.length)
-            log('_cpdicts', cpdicts.length)
-            log('_cognates', cognates.length)
+            // b('_pdicts', pdicts.length)
+            // b('_cpdicts', cpdicts.length)
+            // b('_cognates', cognates.length)
 
             let {cdicts, cfls} = dict2flexFilter(conn, cpdicts, pfls)
 

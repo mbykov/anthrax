@@ -9,32 +9,44 @@ import {oxia, comb, plain, strip} from 'orthos'
 /* let tests = [  'βούκερας', 'καθαρισμός',] */
 let tests = {
     // 'ἀγαθοποιέω': ['γαθοποι', 'γαθ-ο-ποι'],
-    'ἀγαθοποιέω': ['ἀ-γαθοποι-έω'],
+    // 'ἀγαθοποιέω': ['ἀ-γαθοποι-έω'],
     // 'βαρύτονος': ['βαρυτον', 'βαρ-υ-τον'],
     // 'ἄβακος': ['βα'],
     // 'βαρύς': ['βαρ'],
     // 'τόνος': ['τον'],
     // 'ἀγαθός': ['γαθ'],
     // 'στρατηγός': ['στρατηγ', 'στρατ-η-γ'],
-    'ἀγγέλλω': ['ἀ-γγελ-λω'],
-    'διαγγέλλω': ['δια-γγελ-λω'],
-    'ἀναδείκνυμι': ['ἀνα-δεικν-υμι'],
-    'ἀποδείκνυμι': ['ἀπο-δεικν-υμι'],
+
+    'ἀγγέλλω': [{segs: 'ἀ-γγελ-λω', fls: '["act.pres.ind, sg.1","act.pres.sub, sg.1"]'}],
+    'διαγγέλλω': [{segs: 'δια-γγελ-λω', fls: '["act.pres.ind, sg.1","act.pres.sub, sg.1"]'}],
+    'ἀναδείκνυμι': [{segs: 'ἀνα-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}],
+    'ἀποδείκνυμι': [{segs: 'ἀπο-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}, {segs: 'ἀπο-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}],
     '': [''],
     '': [''],
     '': [''],
 }
 
-async function testWF(wf, exp) {
+async function testWF(wf, expected) {
     it(`wf ${wf} - ${wf.form}`, async () => {
-        let result = await anthrax(wf)
-        assert.equal(result.length, exp.length)
-        exp.forEach((plain, idx)=> {
-            if (!plain) return
-            let rstring = result[idx].map(seg=> seg.seg).join('-')
-            plain = comb(plain)
+        let chains = await anthrax(wf)
+        // log('_WF', wf, expected)
+        let idx = 0
+        for await (let chain of chains) {
+            let pr = prettyVerbRes(chain)
+            let exp = expected[idx]
+            let segs = comb(exp.segs)
+            idx++
+            // log('_pr:', pr, segs, exp.fls)
+            assert.equal(pr.segs, segs)
+            assert.equal(pr.fls, exp.fls)
+        }
+        // assert.equal(chains.length, expected.length)
+        expected.forEach((plain, idx)=> {
+            // if (!plain) return
+            // let rstring = chains[idx].map(seg=> seg.seg).join('-')
+            // plain = comb(plain)
             // log('_P', plain, 'R', rstring)
-            assert.equal(plain, rstring)
+            // assert.equal(plain, rstring)
         })
     })
 }
@@ -42,24 +54,32 @@ async function testWF(wf, exp) {
 describe('simple test', () => {
     for (let test in tests) {
         if (!test) continue
-        let expected = tests[test]
-        testWF(test, expected)
+        let expectedected = tests[test]
+        testWF(test, expectedected)
     }
 })
 
 
-/* simpleTest(tests) */
-/* async function simpleTest(tests) {
- *     for  (let wf in tests) {
- *         if (!wf) continue
- *         let exp = tests[wf]
- *         let res = await anthrax(wf)
- *         assert.equal(exp.length, res.length)
- *         exp.forEach((plain, idx)=> {
- *             if (!plain) return
- *             log('_test:', wf, '=', plain)
- *             let exstr = res[idx].map(chain=> chain.plain).join('-')
- *             assert.equal(plain, exstr)
- *         })
- *     }
- * } */
+function prettyVerbRes(chain) {
+    let prettyres = {}
+    prettyres.segs = chain.map(seg=> seg.seg).join('-')
+    prettyres.pref = ''
+    let cdict = chain.slice(-2)[0].cdict
+    prettyres.rdict = cdict.rdict
+    if (cdict.pref) prettyres.dictpref = cdict.pref
+    else if (chain[0].pref) {
+        let prefdict = chain.slice(0)[0].cdicts[0]
+        prettyres.pref = prefdict.term
+    }
+    prettyres.stem = cdict.stem
+    let flsseg = chain.slice(-1)[0]
+    prettyres.fls = prettyVerbFLS(flsseg.fls)
+    prettyres.fls = JSON.stringify(prettyres.fls)
+    // prettyres.trns = cdict.trns[0]
+    if (!prettyres.pref) delete prettyres.pref
+    return prettyres
+}
+
+function prettyVerbFLS(fls) {
+    return fls.map(flex=> [flex.tense, flex.numper].join(', '))
+}
