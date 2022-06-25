@@ -28,10 +28,17 @@ run()
 function prettyVerbRes(chain) {
     let prettyres = {}
     prettyres.segs = chain.map(seg=> seg.seg).join('-')
-    let mainseg = chain.slice(-2)[0]
-    prettyres.mainseg = mainseg.cdict.rdict
+    let cdict = chain.slice(-2)[0].cdict
+    prettyres.rdict = cdict.rdict
+    if (cdict.pref) prettyres.dictpref = cdict.pref
+    else {
+        let prefdict = chain.slice(0)[0].cdicts[0]
+        prettyres.prefdict = prefdict.trns[0]
+    }
+    prettyres.stem = cdict.stem
     let flsseg = chain.slice(-1)[0]
     prettyres.fls = prettyVerbFLS(flsseg.fls)
+    prettyres.trns = cdict.trns[0]
     return prettyres
 }
 

@@ -130,18 +130,24 @@ async function anthraxChains(wf) {
             // if (conn == 'ο') conn = ''
             b('\n_==BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg)
             b('_br pref.seg:', pref.seg, '_conn:', conn)
+            let rdicts = pdicts.map(pdict=> pdict.pref)
+            rdicts = _.compact(rdicts)
+            log('_rdicts', rdicts, pdicts.length, pref.seg)
 
             // == PRE FILTERS ==
             let pfls = br.fls.docs
-            pdicts = pdicts.filter(pdict=> {
+            let cpdicts = pdicts.filter(pdict=> {
                 // return true
-                // if (!pdict.pref) return true // compound
-                if (pdict.pref && pref.seg != pdict.aug) return false
+                if (!pdict.pref) return true // compound, i.e. pref.seg + stem.wo.pref, ἀπο.trns + δείκνυμι.trns
+                if (pdict.pref && pref.seg == pdict.pref) return true // ἀποδείκνυμι.trns
                 // if (pdict.aug && strip(pdict.aug) == strip(conn)) return true
             })
-            // log('_PDICTS_2', pdicts.length)
+            let cognates = _.differenceBy(pdicts, cpdicts)
+            log('_pdicts', pdicts.length)
+            log('_cpdicts', cpdicts.length)
+            log('_cognates', cognates.length)
 
-            let {cdicts, cfls} = dict2flexFilter(conn, pdicts, pfls)
+            let {cdicts, cfls} = dict2flexFilter(conn, cpdicts, pfls)
 
             b('_pdicts:', pdicts.length, '_pfls:', pfls.length)
             b('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
