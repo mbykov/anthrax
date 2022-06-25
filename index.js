@@ -241,7 +241,8 @@ function dict2flexFilter(aug, dicts, fls) {
         // log('_____dict____:', dict.verb, dict.rdict, dict.stem)
         let dfls = []
         for(let flex of fls) {
-            if (!flex.verb) continue
+            // if (!flex.verb) continue
+            // if (!!dict.pref != !!flex.pref) continue // нельзя в случае pref.trns + cdict.trns
             // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
             let ok = false
             if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true

@@ -39,6 +39,7 @@ function prettyVerbRes(chain) {
     prettyres.stem = cdict.stem
     let flsseg = chain.slice(-1)[0]
     prettyres.fls = prettyVerbFLS(flsseg.fls)
+    prettyres.fls = JSON.stringify(prettyres.fls)
     // prettyres.trns = cdict.trns[0]
     if (!prettyres.pref) delete prettyres.pref
     return prettyres

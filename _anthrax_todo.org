@@ -8,9 +8,16 @@
 
 #+STARTUP: hidestars
 
+* 25 мая - вчерне готово
+  - [ ] тесты verb, simple и fls - подряд все
+  - [ ] в процессе доводка verb
+  - [ ] lsj, souda
+  - [ ] name снова
+  - [ ] adj
+  - [ ] все тесты
+  - [ ]
 
 * TODO 16 мая - verb simple
-  - [ ]
 
 * select dicts  = wkts + lsjs
   - нет prefs, нет tail, т.е. simple -
