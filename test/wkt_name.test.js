@@ -44,7 +44,7 @@ let tests = ntests.concat(atests)
 log('_TESTS', tests.length)
 /* tests = [] */
 
-let wfs = []
+// let wfs = []
 for (let wf of tests) {
     if (!wf.dict) log('__NO DICT', wf)
     let wfkey = wf.form

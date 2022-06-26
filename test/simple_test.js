@@ -29,7 +29,7 @@ let tests = {
 }
 
 async function testWF(wf, expected) {
-    it(`wf ${wf} - ${wf.form}`, async () => {
+    it(`wf ${wf} - ${expected}`, async () => {
         let chains = await anthrax(wf)
         // log('_WF', wf, expected)
         let idx = 0
@@ -42,21 +42,13 @@ async function testWF(wf, expected) {
             assert.equal(pr.segs, segs)
             assert.equal(pr.fls, exp.fls)
         }
-        // assert.equal(chains.length, expected.length)
-        expected.forEach((plain, idx)=> {
-            // if (!plain) return
-            // let rstring = chains[idx].map(seg=> seg.seg).join('-')
-            // plain = comb(plain)
-            // log('_P', plain, 'R', rstring)
-            // assert.equal(plain, rstring)
-        })
     })
 }
 
 describe('simple test', () => {
     for (let test in tests) {
         if (!test) continue
-        let expectedected = tests[test]
-        testWF(test, expectedected)
+        let expected = tests[test]
+        testWF(test, expected)
     }
 })

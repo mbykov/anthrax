@@ -10,7 +10,7 @@
 
 
 * 25 мая - вчерне готово
-  - [ ] тесты simple и verb - fls - подряд все
+  - [ ] тесты simple и verb.fls
   - [ ] в процессе доводка verb
   - [ ] lsj, souda
   - [ ] name снова
