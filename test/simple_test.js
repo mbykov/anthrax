@@ -1,6 +1,7 @@
 const log = console.log
 import _ from 'lodash'
 import assert from 'assert'
+import { prettyVerbRes } from '../lib/utils.js'
 
 import { anthrax } from '../index.js'
 import {oxia, comb, plain, strip} from 'orthos'
@@ -21,9 +22,10 @@ let tests = {
     'διαγγέλλω': [{segs: 'δια-γγελ-λω', fls: '["act.pres.ind, sg.1","act.pres.sub, sg.1"]'}],
     'ἀναδείκνυμι': [{segs: 'ἀνα-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}],
     'ἀποδείκνυμι': [{segs: 'ἀπο-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}, {segs: 'ἀπο-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}],
-    '': [''],
-    '': [''],
-    '': [''],
+    'χρονοκρατέω': [{segs: 'χρον-ο-κρατ-έω', fls: '["act.pres.ind, sg.1","act.pres.sub, sg.1"]'}],
+    '': [{segs: '', fls: ''}],
+    '': [{segs: '', fls: ''}],
+    '': [{segs: '', fls: ''}],
 }
 
 async function testWF(wf, expected) {
@@ -58,28 +60,3 @@ describe('simple test', () => {
         testWF(test, expectedected)
     }
 })
-
-
-function prettyVerbRes(chain) {
-    let prettyres = {}
-    prettyres.segs = chain.map(seg=> seg.seg).join('-')
-    prettyres.pref = ''
-    let cdict = chain.slice(-2)[0].cdict
-    prettyres.rdict = cdict.rdict
-    if (cdict.pref) prettyres.dictpref = cdict.pref
-    else if (chain[0].pref) {
-        let prefdict = chain.slice(0)[0].cdicts[0]
-        prettyres.pref = prefdict.term
-    }
-    prettyres.stem = cdict.stem
-    let flsseg = chain.slice(-1)[0]
-    prettyres.fls = prettyVerbFLS(flsseg.fls)
-    prettyres.fls = JSON.stringify(prettyres.fls)
-    // prettyres.trns = cdict.trns[0]
-    if (!prettyres.pref) delete prettyres.pref
-    return prettyres
-}
-
-function prettyVerbFLS(fls) {
-    return fls.map(flex=> [flex.tense, flex.numper].join(', '))
-}

@@ -267,9 +267,9 @@ function dict2flexFilter(aug, dicts, fls) {
 
 async function cleanBreacks(pcwf, dag) {
     let breaks = makeBreaks(pcwf, dag.flexes)
-    p('_breaks', breaks.length)
+    p('_breaks', breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    // log('_breaks-ids', breaksids)
+    // p('_breaks-ids', breaksids)
 
     // dicts - те, что есть в словарях
     let dicts = await findDicts(breaks)
@@ -301,6 +301,12 @@ async function cleanBreacks(pcwf, dag) {
     return {breaks, dicts}
 }
 
+function findTreePart(breaks) {
+    let heads = breaks.filter(br=> {
+        let head
+    })
+    return []
+}
 
 function prettyBeakIDs(breaks) {
     return breaks.map(br=> {
@@ -336,6 +342,7 @@ function findConnection(pstr) {
     return conn
 }
 
+// TODO: χρονοκρατέω
 function makeBreaks(pcwf, flexes) {
     let breaks = []
     for (let fls of flexes) {
@@ -343,7 +350,7 @@ function makeBreaks(pcwf, flexes) {
         // if (pterm != 'εω') continue
         let phead = pcwf.slice(0, -pterm.length)
         let pos = phead.length + 1
-        let head, tail, vow, connection, res
+        let head, tail, vow, conn = '', res
         while (pos > 0) {
             pos--
             head = phead.slice(0, pos)
@@ -352,14 +359,15 @@ function makeBreaks(pcwf, flexes) {
             // todo: наверное, на след шагу в conn чтобы сразу добавить гласную
             // но в простейшем ἀγαθοποιέω окончание έω, а head заканчивается на гласную, отбросить гласную здесь нельзя
             tail = phead.slice(pos)
-            connection = findConnection(tail)
-            // let {conn, tail} = findConnection(tail)
-            if (connection.conn && connection.tail) {
-                res = {head, conn: connection.conn, tail: connection.tail, fls}
-                // log('_BR_c', head, connection.conn, connection.tail, fls._id)
+            conn = findConnection(tail)
+            if (conn) {
+                let re = new RegExp('^' + conn)
+                tail = tail.replace(re, '')
+                res = {head, conn, tail, fls}
+                // log('_BR_c', head, conn, fls._id)
             } else {
                 // log('_BR', head, tail, fls._id)
-                res = {head, conn: '', tail, fls}
+                res = {head, conn, tail, fls}
             }
             /* if (!tail) continue */ // нельзя, если simple
             if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
