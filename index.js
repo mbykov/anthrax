@@ -76,7 +76,7 @@ async function anthraxChains(wf) {
         let re = new RegExp('^' + aug)
         let pcwf = dag.pcwf.replace(re, '')
         p('_\n==scheme aug== :', dag.pcwf, 'aug_:', aug, 'pcwf', pcwf)
-        let {breaks, dicts} = await cleanBreacks(pcwf, dag)
+        let {breaks, dicts} = await cleanBreaks(pcwf, dag)
 
         for (let br of breaks) {
             if (!br.conn) br.conn = ''
@@ -90,11 +90,23 @@ async function anthraxChains(wf) {
 
             // == PRE FILTERS ==
             let pfls = br.fls.docs
-            pdicts = pdicts.filter(pdict=> {
-                if (!pdict.pref) return true
+            // log('_====P', pfls.length)
+            pfls = pfls.filter(flex=> {
+                if (!flex.aug) flex.aug = ''
+                if (flex.pref) return flase
+                // if (!flex.verb) return false
+                // if (flex.tense == 'mid.aor.ind' && flex.numper == 'sg.2') log('_=====', flex, aug)
+                if (aug && flex.aug == aug) return true
+                if (!aug && !flex.aug) return true
+            })
+            // log('_====P2', pfls.length)
+
+            pdicts = pdicts.filter(dict=> {
+                // log('_', dict.stem, dict.rdict)
+                if (!dict.pref) return true
             })
 
-            let {cdicts, cfls} = dict2flexFilter(conn, pdicts, pfls)
+            let {cdicts, cfls} = dict2flexFilter(aug, pdicts, pfls)
             b('_pdicts:', pdicts.length, '_pfls:', pfls.length)
             b('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
 
@@ -117,7 +129,7 @@ async function anthraxChains(wf) {
         // let {conn, pcwf} = schemePref(pref, dag.pcwf)
         p('_\n==scheme pref== .seg:', pref.seg, 'conn:', pref.conn, 'pcwf', pcwf)
 
-        let {breaks, dicts} = await cleanBreacks(pcwf, dag)
+        let {breaks, dicts} = await cleanBreaks(pcwf, dag)
 
         for (let br of breaks) {
             if (!br.conn) br.conn = ''
@@ -167,6 +179,41 @@ async function anthraxChains(wf) {
     return chains
 }
 
+// ================================================= FILTERS ==============
+function dict2flexFilter(aug, dicts, fls) {
+    let cdicts = []
+    let cfls = []
+    for (let dict of dicts) {
+        // if (!dict.verb) continue
+        // log('_____dict____:', dict.verb, dict.rdict, dict.stem)
+        let dfls = []
+        for(let flex of fls) {
+            // if (!flex.verb) continue
+            // if (!!dict.pref != !!flex.pref) continue // нельзя в случае pref.trns + cdict.trns
+            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
+            let ok = false
+            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
+            else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
+            else if (dict.part && flex.part ) ok = true
+
+            // else if (dict.verb && flex.verb) ok = true
+            else if (dict.verb && flex.verb && dict.keys.includes(flex.key)) ok = true
+            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
+
+            // if (dict.stem == 'γραφ' && flex.tense =='act.aor.sub') log('======= FLX', flex)
+
+            if (ok) dfls.push(flex)
+            // if (ok) log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
+        }
+        // if (dfls.length) log('____dict.fls', dict.stem, dict.rdict)
+        if (dfls.length) {
+            cdicts.push(dict)
+            cfls.push(dfls) // each dict has array of fls
+        }
+    }
+    return {cdicts, cfls}
+}
+
 
 function makeChains(br, cdicts, cfls, mainseg, headdicts, pref) {
     let chains = []
@@ -203,71 +250,9 @@ function makeChains(br, cdicts, cfls, mainseg, headdicts, pref) {
     return chains
 }
 
-function makeChain_old(br, cdicts, cfls, mainseg, headdicts, pref) {
-    let chain = []
-    let flsseg = {seg: br.fls._id, fls: cfls}
-    chain.push(flsseg)
-
-    let tailseg = {seg: mainseg, cdicts, mainseg: true}
-    chain.unshift(tailseg)
-
-    if (br.head && br.tail) {
-        let connseg = {seg: br.conn, conn: true}
-        if (br.conn) chain.unshift(connseg)
-        if (headdicts.length) {
-            let headseg = {seg: br.head, cdicts: headdicts, head: true}
-            chain.unshift(headseg)
-        }
-    }
-
-    if (pref.seg) {
-        let seg = pref.seg
-        if (pref.conn) seg = [seg, pref.conn].join('')
-        let prefseg
-        if (pref.cdicts) prefseg = {seg: seg, cdicts: pref.cdicts, pref: true}
-        else prefseg = {seg: seg, aug: true}
-        chain.unshift(prefseg)
-    }
-    return chain
-}
-
-
-// ================================================= FILTERS ==============
-function dict2flexFilter(aug, dicts, fls) {
-    let cdicts = []
-    let cfls = []
-    for (let dict of dicts) {
-        // if (!dict.verb) continue
-        // log('_____dict____:', dict.verb, dict.rdict, dict.stem)
-        let dfls = []
-        for(let flex of fls) {
-            // if (!flex.verb) continue
-            // if (!!dict.pref != !!flex.pref) continue // нельзя в случае pref.trns + cdict.trns
-            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
-            let ok = false
-            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
-            else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
-            else if (dict.part && flex.part ) ok = true
-
-            // else if (dict.verb && flex.verb) ok = true
-            else if (dict.verb && flex.verb && dict.keys.includes(flex.key)) ok = true
-            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
-
-            if (ok) dfls.push(flex)
-            // if (ok) log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
-        }
-        // if (dfls.length) log('____dict.fls', dict.stem, dict.rdict)
-        if (dfls.length) {
-            cdicts.push(dict)
-            cfls.push(dfls) // each dict has array of fls
-        }
-    }
-    return {cdicts, cfls}
-}
-
-async function cleanBreacks(pcwf, dag) {
+async function cleanBreaks(pcwf, dag) {
     let breaks = makeBreaks(pcwf, dag.flexes)
-    p('_breaks', breaks)
+    // p('_breaks', breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
     // p('_breaks-ids', breaksids)
 
@@ -299,13 +284,6 @@ async function cleanBreacks(pcwf, dag) {
     p('_cleandictstems_:', cleandictstems)
 
     return {breaks, dicts}
-}
-
-function findTreePart(breaks) {
-    let heads = breaks.filter(br=> {
-        let head
-    })
-    return []
 }
 
 function prettyBeakIDs(breaks) {
@@ -342,7 +320,8 @@ function findConnection(pstr) {
     return conn
 }
 
-// TODO: χρονοκρατέω
+// only two parts, but the second can be divided into connector and a tail itself
+// last part may begin with accent
 function makeBreaks(pcwf, flexes) {
     let breaks = []
     for (let fls of flexes) {
@@ -363,6 +342,7 @@ function makeBreaks(pcwf, flexes) {
             if (conn) {
                 let re = new RegExp('^' + conn)
                 tail = tail.replace(re, '')
+                if (!tail) continue
                 res = {head, conn, tail, fls}
                 // log('_BR_c', head, conn, fls._id)
             } else {

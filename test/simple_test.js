@@ -23,7 +23,7 @@ let tests = {
     'ἀναδείκνυμι': [{segs: 'ἀνα-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}],
     'ἀποδείκνυμι': [{segs: 'ἀπο-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}, {segs: 'ἀπο-δεικν-υμι', fls: '["act.pres.ind, sg.1"]'}],
     'χρονοκρατέω': [{segs: 'χρον-ο-κρατ-έω', fls: '["act.pres.ind, sg.1","act.pres.sub, sg.1"]'}],
-    '': [{segs: '', fls: ''}],
+    'ἀντιπαραγράφω': [{segs: 'ἀντιπαρα-γραφ-ω', fls: '["act.pres.ind, sg.1","act.pres.sub, sg.1"]'}],
     '': [{segs: '', fls: ''}],
     '': [{segs: '', fls: ''}],
 }
