@@ -43,18 +43,20 @@ for (let wf of tests) {
 log('_CACHE', cache['ἀγαθοεργέω'])
 log('_CACHE', _.keys(cache).length)
 
-async function testWF(form, exp) {
-    it(`verb: - ${form} - ${expected}`, async () => {
-        let chains = await anthrax(form)
+
+async function testWF(wf, expected) {
+    it(`wf ${wf} - ${expected}`, async () => {
+        let chains = await anthrax(wf)
+        // log('_WF', wf, expected)
         let idx = 0
         for await (let chain of chains) {
             let pr = prettyVerbRes(chain)
-            // let exp = expected[idx]
+            let exp = expected[idx]
             // let segs = comb(exp.segs)
             idx++
-            log('_pr:', pr.fls, exp)
-            assert.equal(pr.fls, exp)
-            assert.equal(true, false)
+            // log('_pr.fls:', typeof pr.fls)
+            // let fls = JSON.stringify(pr.fls.sort())
+            assert.equal(pr.fls, expected)
         }
     })
 }
@@ -66,6 +68,8 @@ describe('test verbs:', () => {
         testWF(form, expected)
     }
 })
+
+
 
 
 function compactVerbFls(fls) {

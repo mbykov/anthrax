@@ -38,6 +38,7 @@ function parsePars (pars, only)  {
 
         let nums = ['sg', 'du', 'pl']
         par.parts.forEach(line => {
+            return
             let descrs = line.descr.split('-')
             let rdescr = descrs[0]
             let gend = descrs[1]
@@ -57,6 +58,7 @@ function parsePars (pars, only)  {
         })
 
         par.infs.forEach(line => {
+            return
             line.forms.forEach((form2, idy) => {
                 if (!form2) return
                 form2.split('-').forEach(form => {
