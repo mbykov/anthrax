@@ -28,8 +28,8 @@ rows = rows.slice(0, 500)
 let tests = makeVerbTests(rows)
 
 /* tests = [] */
-// tests = tests.slice(0, 2)
-log('TESTS', tests.length)
+tests = tests.slice(0, 2)
+log('TESTS', tests)
 
 
 for (let wf of tests) {
