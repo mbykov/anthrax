@@ -10,10 +10,11 @@
 
 
 * 25 мая - вчерне готово
-  - [ ] тесты simple и verb.fls
-  - [ ] в процессе доводка verb
-  - [ ] lsj, souda
+  - [X] тесты simple и verb.fls start
+  - [ ] participle, inf
   - [ ] name снова
+  - [ ] test compound
+  - [ ] lsj, souda
   - [ ] adj
   - [ ] все тесты
   - [ ]
