@@ -24,23 +24,22 @@ log('_ROWS', rows.length)
 
 let cache =  new Map();
 
-rows = rows.slice(0, 500)
+rows = rows.slice(0, 1500)
 let tests = makeVerbTests(rows)
 
 /* tests = [] */
-tests = tests.slice(0, 2)
-log('TESTS', tests)
+// tests = tests.slice(0, 20)
+log('TESTS', tests.length)
 
 
 for (let wf of tests) {
-    /* let wfkey = [wf.dict, wf.form].join('-') // plain.form нельзя, ἕδρᾳ - отвалится йота */
     if (!cache[wf.form]) cache[wf.form] = []
     if (wf.verb) cache[wf.form].push([wf.tense, wf.numper].join(', '))
-    /* else if (wf.part) cache[wf.form].push([wf.tense, wf.gend].join(' ')) */
+    else if (wf.part) cache[wf.form].push([wf.tense, [wf.gend, 'sg.nom'].join('.')].join(', '))
     // else if (wf.inf) cache[wf.form].push(wf.tense)
 }
 
-log('_CACHE', cache['ἀγαθοεργέω'])
+log('_CACHE', cache['ἀγαθοποιήσας'])
 log('_CACHE', _.keys(cache).length)
 
 

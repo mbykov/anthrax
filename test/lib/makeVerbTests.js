@@ -9,7 +9,7 @@ const numpers = "sg.1 sg.2 sg.3 du.2 du.3 pl.1 pl.2 pl.3".split(' ')
 
 export function makeVerbTests(rows, only) {
     let pars = parseText(rows, only)
-    pars = pars.slice(0, 4)
+    // pars = pars.slice(0, 4)
     let tests = parsePars (pars, only)
     return tests
 }
@@ -39,7 +39,6 @@ function parsePars (pars, only)  {
 
         let nums = ['sg', 'du', 'pl']
         par.parts.forEach(line => {
-            // return
             let descrs = line.descr.split('-')
             let rdescr = descrs[0]
             let gend = descrs[1]
