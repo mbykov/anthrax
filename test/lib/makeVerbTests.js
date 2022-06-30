@@ -58,7 +58,6 @@ function parsePars (pars, only)  {
         })
 
         par.infs.forEach(line => {
-            return
             line.forms.forEach((form2, idy) => {
                 if (!form2) return
                 form2.split('-').forEach(form => {

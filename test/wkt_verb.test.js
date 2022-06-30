@@ -36,7 +36,7 @@ for (let wf of tests) {
     if (!cache[wf.form]) cache[wf.form] = []
     if (wf.verb) cache[wf.form].push([wf.tense, wf.numper].join(', '))
     else if (wf.part) cache[wf.form].push([wf.tense, [wf.gend, 'sg.nom'].join('.')].join(', '))
-    // else if (wf.inf) cache[wf.form].push(wf.tense)
+    else if (wf.inf) cache[wf.form].push(wf.tense)
 }
 
 log('_CACHE', cache['ἀγαθοποιήσας'])
