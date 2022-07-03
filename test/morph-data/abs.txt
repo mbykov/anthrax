@@ -1,0 +1,13 @@
+ verb: *ἀμεθυστίζω # abs
+ verb: ἀντιγράφω # нету
+ verb: καταγράφω # abs
+ verb: κλῄζω # abs
+ verb: παράκειμαι # abs
+ verb: πείθομαι # abs
+ verb: περιοδεύω # abs
+ verb: ποππύζω # abs
+ verb: συγκρούομαι # abs
+ verb: ὑποβοηθῶ # abs
+
+# вычисляю part-stem. Вычисляю flakes. Нахожу verbs, из них нужные r-dicts. Нахожу кратчайший.
+# LSJ, нет keys. Есть type, pos

@@ -16,7 +16,7 @@ async function run() {
     let chains = await anthrax(wordform)
     log('\n_run chains:', wordform, chains.length)
     for (let chain of chains) {
-        // log('_chain:', chain)
+        log('_chain:', chain)
         let prettyres = prettyVerbRes(chain)
         // log('_r:', prettyres)
         res.push(prettyres)

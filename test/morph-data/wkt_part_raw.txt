@@ -9,6 +9,7 @@ dict: ἀγαθοεργέων • (agathoergéōn) m (feminine ἀγαθοεργ
  present active participle of ἀγαθοεργέω (agathoergéō)
  tense: act.pres.part
  verb: ἀγαθοεργέω
+ stem: γαθοεργ
 
 First and third declension of ἀγαθοεργέων; ἀγαθοεργέουσα; ἀγαθοεργέον (Attic)
 Number Singular Dual Plural
@@ -29,6 +30,7 @@ dict: ἀγαθοποιεόμενος • (agathopoieómenos) m (feminine ἀγ�
  present mediopassive participle of ἀγαθοποιέω (agathopoiéō)
  tense: mid.pres.part
  verb: ἀγαθοποιέω
+ stem: γαθοποι
 
 First and second declension of ἀγαθοποιεόμενος; ἀγαθοποιεομένη; ἀγαθοποιεόμενον (Attic)
 Number Singular Dual Plural
@@ -49,6 +51,7 @@ dict: ἀγαθοποιηθείς • (agathopoiētheís) m (feminine ἀγαθ�
  aorist passive participle of ἀγαθοποιέω (agathopoiéō)
  tense: pas.aor.part
  verb: ἀγαθοποιέω
+ stem: γαθοποι
 
 First and third declension of ἀγαθοποιηθείς; ἀγαθοποιηθεῖσα; ἀγαθοποιηθέν (Attic)
 Number Singular Dual Plural
@@ -69,6 +72,7 @@ dict: ἀγαθοποιηθησόμενος • (agathopoiēthēsómenos) m (fem
  future passive participle of ἀγαθοποιέω (agathopoiéō)
  tense: pas.fut.part
  verb: ἀγαθοποιέω
+ stem: γαθοποι
 
 First and second declension of ἀγαθοποιηθησόμενος; ἀγαθοποιηθησομένη; ἀγαθοποιηθησόμενον (Attic)
 Number Singular Dual Plural
@@ -89,6 +93,7 @@ dict: ἀγαθοποιησάμενος • (agathopoiēsámenos) m (feminine �
  aorist middle participle of ἀγαθοποιέω (agathopoiéō)
  tense: mid.aor.part
  verb: ἀγαθοποιέω
+ stem: γαθοποι
 
 First and second declension of ἀγαθοποιησάμενος; ἀγαθοποιησαμένη; ἀγαθοποιησάμενον (Attic)
 Number Singular Dual Plural
@@ -109,6 +114,7 @@ dict: ἀγαθοποιήσας • (agathopoiḗsās) m (feminine ἀγαθοπ
  aorist active participle of ἀγαθοποιέω (agathopoiéō)
  tense: act.aor.part
  verb: ἀγαθοποιέω
+ stem: γαθοποι
 
 First and third declension of ἀγαθοποιήσας; ἀγαθοποιήσασα; ἀγαθοποιῆσαν (Attic)
 Number Singular Dual Plural
@@ -148,6 +154,7 @@ dict: ἀγαθοποιήσων • (agathopoiḗsōn) m (feminine ἀγαθο
  future active participle of ἀγαθοποιέω (agathopoiéō)
  tense: act.fut.part
  verb: ἀγαθοποιέω
+ stem: γαθοποι
 
 First and third declension of ἀγαθοποιήσων; ἀγαθοποιήσουσα; ἀγαθοποιῆσον (Attic)
 Number Singular Dual Plural
@@ -168,6 +175,7 @@ dict: ἀγαθοποιούμενος • (agathopoioúmenos) m (feminine ἀγ�
  present mediopassive participle contracted of ἀγαθοποιέω (agathopoiéō)
  tense: mid.pres.part
  verb:  ἀγαθοποιέω
+ stem:  γαθοποι
 
 First and second declension of ἀγαθοποιούμενος; ἀγαθοποιουμένη; ἀγαθοποιούμενον (Attic)
 Number Singular Dual Plural
@@ -180,15 +188,15 @@ acc: ἀγαθοποιούμενον, ἀγαθοποιουμένην, ἀγαθ
 voc: ἀγαθοποιούμενε, ἀγαθοποιουμένη, ἀγαθοποιούμενον, ἀγαθοποιουμένω, ἀγαθοποιουμένα, ἀγαθοποιουμένω, ἀγαθοποιούμενοι, ἀγαθοποιούμεναι, ἀγαθοποιούμενα
 
 Derived forms Adverb Comparative Superlative
- ἀγαθοποιουμένως
- ἀγαθοποιουμενώτερος
- ἀγαθοποιουμενώτατος
+ ἀγαθοποιουμένως, ἀγαθοποιουμενώτερος, ἀγαθοποιουμενώτατος
 
-ἀγαλλιασθησόμενος • (agalliasthēsómenos) m (feminine ἀγαλλιασθησομένη, neuter ἀγαλλιασθησόμενον); first/second declension
+# --------------------
+dict: ἀγαλλιασθησόμενος • (agalliasthēsómenos) m (feminine ἀγαλλιασθησομένη, neuter ἀγαλλιασθησόμενον); first/second declension
 
  future passive participle of ἀγαλλιάω (agalliáō)
  tense: pas.fut.part
  verb: ἀγαλλιάω
+ stem: γαλλι
 
 First and second declension of ἀγαλλιασθησόμενος; ἀγαλλιασθησομένη; ἀγαλλιασθησόμενον (Attic)
 Number Singular Dual Plural
@@ -209,6 +217,7 @@ dict: ἀγαλλιώμενος • (agalliṓmenos) m (feminine ἀγαλλιω
  present mediopassive participle contracted of ἀγαλλιάω (agalliáō)
  tense: mid.pres.part
  verb:  ἀγαλλιάω
+ stem:  γαλλι
 
 First and second declension of ἀγαλλιώμενος; ἀγαλλιωμένη; ἀγαλλιώμενον (Attic)
 Number Singular Dual Plural
@@ -230,6 +239,7 @@ Derived forms Adverb Comparative Superlative
  present active participle contracted of ἀγαλλιάω (agalliáō)
  tense: act.pres.part
  verb: ἀγαλλιάω
+ stem: γαλλι
 
 First and third declension of ἀγαλλιῶν; ἀγαλλιῶσα; ἀγαλλιῶν (Attic)
 Number Singular Dual Plural
@@ -250,6 +260,7 @@ dict: ἀγανακτεόμενος • (aganakteómenos) m (feminine ἀγαν�
  present mediopassive participle of ἀγανακτέω (aganaktéō)
  tense: mid.pres.part
  verb: ἀγανακτέω
+ stem: γανακτ
 
 First and second declension of ἀγανακτεόμενος; ἀγανακτεομένη; ἀγανακτεόμενον (Attic)
 Number Singular Dual Plural
@@ -270,6 +281,7 @@ dict: ἀγανακτέων • (aganaktéōn) m (feminine ἀγανακτέου
  present active participle of ἀγανακτέω (aganaktéō)
  tense: act.pres.part
  verb: ἀγανακτέω
+ stem: γανακτ
 
 First and third declension of ἀγανακτέων; ἀγανακτέουσα; ἀγανακτέον (Attic)
 Number Singular Dual Plural
@@ -290,6 +302,7 @@ dict: ἀγανακτησόμενος • (aganaktēsómenos) m (feminine ἀγ�
  future middle participle of ἀγανακτέω (aganaktéō)
  tense: mid.fut.part
  verb: ἀγανακτέω
+ stem: γανακτ
 
 First and second declension of ἀγανακτησόμενος; ἀγανακτησομένη; ἀγανακτησόμενον (Attic)
 Number Singular Dual Plural
@@ -310,6 +323,7 @@ dict: ἀγανακτήσων • (aganaktḗsōn) m (feminine ἀγανακτή
  future active participle of ἀγανακτέω (aganaktéō)
  tense: act.fut.part
  verb: ἀγανακτέω
+ stem: γανακτ
 
 First and third declension of ἀγανακτήσων; ἀγανακτήσουσα; ἀγανακτῆσον (Attic)
 Number Singular Dual Plural
@@ -330,6 +344,7 @@ dict: ἀγανακτούμενος • (aganaktoúmenos) m (feminine ἀγαν�
  present mediopassive participle contracted of ἀγανακτέω (aganaktéō)
  tense: mid.pres.part
  verb: ἀγανακτέω
+ stem: γανακτ
 
 First and second declension of ἀγανακτούμενος; ἀγανακτουμένη; ἀγανακτούμενον (Attic)
 Number Singular Dual Plural
@@ -350,6 +365,7 @@ dict: ἀγανακτῶν • (aganaktôn) m (feminine ἀγανακτοῦσα
  present active participle contracted of ἀγανακτέω (aganaktéō)
  tense: act.pres.part
  verb: ἀγανακτέω
+ stem: γανακτ
 
 First and third declension of ἀγανακτῶν; ἀγανακτοῦσα; ἀγανακτοῦν (Attic)
 Number Singular Dual Plural
@@ -370,6 +386,7 @@ dict: ἀγαπαόμενος • (agapaómenos) m (feminine ἀγαπαομέν
  present mediopassive participle of ἀγαπάω (agapáō)
  tense: mid.pres.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and second declension of ἀγαπαόμενος; ἀγαπαομένη; ἀγαπαόμενον (Attic)
 Number Singular Dual Plural
@@ -390,6 +407,7 @@ dict: ἀγαπάων • (agapáōn) m (feminine ἀγαπάουσα, neuter �
  present active participle of ἀγαπάω (agapáō)
  tense: act.pres.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and third declension of ἀγαπάων; ἀγαπάουσα; ἀγαπάον (Attic)
 Number Singular Dual Plural
@@ -410,6 +428,7 @@ dict: ἀγαπηθείς • (agapētheís) m (feminine ἀγαπηθεῖσα,
  aorist passive participle of ἀγαπάω (agapáō)
  tense: pas.aor.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and third declension of ἀγαπηθείς; ἀγαπηθεῖσα; ἀγαπηθέν (Attic)
 Number Singular Dual Plural
@@ -430,6 +449,7 @@ dict: ἀγαπηθησόμενος • (agapēthēsómenos) m (feminine ἀγα
  future passive participle of ἀγαπάω (agapáō)
  tense: pas.fut.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and second declension of ἀγαπηθησόμενος; ἀγαπηθησομένη; ἀγαπηθησόμενον (Attic)
 Number Singular Dual Plural
@@ -450,6 +470,7 @@ dict: ἀγαπησάμενος • (agapēsámenos) m (feminine ἀγαπησα
  aorist middle participle of ἀγαπάω (agapáō)
  tense: mid.aor.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and second declension of ἀγαπησάμενος; ἀγαπησαμένη; ἀγαπησάμενον (Attic)
 Number Singular Dual Plural
@@ -470,6 +491,7 @@ dict: ἀγαπήσας • (agapḗsās) m (feminine ἀγαπήσασα, neute
  aorist active participle of ἀγαπάω (agapáō)
  tense: act.aor.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and third declension of ἀγαπήσας; ἀγαπήσασα; ἀγαπῆσαν (Attic)
 Number Singular Dual Plural
@@ -490,6 +512,7 @@ dict: ἀγαπησόμενος • (agapēsómenos) m (feminine ἀγαπησο
  future middle participle of ἀγαπάω (agapáō)
  tense: mid.fut.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and second declension of ἀγαπησόμενος; ἀγαπησομένη; ἀγαπησόμενον (Attic)
 Number Singular Dual Plural
@@ -510,6 +533,7 @@ dict: ἀγαπήσων • (agapḗsōn) m (feminine ἀγαπήσουσα, neu
  future active participle of ἀγαπάω (agapáō)
  tense: act.fut.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and third declension of ἀγαπήσων; ἀγαπήσουσα; ἀγαπῆσον (Attic)
 Number Singular Dual Plural
@@ -530,6 +554,7 @@ dict: ἀγαπώμενος • (agapṓmenos) m (feminine ἀγαπωμένη, 
  present mediopassive participle contracted of ἀγαπάω (agapáō)
  tense: mid.pres.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and second declension of ἀγαπώμενος; ἀγαπωμένη; ἀγαπώμενον (Attic)
 Number Singular Dual Plural
@@ -550,6 +575,7 @@ dict: ἀγαπῶν • (agapôn) m (feminine ἀγαπῶσα, neuter ἀγα�
  present active participle contracted of ἀγαπάω (agapáō)
  tense: act.pres.part
  verb: ἀγαπάω
+ stem: γαπ
 
 First and third declension of ἀγαπῶν; ἀγαπῶσα; ἀγαπῶν (Attic)
 Number Singular Dual Plural
@@ -569,7 +595,8 @@ dict: ἀγασσάμενος • (agassámenos) m (feminine ἀγασσαμέν
 
  aorist middle participle of ἄγαμαι (ágamai)
  tense: mid.aor.part
- verb: ἄγαμαι
+ verb: ἄγαμαι # abs
+ stem: γαμ
 
 First and second declension of ἀγασσάμενος; ἀγασσαμένη; ἀγασσάμενον (Attic)
 Number Singular Dual Plural
@@ -590,6 +617,7 @@ dict: ἀγγαρευόμενος • (angareuómenos) m (feminine ἀγγαρε
  present mediopassive participle of ἀγγαρεύω (angareúō)
  tense: mid.pres.part
  verb: ἀγγαρεύω
+ stem: γγαρευ
 
 First and second declension of ἀγγαρευόμενος; ἀγγαρευομένη; ἀγγαρευόμενον (Attic)
 Number Singular Dual Plural
@@ -610,6 +638,7 @@ dict: ἀγγαρευσόμενος • (angareusómenos) m (feminine ἀγγα�
  future middle participle of ἀγγαρεύω (angareúō)
  tense: mid.fut.part
  verb: ἀγγαρεύω
+ stem: γγαρευ
 
 First and second declension of ἀγγαρευσόμενος; ἀγγαρευσομένη; ἀγγαρευσόμενον (Attic)
 Number Singular Dual Plural
@@ -630,6 +659,7 @@ dict: ἀγγαρεύσων • (angareúsōn) m (feminine ἀγγαρεύσου
  future active participle of ἀγγαρεύω (angareúō)
  tense: act.fut.part
  verb: ἀγγαρεύω
+ stem: γγαρευ
 
 First and third declension of ἀγγαρεύσων; ἀγγαρεύσουσα; ἀγγαρεῦσον (Attic)
 Number Singular Dual Plural
@@ -650,6 +680,7 @@ dict: ἀγγειλάμενος • (angeilámenos) m (feminine ἀγγει�
  (Epic)/(Attic) aorist middle participle of ἀγγέλλω (angéllō)
  tense: mid.aor.part
  verb: ἀγγέλλω
+ stem: γγειλ
 
 First and second declension of ἀγγειλάμενος; ἀγγειλαμένη; ἀγγειλάμενον (Attic)
 Number Singular Dual Plural
@@ -670,6 +701,7 @@ dict: ἀγγείλας • (angeílās) m (feminine ἀγγείλασα, neut
  (Epic)/(Attic) aorist active participle of ἀγγέλλω (angéllō)
  tense: act.aor.part
  verb: ἀγγέλλω
+ stem: γγειλ
 
 First and third declension of ἀγγείλας; ἀγγείλασα; ἀγγεῖλαν (Attic)
 Number Singular Dual Plural
@@ -690,6 +722,7 @@ dict: ἀγγελείς • (angeleís) m (feminine ἀγγελεῖσα, neut
  aorist passive participle of ἀγγέλλω (angéllō)
  tense: pas.aor.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and third declension of ἀγγελείς; ἀγγελεῖσα; ἀγγελέν (Attic)
 Number Singular Dual Plural
@@ -710,6 +743,7 @@ dict: ἀγγελεόμενος • (angeleómenos) m (feminine ἀγγελε�
  future middle participle of ἀγγέλλω (angéllō)
  tense: mid.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and second declension of ἀγγελεόμενος; ἀγγελεομένη; ἀγγελεόμενον (Attic)
 Number Singular Dual Plural
@@ -730,6 +764,7 @@ dict: ἀγγελέων • (angeléōn) m (feminine ἀγγελέουσα, ne
  future active participle of ἀγγέλλω (angéllō)
  tense: act.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and third declension of ἀγγελέων; ἀγγελέουσα; ἀγγελέον (Attic)
 Number Singular Dual Plural
@@ -750,6 +785,7 @@ dict: ἀγγελησόμενος • (angelēsómenos) m (feminine ἀγγε�
  Koine future passive participle of ἀγγέλλω (angéllō)
  tense: pas.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and second declension of ἀγγελησόμενος; ἀγγελησομένη; ἀγγελησόμενον (Attic)
 Number Singular Dual Plural
@@ -770,6 +806,7 @@ dict: ἀγγελθείς • (angeltheís) m (feminine ἀγγελθεῖσα
  (Epic)/(Attic) aorist passive participle of ἀγγέλλω (angéllō)
  tense: pas.aor.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and third declension of ἀγγελθείς; ἀγγελθεῖσα; ἀγγελθέν (Attic)
 Number Singular Dual Plural
@@ -790,6 +827,7 @@ dict: ἀγγελθησόμενος • (angelthēsómenos) m (feminine ἀγ�
  future passive participle of ἀγγέλλω (angéllō)
  tense: pas.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and second declension of ἀγγελθησόμενος; ἀγγελθησομένη; ἀγγελθησόμενον (Attic)
 Number Singular Dual Plural
@@ -810,6 +848,7 @@ dict: ἀγγελιόμενος • (angeliómenos) m (feminine ἀγγελιο�
  Doric future middle participle of ἀγγέλλω (angéllō)
  tense: mid.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and second declension of ἀγγελιόμενος; ἀγγελιομένη; ἀγγελιόμενον (Attic)
 Number Singular Dual Plural
@@ -830,6 +869,7 @@ dict: ἀγγελίων • (angelíōn) m (feminine ἀγγελίουσα, neut
  Doric future active participle of ἀγγέλλω (angéllō)
  tense: act.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and third declension of ἀγγελίων; ἀγγελίουσα; ἀγγελίον (Attic)
 Number Singular Dual Plural
@@ -850,6 +890,7 @@ dict: ἀγγελλόμενος • (angellómenos) m (feminine ἀγγελλ�
  present mediopassive participle of ἀγγέλλω (angéllō)
  tense: mid.pres.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and second declension of ἀγγελλόμενος; ἀγγελλομένη; ἀγγελλόμενον (Attic)
 Number Singular Dual Plural
@@ -870,6 +911,7 @@ dict: ἀγγέλλων • (angéllōn) m (feminine ἀγγέλλουσα, ne
  present active participle of ἀγγέλλω (angéllō)
  tense: act.pres.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and third declension of ἀγγέλλων; ἀγγέλλουσα; ἀγγέλλον (Attic)
 Number Singular Dual Plural
@@ -890,6 +932,7 @@ dict: ἀγγελόμενος • (angelómenos) m (feminine ἀγγελομέ
  aorist middle participle of ἀγγέλλω (angéllō)
  tense: mid.aor.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and second declension of ἀγγελόμενος; ἀγγελομένη; ἀγγελόμενον (Attic)
 Number Singular Dual Plural
@@ -910,6 +953,7 @@ dict: ἀγγελούμενος • (angeloúmenos) m (feminine ἀγγελο�
  future middle participle contracted of ἀγγέλλω (angéllō)
  tense: mid.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and second declension of ἀγγελούμενος; ἀγγελουμένη; ἀγγελούμενον (Attic)
 Number Singular Dual Plural
@@ -930,6 +974,7 @@ dict: ἀγγελών • (angelṓn) m (feminine ἀγγελοῦσα, neuter
  aorist active participle of ἀγγέλλω (angéllō)
  tense: act.aor.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and third declension of ἀγγελών; ἀγγελοῦσα; ἀγγελόν (Attic)
 Number Singular Dual Plural
@@ -950,6 +995,7 @@ dict: ἀγγελῶν • (angelôn) m (feminine ἀγγελοῦσα, neuter
  future active participle contracted of ἀγγέλλω (angéllō)
  tense: act.fut.part
  verb: ἀγγέλλω
+ stem: γγελ
 
 First and third declension of ἀγγελῶν; ἀγγελοῦσα; ἀγγελοῦν (Attic)
 Number Singular Dual Plural
@@ -970,6 +1016,7 @@ dict: ἀγειράμενος • (ageirámenos) m (feminine ἀγειραμέν
  aorist middle participle of ἀγείρω (ageírō)
  tense: mid.aor.part
  verb: ἀγείρω
+ stem: γειρ
 
 First and second declension of ἀγειράμενος; ἀγειραμένη; ἀγειράμενον (Attic)
 Number Singular Dual Plural
@@ -990,6 +1037,7 @@ dict: ἀγείρας • (ageírās) m (feminine ἀγείρασα, neuter ἀ�
  aorist active participle of ἀγείρω (ageírō)
  tense: act.aor.part
  verb: ἀγείρω
+ stem: γειρ
 
 First and third declension of ἀγείρας; ἀγείρασα; ἀγεῖραν (Attic)
 Number Singular Dual Plural
@@ -1010,6 +1058,7 @@ dict: ἀγειρόμενος • (ageirómenos) m (feminine ἀγειρομέν
  present mediopassive participle of ἀγείρω (ageírō)
  tense: mid.pres.part
  verb: ἀγείρω
+ stem: γειρ
 
 First and second declension of ἀγειρόμενος; ἀγειρομένη; ἀγειρόμενον (Attic)
 Number Singular Dual Plural
@@ -1030,6 +1079,7 @@ dict: ἀγείρων • (ageírōn) m (feminine ἀγείρουσα, neuter �
  present active participle of ἀγείρω (ageírō)
  tense: act.pres.part
  verb: ἀγείρω
+ stem: γειρ
 
 First and third declension of ἀγείρων; ἀγείρουσα; ἀγεῖρον (Attic)
 Number Singular Dual Plural
@@ -1050,6 +1100,7 @@ dict: ἀγερεόμενος • (agereómenos) m (feminine ἀγερεομέν
  future middle participle of ἀγείρω (ageírō)
  tense: mid.fut.part
  verb: ἀγείρω
+ stem: γερ
 
 First and second declension of ἀγερεόμενος; ἀγερεομένη; ἀγερεόμενον (Attic)
 Number Singular Dual Plural
@@ -1070,6 +1121,7 @@ dict: ἀγερέων • (ageréōn) m (feminine ἀγερέουσα, neuter �
  future active participle of ἀγείρω (ageírō)
  tense: act.fut.part
  verb: ἀγείρω
+ stem: γερ
 
 First and third declension of ἀγερέων; ἀγερέουσα; ἀγερέον (Attic)
 Number Singular Dual Plural
@@ -1084,12 +1136,14 @@ voc: ἀγερέων, ἀγερέουσα, ἀγερέον, ἀγερέοντε,
 Derived forms Adverb Comparative Superlative
  ἀγερεόντως
 
+# ageiro
 # --------------------
 dict: ἀγερησόμενος • (agerēsómenos) m (feminine ἀγερησομένη, neuter ἀγερησόμενον); first/second declension
 
  future passive participle of ἀγείρω (ageírō)
  tense: pas.fut.part
  verb: ἀγείρω
+ stem: γερ
 
 First and second declension of ἀγερησόμενος; ἀγερησομένη; ἀγερησόμενον (Attic)
 Number Singular Dual Plural
@@ -1110,6 +1164,7 @@ dict: ἀγερθείς • (agertheís) m (feminine ἀγερθεῖσα, neute
  aorist passive participle of ἀγείρω (ageírō)
  tense: pas.aor.part
  verb: ἀγείρω
+ stem: γερ
 
 First and third declension of ἀγερθείς; ἀγερθεῖσα; ἀγερθέν (Attic)
 Number Singular Dual Plural
@@ -1130,6 +1185,7 @@ dict: ἀγερούμενος • (ageroúmenos) m (feminine ἀγερουμέν
  future middle participle contracted of ἀγείρω (ageírō)
  tense: mid.fut.part
  verb: ἀγείρω
+ stem: γερ
 
 First and second declension of ἀγερούμενος; ἀγερουμένη; ἀγερούμενον (Attic)
 Number Singular Dual Plural
@@ -1150,6 +1206,7 @@ dict: ἀγερῶν • (agerôn) m (feminine ἀγεροῦσα, neuter ἀγ�
  future active participle contracted of ἀγείρω (ageírō)
  tense: act.fut.part
  verb: ἀγείρω
+ stem: γερ
 
 First and third declension of ἀγερῶν; ἀγεροῦσα; ἀγεροῦν (Attic)
 Number Singular Dual Plural
@@ -1170,6 +1227,7 @@ dict: ἁγιαζόμενος • (hagiazómenos) m (feminine ἁγιαζομέ�
  present mediopassive participle of ἁγιάζω (hagiázō)
  tense: mid.pres.part
  verb: ἁγιάζω
+ stem: γιαζ
 
 First and second declension of ἁγιαζόμενος; ἁγιαζομένη; ἁγιαζόμενον (Attic)
 Number Singular Dual Plural
@@ -1190,6 +1248,7 @@ dict: ἁγιάζων • (hagiázōn) m (feminine ἁγιάζουσα, neuter �
  present active participle of ἁγιάζω (hagiázō)
  tense: act.pres.part
  verb: ἁγιάζω
+ stem: γιαζ
 
 First and third declension of ἁγιάζων; ἁγιάζουσα; ἁγιάζον (Attic)
 Number Singular Dual Plural
@@ -1210,6 +1269,7 @@ dict: ἀγορεύσων • (agoreúsōn) m (feminine ἀγορεύσουσα,
  future active participle of ἀγορεύω (agoreúō)
  tense: act.fut.part
  verb: ἀγορεύω
+ stem: γορ
 
 First and third declension of ἀγορεύσων; ἀγορεύσουσα; ἀγορεῦσον (Attic)
 Number Singular Dual Plural
@@ -1230,6 +1290,7 @@ dict: ἀγορεύων • (agoreúōn) m (feminine ἀγορεύουσα, neut
  present active participle of ἀγορεύω (agoreúō)
  tense: act.pres.part
  verb: ἀγορεύω
+ stem: γορ
 
 First and third declension of ἀγορεύων; ἀγορεύουσα; ἀγορεῦον (Attic)
 Number Singular Dual Plural
@@ -1250,6 +1311,8 @@ dict: ἀγρόμενος • (agrómenos) m (feminine ἀγρομένη, neut
  aorist middle participle of ἀγείρω (ageírō)
  tense: mid.aor.part
  verb: ἀγείρω
+ stem: γρ
+# но такого стема нет
 
 First and second declension of ἀγρόμενος; ἀγρομένη; ἀγρόμενον (Attic)
 Number Singular Dual Plural
@@ -1270,6 +1333,7 @@ dict: ἄγων • (ágōn) m (feminine ἄγουσα, neuter ἄγον); first
  present active participle of ἄγω (ágō)
  tense: act.pres.part
  verb: ἄγω
+ stem: γ
 
 First and third declension of ἄγων; ἄγουσα; ἄγον (Attic)
 Number Singular Dual Plural
@@ -1290,6 +1354,7 @@ dict: ἀδικούμενος • (adikoúmenos) m (feminine ἀδικουμέν
  present mediopassive participle contracted of ἀδικέω (adikéō)
  tense: mid.pres.part
  verb: ἀδικέω
+ stem: δικ
 
 First and second declension of ἀδικούμενος; ἀδικουμένη; ἀδικούμενον (Attic)
 Number Singular Dual Plural
@@ -1310,6 +1375,7 @@ dict: ἀείρας • (aeírās) m (feminine ἀείρασα, neuter ἀεῖ�
  aorist active participle of ἀείρω (aeírō)
  tense: act.aor.part
  verb: ἀείρω
+ stem: ειρ
 
 First and third declension of ἀείρας; ἀείρασα; ἀεῖραν (Attic)
 Number Singular Dual Plural
@@ -1330,6 +1396,7 @@ dict: αἰθόμενος • (aithómenos) m (feminine αἰθομένη, neute
  present middle participle of αἴθω (aíthō)
  tense: mid.pres.part
  verb: αἴθω
+ stem: θ
 
 First and second declension of αἰθόμενος; αἰθομένη; αἰθόμενον (Attic)
 Number Singular Dual Plural
@@ -1350,6 +1417,7 @@ dict: αἴθων • (aíthōn) m (feminine αἴθουσα, neuter αἶθον
  present active participle of αἴθω (aíthō)
  tense: act.pres.part
  verb: αἴθω
+ stem: θ
 
 First and third declension of αἴθων; αἴθουσα; αἶθον (Attic)
 Number Singular Dual Plural
@@ -1370,6 +1438,7 @@ dict: ἀΐξας • (āḯxās) m (feminine ἀΐξασα, neuter ἀῗξ�
  aorist active participle of ἀΐσσω (aḯssō)
  tense: act.aor.part
  verb: ἀΐσσω
+ stem: ϊσ
 
 First and third declension of ἀΐξας; ἀΐξασα; ἀΐξαν (Attic)
 Number Singular Dual Plural
@@ -1390,6 +1459,7 @@ dict: αἰσθόμενος • (aisthómenos) m (feminine αἰσθομένη, 
  aorist middle participle of αἰσθάνομαι (aisthánomai)
  tense: mid.aor.part
  verb: αἰσθάνομαι
+ stem: σθ
 
 First and second declension of αἰσθόμενος; αἰσθομένη; αἰσθόμενον (Attic)
 Number Singular Dual Plural
@@ -1407,9 +1477,10 @@ Derived forms Adverb Comparative Superlative
 # --------------------
 dict: αἰτίζων • (aitízōn) m (feminine αἰτίζουσα, neuter αἰτῖζον); first/third declension
 
- present active participle of αἰτίζων (aitízōn)
+ present active participle of αἰτίζω (aitízōn)
  tense: act.pres.part
- verb: αἰτίζων
+ verb: αἰτίζω # abs
+ stem: τιζ
 
 First and third declension of αἰτίζων; αἰτίζουσα; αἰτίζον (Attic)
 Number Singular Dual Plural
@@ -1430,6 +1501,7 @@ dict: ἀκμάζων • (akmázōn) m (feminine ἀκμάζουσα, neuter �
  present active participle of ἀκμάζω (akmázō)
  tense: act.pres.part
  verb: ἀκμάζω
+ stem: κμαζ
 
 First and third declension of ἀκμάζων; ἀκμάζουσα; ἀκμάζον (Attic)
 Number Singular Dual Plural
@@ -1450,6 +1522,7 @@ dict: ἀκούσας • (akoúsās) m (feminine ἀκούσασα, neuter α
  aorist active participle of ἀκούω (akoúō)
  tense: act.aor.part
  verb: ἀκούω
+ stem: κο
 
 First and third declension of ἀκούσας; ἀκούσασα; ἀκοῦσαν (Attic)
 Number Singular Dual Plural
@@ -1470,6 +1543,7 @@ dict: ἀκούων • (akoúōn) m (feminine ἀκούουσα, neuter ἀ�
  present active participle of ἀκούω (akoúō)
  tense: act.pres.part
  verb: ἀκούω
+ stem: κο
 
 First and third declension of ἀκούων; ἀκούουσα; ἀκοῦον (Attic)
 Number Singular Dual Plural
@@ -1489,7 +1563,8 @@ dict: ἀλεείνων • (aleeínōn) m (feminine ἀλεείνουσα, neut
 
  present active participle of ἀλεείνω (aleeínō)
  tense: act.pres.part
- verb: ἀλεείνω
+ verb: ἀλεείνω # abs
+ stem: λεειν
 
 First and third declension of ἀλεείνων; ἀλεείνουσα; ἀλεεῖνον (Attic)
 Number Singular Dual Plural
@@ -1509,7 +1584,8 @@ dict: ἀλευάμενος • (aleuámenos) m (feminine ἀλευαμένη, n
 
  (Epic) aorist middle participle of ἀλέομαι (aléomai)
  tense: mid.aor.part
- verb: ἀλέομαι
+ verb: ἀλέομαι # abs
+ stem: λ
 
 First and second declension of ἀλευάμενος; ἀλευαμένη; ἀλευάμενον (Epic)
 Number Singular Dual Plural
@@ -1530,6 +1606,7 @@ dict: ἁλισκόμενος • (haliskómenos) m (feminine ἁλισκομέ�
  present mediopassive participle of ἁλίσκομαι (halískomai)
  tense: mid.pres.part
  verb: ἁλίσκομαι
+ stem: λ
 
 First and second declension of ἁ̆λισκόμενος; ἁ̆λισκομένη; ἁ̆λισκόμενον (Attic)
 Number Singular Dual Plural
@@ -1554,6 +1631,7 @@ Verb
  aorist active participle of ἀλύσκω (alúskō)
  tense: act.aor.part
  verb: ἀλύσκω
+ stem: λ
 
 First and third declension of ἀλύξας; ἀλύξασα; ἀλύξαν (Attic)
 Number Singular Dual Plural
@@ -1574,6 +1652,7 @@ dict: ἀλώμενος • (alṓmenos) m (feminine ἀλωμένη, neuter ἀ
  present mediopassive participle of ἀλάομαι (aláomai)
  tense: mid.pres.part
  verb: ἀλάομαι
+ stem: λ
 
 First and second declension of ἀλώμενος; ἀλωμένη; ἀλώμενον (Attic)
 Number Singular Dual Plural
@@ -1593,7 +1672,8 @@ dict: ἀμεθυστίζων • (amethustízōn) m (feminine ἀμεθυστ
 
  present active participle of *ἀμεθυστίζω (*amethustízō)
  tense: act.pres.part
- verb: *ἀμεθυστίζω
+ verb: *ἀμεθυστίζω # abs
+ stem: μεθυστιζ
  having the color of an amethyst; amethyst-colored
 
 First and third declension of ἀμεθυστίζων; ἀμεθυστίζουσα; ἀμεθύστιζον (Attic)
@@ -1615,6 +1695,7 @@ dict: ἀμειβόμενος • (ameibómenos) m (feminine ἀμειβομέν
  present mediopassive participle of ἀμείβω (ameíbō)
  tense: mid.pres.part
  verb: ἀμείβω
+ stem: μειβ
 
 First and second declension of ἀμειβόμενος; ἀμειβομένη; ἀμειβόμενον (Attic)
 Number Singular Dual Plural
@@ -1631,7 +1712,8 @@ dict: ἀμνηστούμενος • (amnēstoúmenos) m (feminine ἀμνησ�
 
  present mediopassive participle contracted of ἀμνηστέω (amnēstéō)
  tense: mid.pres.part
- verb: ἀμνηστέω
+ verb: ἀμνηστέω # abs
+ stem: μνηστ
 
 First and second declension of ἀμνηστούμενος; ἀμνηστουμένη; ἀμνηστούμενον (Attic)
 Number Singular Dual Plural
@@ -1651,7 +1733,8 @@ dict: ἀμπεπαλών • (ampepalṓn) m (feminine ἀμπεπαλοῦσα
 
  (Epic) aorist active participle of ἀναπάλλω (anapállō)
  tense: act.aor.part
- verb: ἀναπάλλω
+ verb: ἀναπάλλω # abs # NB: pref - ἀμπε
+ stem: παλ
 
 First and third declension of ἀμπεπαλών; ἀμπεπαλοῦσα; ἀμπεπαλόν (Epic)
 Number Singular Dual Plural
@@ -1669,6 +1752,7 @@ dict: ἀμύνων • (amū́nōn) m (feminine ἀμύνουσα, neuter �
  present active participle of ἀμύνω (amū́nō)
  tense: act.pres.part
  verb: ἀμύνω
+ stem: μυν
 
 First and third declension of ἀμύνων; ἀμύνουσα; ἀμῦνον (Attic)
 Number Singular Dual Plural
@@ -1689,6 +1773,7 @@ dict: ἀναβάς • (anabā́s) m (feminine ἀναβᾶσα, neuter ἀν
  aorist active participle of ἀναβαίνω (anabaínō)
  tense: act.aor.part
  verb: ἀναβαίνω
+ stem: β
 
 First and third declension of ἀναβάς; ἀναβᾶσα; ἀναβάν (Attic)
 Number Singular Dual Plural
@@ -1709,6 +1794,7 @@ dict: ἀναγιγνωσκόμενος • (anagignōskómenos)
  present mediopassive participle of ἀναγιγνώσκω (anagignṓskō)
  tense: mid.pres.part
  verb: ἀναγιγνώσκω
+ stem: γιγνωσκ
 
 First and second declension of ἀναγιγνωσκόμενος; ἀναγιγνωσκομένη; ἀναγιγνωσκόμενον (Attic)
 Number Singular Dual Plural
@@ -1726,6 +1812,7 @@ dict: ἀναδούμενος • (anadoúmenos) m (feminine ἀναδουμέν
  present mediopassive participle of ἀναδέω (anadéō)
  tense: mid.pres.part
  verb: ἀναδέω
+ stem: δ # ? или ναδ ?
 
 First and second declension of ἀναδούμενος; ἀναδουμένη; ἀναδούμενον (Attic)
 Number Singular Dual Plural
@@ -1745,7 +1832,8 @@ dict: ἀναΐξας • (anāḯxās) m (feminine ἀναΐξασα, neuter �
 
  aorist active participle of ἀναΐσσω (anaḯssō)
  tense: act.aor.part
- verb: ἀναΐσσω
+ verb: ἀναΐσσω # abs
+ stem: ναΐσ # NB: ?
 
 First and third declension of ἀναΐξας; ἀναΐξασα; ἀναΐξαν (Attic)
 Number Singular Dual Plural
@@ -1766,6 +1854,7 @@ dict: ἀναιρεθείς • (anairetheís) m (feminine ἀναιρεθεῖ�
  aorist passive participle of ἀναιρέω (anairéō)
  tense: pas.aor.part
  verb: ἀναιρέω
+ stem: ναιρ
 
 First and third declension of ἀναιρεθείς; ἀναιρεθεῖσα; ἀναιρεθέν (Attic)
 Number Singular Dual Plural
@@ -1786,6 +1875,7 @@ dict: ἀνασκευασάμενος • (anaskeuasámenos) m (feminine ἀνα
  aorist middle participle of ἀνασκευάζω (anaskeuázō)
  tense: mid.aor.part
  verb: ἀνασκευάζω
+ stem: νασκευ
 
 First and second declension of ἀνασκευασάμενος; ἀνασκευασαμένη; ἀνασκευασάμενον (Attic)
 Number Singular Dual Plural
@@ -1805,7 +1895,8 @@ dict: ἀνάσσων • (anássōn) m (feminine ἀνάσσουσα, neuter �
 
  present active participle of ἀνάσσω (anássō)
  tense: act.pres.part
- verb: ἀνάσσω
+ verb: ἀνάσσω # abs
+ stem: νασ
 
 First and third declension of ἀνάσσων; ἀνάσσουσα; ἀνάσσον (Attic)
 Number Singular Dual Plural
@@ -1826,6 +1917,7 @@ dict: ἀναστάς • (anastā́s) m (feminine ἀναστᾶσα, neuter 
  aorist active participle of ἀνίστημι (anístēmi)
  tense: act.aor.part
  verb: ἀνίστημι
+ stem: στ
 
 First and third declension of ἀναστάς; ἀναστᾶσα; ἀναστάν (Attic)
 Number Singular Dual Plural
@@ -1845,7 +1937,8 @@ dict: ἀνασχών • (anaskhṓn) m (feminine ἀνασχοῦσα, neuter 
 
  aorist active participle of ἀνέχω (anékhō)
  tense: act.aor.part
- verb: ἀνέχω
+ verb: ἀνέχω # abs
+ stem: χ
 
 First and third declension of ἀνασχών; ἀνασχοῦσα; ἀνασχόν (Attic)
 Number Singular Dual Plural
@@ -1865,7 +1958,8 @@ dict: ἀνατελλόμενος • (anatellómenos) m (feminine ἀνατελ
 
  present passive participle of ἀνατέλλω (anatéllō)
  tense: pas.pres.part
- verb: ἀνατέλλω
+ verb: ἀνατέλλω # abs
+ stem: τελ
 
 First and second declension of ἀνατελλόμενος; ἀνατελλομένη; ἀνατελλόμενον (Attic)
 Number Singular Dual Plural
@@ -1886,6 +1980,7 @@ dict: ἀνατέλλων • (anatéllōn) m (feminine ἀνατέλλουσα,
  present active participle of ἀνατέλλω (anatéllō)
  tense: act.pres.part
  verb: ἀνατέλλω
+ stem: τελ
 
 First and third declension of ἀνατέλλων; ἀνατέλλουσα; ἀνατέλλον (Attic)
 Number Singular Dual Plural
@@ -1905,7 +2000,8 @@ dict: ἀναχωρήσας • (anakhōrḗsās) m (feminine ἀναχωρή�
 
  aorist active participle of ἀναχωρέω (anakhōréō)
  tense: act.aor.part
- verb: ἀναχωρέω
+ verb: ἀναχωρέω # abs
+ stem: χωρ
 
 First and third declension of ἀναχωρήσας; ἀναχωρήσασα; ἀναχωρῆσαν (Attic)
 Number Singular Dual Plural
@@ -1925,7 +2021,8 @@ dict: ἀνειμένος • (aneiménos) m (feminine ἀνειμένη, neuter
 
  perfect mediopassive participle of ἀνίημι (aníēmi)
  tense: mid.pf.part
- verb: ἀνίημι
+ verb: ἀνίημι # abs
+ stem: ν # NB: xxx???
 
 First and second declension of ἀνειμένος; ἀνειμένη; ἀνειμένον (Attic)
 Number Singular Dual Plural
@@ -1946,6 +2043,7 @@ dict: ἀνεσκαμμένος • (aneskamménos) m (feminine ἀνεσκαμ�
  perfect mediopassive participle of ἀνασκάπτω (anaskáptō)
  tense: mid.pf.part
  verb: ἀνασκάπτω
+ stem: σκα
 
 First and second declension of ἀνεσκαμμένος; ἀνεσκαμμένη; ἀνεσκαμμένον (Attic)
 Number Singular Dual Plural
@@ -1962,7 +2060,8 @@ dict: ἀνημμένος • (anēmménos)
 
  perfect middle/passive participle of ἀνάπτω (anáptō)
  tense: mid.pf.part
- verb: ἀνάπτω
+ verb: ἀνάπτω # abs pf
+ stem: μ # NB: ?
 
 First and second declension of ἀνημμένος; ἀνημμένη; ἀνημμένον (Attic)
 Number Singular Dual Plural
@@ -1980,6 +2079,7 @@ dict: ἀνιστάμενος • (anistámenos) m (feminine ἀνισταμέν
  present middle participle of ἀνίστημι (anístēmi)
  tense: mid.pres.part
  verb: ἀνίστημι
+ stem: στ
 
 First and second declension of ἀνιστάμενος; ἀνισταμένη; ἀνιστάμενον (Attic)
 Number Singular Dual Plural
@@ -2000,6 +2100,7 @@ dict: ἀνστάς • (anstā́s) m (feminine ἀνστᾶσα, neuter ἀν
  (Epic) aorist active participle of ἀνίστημι (anístēmi)
  tense: act.aor.part
  verb: ἀνίστημι
+ stem: στ
 
 First and third declension of ἀνστάς; ἀνστᾶσα; ἀνστάν (Attic)
 Number Singular Dual Plural
@@ -2019,7 +2120,8 @@ dict: ἀνταναγαγόμενος • (antanagagómenos) m (feminine ἀντ
 
  aorist middle participle of ἀντανάγω (antanágō)
  tense: mid.aor.part
- verb: ἀντανάγω
+ verb: ἀντανάγω # abs # NB: интересно, второй префикс, aor с редупликацией
+ stem: γαγ
 
 First and second declension of ἀνταναγαγόμενος; ἀνταναγαγομένη; ἀνταναγαγόμενον (Attic)
 Number Singular Dual Plural
@@ -2039,7 +2141,8 @@ dict: ἀντιβολήσας • (antibolḗsās) m (feminine ἀντιβολή
 
  aorist active participle of ἀντιβολέω (antiboléō)
  tense: act.aor.part
- verb: ἀντιβολέω
+ verb: ἀντιβολέω # abs
+ stem: βολ
 
 First and third declension of ἀντιβολήσας; ἀντιβολήσασα; ἀντιβολῆσαν (Attic)
 Number Singular Dual Plural
@@ -2059,7 +2162,8 @@ dict: ἀντιγραφείς • (antigrapheís) m (feminine ἀντιγραφ
 
  aorist passive participle of ἀντιγράφω (antigráphō)
  tense: pas.aor.part
- verb: ἀντιγράφω
+ verb: ἀντιγράφω # abs # нету
+ stem: γραφ
 
 First and third declension of ἀντιγραφείς; ἀντιγραφεῖσα; ἀντιγραφέν (Attic)
 Number Singular Dual Plural
@@ -2076,7 +2180,8 @@ dict: ἀντικαθεζόμενος • (antikathezómenos) m (feminine ἀν�
 
  aorist middle participle of ἀντικαθίζομαι (antikathízomai)
  tense: mid.aor.part
- verb: ἀντικαθίζομαι
+ verb: ἀντικαθίζομαι # abs, есть καθίζω
+ stem: καθ
 
 First and second declension of ἀντικαθεζόμενος; ἀντικαθεζομένη; ἀντικαθεζόμενον (Attic)
 Number Singular Dual Plural
@@ -6953,6 +7058,7 @@ dict: καθεστώς • (kathestṓs) m (feminine καθεστῶσα, neuter
  perfect active participle of καθίστημι (kathístēmi)
  tense: act.pf.part
  verb: καθίστημι
+ stem: στ
 
 
 First and third declension of καθεστώς; καθεστῶσα; καθεστός (Attic)
@@ -6971,6 +7077,7 @@ dict: καθήμενος • (kathḗmenos) m (feminine καθημένη, neuter
  perfect mediopassive participle of κάθημαι (káthēmai)
  tense: mid.pf.part
  verb: κάθημαι
+ stem: καθ
 
 First and second declension of καθήμενος; καθημένη; καθήμενον (Attic)
 Number Singular Dual Plural
@@ -6991,6 +7098,7 @@ dict: καθίζων • (kathízōn) m (feminine καθίζουσα, neuter κ�
  present active participle of καθίζω (kathízō)
  tense: act.pres.part
  verb: καθίζω
+ stem: καθ
 
 First and third declension of καθίζων; καθίζουσα; καθῖζον (Attic)
 Number Singular Dual Plural
@@ -7011,6 +7119,7 @@ dict: καθιστάμενος • (kathistámenos) m (feminine καθισταμ
  present middle participle of καθίστημι (kathístēmi)
  tense: mid.pres.part
  verb: καθίστημι
+ stem: στ
 
 First and second declension of καθιστάμενος; καθισταμένη; καθιστάμενον (Attic)
 Number Singular Dual Plural
@@ -7031,6 +7140,7 @@ dict: καθιστάς • (kathistā́s) m (feminine καθιστᾶσα, neu
  present active participle of καθίστημι (kathístēmi)
  tense: act.pres.part
  verb: καθίστημι
+ stem: στ
 
 First and third declension of καθιστάς; καθιστᾶσα; καθιστάν (Attic)
 Number Singular Dual Plural
@@ -7050,7 +7160,8 @@ dict: κακκείων • (kakkeíōn) m (feminine κακκείουσα, neuter
 
  (Epic) future active participle of κατάκειμαι (katákeimai)
  tense: act.fut.part
- verb: κατάκειμαι
+ verb: κατάκειμαι # abs
+ stem: xxx # TODO:
 
 First and third declension of κακκείων; κακκείουσα; κακκεῖον (Attic)
 Number Singular Dual Plural
@@ -7071,6 +7182,7 @@ dict: καλέων • (kaléōn) m (feminine καλέουσα, neuter καλέ�
  present active participle of καλέω (kaléō)
  tense: act.pres.part
  verb: καλέω
+ stem: καλ
 
 First and third declension of καλέων; καλέουσα; καλέον (Attic)
 Number Singular Dual Plural
@@ -7091,6 +7203,7 @@ dict: καλούμενος • (kaloúmenos) m (feminine καλουμένη, neu
  present mediopassive participle of καλέω (kaléō)
  tense: mid.pres.part
  verb: καλέω
+ stem: καλ
 
 First and second declension of καλούμενος; καλουμένη; καλούμενον (Attic)
 Number Singular Dual Plural
@@ -7108,6 +7221,7 @@ dict: καλυφείς • (kalupheís) m (feminine καλυφεῖσα, neuter 
  aorist passive participle of καλύπτω (kalúptō)
  tense: pas.aor.part
  verb: καλύπτω
+ stem: καλυφ
 
 First and third declension of καλυφείς; καλυφεῖσα; καλυφέν (Attic)
 Number Singular Dual Plural
@@ -7128,6 +7242,7 @@ dict: κανονιζόμενος • (kanonizómenos)
  present mediopassive participle of κανονίζω (kanonízō)
  tense: mid.pres.part
  verb: κανονίζω
+ stem: κανον
 
 First and second declension of κανονιζόμενος; κανονιζομένη; κανονιζόμενον (Attic)
 Number Singular Dual Plural
@@ -7147,7 +7262,8 @@ dict: καταβάλλων • (katabállōn) m (feminine καταβάλλου
 
  present active participle of καταβάλλω (katabállō)
  tense: act.pres.part
- verb: καταβάλλω
+ verb: καταβάλλω # abs
+ stem: βαλ
 
 First and third declension of καταβάλλων; καταβάλλουσα; καταβάλλον (Attic)
 Number Singular Dual Plural
@@ -7167,7 +7283,8 @@ dict: καταγραφείς • (katagrapheís) m (feminine καταγραφε�
 
  aorist passive participle of καταγράφω (katagráphō)
  tense: pas.aor.part
- verb: καταγράφω
+ verb: καταγράφω # abs
+ stem: γραφ
 
 First and third declension of καταγραφείς; καταγραφεῖσα; καταγραφέν (Attic)
 Number Singular Dual Plural
@@ -7184,7 +7301,8 @@ dict: καταδύς • (katadū́s) m (feminine καταδῦσα, neuter κ
 
  (Epic) aorist active participle of καταδύω (katadúō)
  tense: act.aor.part
- verb: καταδύω
+ verb: καταδύω # abs
+ stem: δ
 
 First and third declension of καταδύς; καταδῦσα; καταδύν (Attic)
 Number Singular Dual Plural
@@ -7204,7 +7322,8 @@ dict: καταθείς • (katatheís) m (feminine καταθεῖσα, neuter 
 
  aorist active participle of κατατίθημι (katatíthēmi)
  tense: act.aor.part
- verb: κατατίθημι
+ verb: κατατίθημι # abs
+ stem: θ # TODO ?
 
 First and third declension of καταθείς; καταθεῖσα; καταθέν (Attic)
 Number Singular Dual Plural
@@ -7225,6 +7344,7 @@ dict: κατακεχυμένος • (katakekhuménos) m (feminine κατακε�
  perfect mediopassive participle of καταχέω (katakhéō)
  tense: mid.pf.part
  verb: καταχέω
+ stem: χ
 
 First and second declension of κατακεχυμένος; κατακεχυμένη; κατακεχυμένον (Attic)
 Number Singular Dual Plural
@@ -7244,7 +7364,8 @@ dict: κατακληθείς • (kataklētheís) m (feminine κατακληθε
 
  aorist passive participle of κατακαλέω (katakaléō)
  tense: pas.aor.part
- verb: κατακαλέω
+ verb: κατακαλέω # abs
+ stem: καλ
 
 First and third declension of κατακληθείς; κατακληθεῖσα; κατακληθέν (Attic)
 Number Singular Dual Plural
@@ -7264,7 +7385,8 @@ dict: κατάξων • (katáxōn) m (feminine κατάξουσα, neuter κα
 
  future active participle of κατάγνυμι (katágnūmi)
  tense: act.fut.part
- verb: κατάγνυμι
+ verb: κατάγνυμι # abs
+ stem: γν
 
 First and third declension of κατάξων; κατάξουσα; κατάξον (Attic)
 Number Singular Dual Plural
@@ -7284,7 +7406,8 @@ dict: καταπλέων • (katapléōn) m (feminine καταπλέουσα, n
 
  present active participle of καταπλέω (katapléō)
  tense: act.pres.part
- verb: καταπλέω
+ verb: καταπλέω # abs
+ stem: πλ
 
 First and third declension of καταπλέων; καταπλέουσα; καταπλέον (Attic)
 Number Singular Dual Plural
@@ -7305,6 +7428,7 @@ dict: καταστάς • (katastā́s) m (feminine καταστᾶσα, neut
  aorist active participle of καθίστημι (kathístēmi)
  tense: act.aor.part
  verb: καθίστημι
+ stem: στ
 
 First and third declension of καταστάς; καταστᾶσα; καταστάν (Attic)
 Number Singular Dual Plural
@@ -7324,7 +7448,8 @@ dict: κατατεθνηώς • (katatethnēṓs) m (feminine κατατεθν�
 
  (Epic) perfect active participle of καταθνῄσκω (katathnḗiskō): dead
  tense: act.pf.part
- verb: καταθνῄσκω
+ verb: καταθνῄσκω # abs
+ stem: θν # TODO
 
 
 For the masculine and neuter:
@@ -7397,6 +7522,7 @@ dict: κατειλημμένος • (kateilēmménos) m (feminine κατειλ�
  perfect mediopassive participle of καταλαμβάνω (katalambánō)
  tense: mid.pf.part
  verb: καταλαμβάνω
+ stem: λημ # TODO: есть, но нет стема μμένος - mid.pf - отдельно imperative
 
 First and second declension of κατειλημμένος; κατειλημμένη; κατειλημμένον (Attic)
 Number Singular Dual Plural
@@ -7417,6 +7543,7 @@ dict: κατεσκευασμένος • (kateskeuasménos) m (feminine κατε
  mediopassive perfect participle of κατασκευάζω (kataskeuázō)
  tense: mid.pf.part
  verb: κατασκευάζω
+ stem: σκευ
 
 First and second declension of κατεσκευασμένος; κατεσκευασμένη; κατεσκευασμένον (Attic)
 Number Singular Dual Plural
@@ -7436,7 +7563,8 @@ dict: κατεσχηκώς • (kateskhēkṓs) m (feminine κατεσχηκυ�
 
  perfect active participle of κατέχω (katékhō)
  tense: act.pf.part
- verb: κατέχω
+ verb: κατέχω # abs
+ stem: σχ # TODO
 
 First and third declension of κατεσχηκώς; κατεσχηκυῖα; κατεσχηκός (Attic)
 Number Singular Dual Plural
@@ -7456,7 +7584,8 @@ dict: κατιών • (katiṓn) m (feminine κατιοῦσα, neuter κατι
 
  present active participle of κάτειμι (káteimi)
  tense: act.pres.part
- verb: κάτειμι
+ verb: κάτειμι # abs
+ stem: xxx # TODO: м.б., если нет стема, но есть conn, сделать conn стемом?
 
 First and third declension of κατιών; κατιοῦσα; κατιόν (Attic)
 Number Singular Dual Plural
@@ -7477,6 +7606,7 @@ dict: κείμενος • (keímenos) m (feminine κειμένη, neuter κεί
  present middle participle of κεῖμαι (keîmai)
  tense: mid.pres.part
  verb: κεῖμαι
+ stem: κ
 
 First and second declension of κείμενος; κειμένη; κείμενον (Attic)
 Number Singular Dual Plural
@@ -7496,7 +7626,8 @@ dict: κεκλεισμένος • (kekleisménos) m (feminine κεκλεισμ�
 
  perfect passive participle of κλῄζω (klḗizō): having been made famous, celebrated
  tense: pas.pf.part
- verb: κλῄζω
+ verb: κλῄζω # abs
+ stem: κεκλεισ # TODO ?
 
 First and second declension of κεκλεισμένος; κεκλεισμένη; κεκλεισμένον (Koine)
 Number Singular Dual Plural
@@ -7516,7 +7647,8 @@ dict: κεκορυθμένος • (kekoruthménos) m (feminine κεκορυθμ
 
  perfect passive participle of κορύσσω (korússō)
  tense: pas.pf.part
- verb: κορύσσω
+ verb: κορύσσω # abs
+ stem: κεκορυ # TODO
 
 First and second declension of κεκορυθμένος; κεκορυθμένη; κεκορυθμένον (Attic)
 Number Singular Dual Plural
@@ -7537,6 +7669,7 @@ dict: κεκτημένος • (kektēménos) m (feminine κεκτημένη, ne
  perfect mediopassive participle of κτάομαι (ktáomai)
  tense: mid.pf.part
  verb: κτάομαι
+ stem: κεκτ
 
 First and second declension of κεκτημένος; κεκτημένη; κεκτημένον (Attic)
 Number Singular Dual Plural
@@ -7557,6 +7690,7 @@ dict: κελεύων • (keleúōn) m (feminine κελεύουσα, neuter κε
  present active participle of κελεύω (keleúō)
  tense: act.pres.part
  verb: κελεύω
+ stem: κελ
 
 First and third declension of κελεύων; κελεύουσα; κελεῦον (Attic)
 Number Singular Dual Plural
@@ -7576,7 +7710,8 @@ dict: κεχαρισμένος • (kekharisménos) m (feminine κεχαρισμ
 
  perfect mediopassive participle of χαρίζομαι (kharízomai)
  tense: mid.pf.part
- verb: χαρίζομαι
+ verb: χαρίζομαι # abs
+ stem: κεχαρισ # TODO
 
 First and second declension of κεχαρισμένος; κεχαρισμένη; κεχαρισμένον (Attic)
 Number Singular Dual Plural
@@ -7596,7 +7731,8 @@ dict: κεχαριτωμένος • (kekharitōménos) m (feminine κεχαρι
 
  perfect mediopassive participle of χαριτόω (kharitóō)
  tense: mid.pf.part
- verb: χαριτόω
+ verb: χαριτόω # abs
+ stem: κεχαριτ
 
 First and second declension of κεχαριτωμένος; κεχαριτωμένη; κεχαριτωμένον (Attic)
 Number Singular Dual Plural
@@ -7617,6 +7753,7 @@ dict: κεχηνώς • (kekhēnṓs)
  perfect active participle of χάσκω (kháskō)
  tense: act.pf.part
  verb: χάσκω
+ stem: κεχην
 
 First and third declension of κεχηνώς; κεχηνυῖα; κεχηνός (Attic)
 Number Singular Dual Plural
@@ -7633,7 +7770,8 @@ dict: κεχολωμένος • (kekholōménos) m (feminine κεχολωμέν
 
  perfect passive participle of χολόω (kholóō)
  tense: pas.pf.part
- verb: χολόω
+ verb: χολόω # abs
+ stem: κεχολ
 
 First and second declension of κεχολωμένος; κεχολωμένη; κεχολωμένον (Attic)
 Number Singular Dual Plural
@@ -7654,6 +7792,7 @@ dict: κηδόμενος • (kēdómenos) m (feminine κηδομένη, neuter 
  present mediopassive participle of κήδω (kḗdō)
  tense: mid.pres.part
  verb: κήδω
+ stem: κηδ
 
 First and second declension of κηδόμενος; κηδομένη; κηδόμενον (Attic)
 Number Singular Dual Plural
@@ -7673,7 +7812,8 @@ dict: κινδυνεύων • (kindūneúōn) m (feminine κινδυνεύου�
 
  present active participle of κινδυνεύω (kindūneúō)
  tense: act.pres.part
- verb: κινδυνεύω
+ verb: κινδυνεύω # abs
+ stem: κινδυν
 
 First and third declension of κινδυνεύων; κινδυνεύουσα; κινδυνεῦον (Attic)
 Number Singular Dual Plural
@@ -7694,6 +7834,7 @@ dict: κινήσας • (kīnḗsās) m (feminine κινήσασα, neuter κι
  aorist active participle of κινέω (kīnéō)
  tense: act.aor.part
  verb: κινέω
+ stem: κιν
 
 First and third declension of κινήσας; κινήσασα; κινῆσαν (Attic)
 Number Singular Dual Plural
@@ -7713,7 +7854,8 @@ dict: κιών • (kiṓn) m (feminine κιοῦσα, neuter κιόν); first/t
 
  present active participle of κίω (kíō)
  tense: act.pres.part
- verb: κίω
+ verb: κίω # abs
+ stem: κ
 
 First and third declension of κιών; κιοῦσα; κιόν (Attic)
 Number Singular Dual Plural
@@ -7731,6 +7873,7 @@ dict: κλαίων • (klaíōn) m (feminine κλαίουσα, neuter κλαῖ
  present active participle of κλαίω (klaíō)
  tense: act.pres.part
  verb: κλαίω
+ stem: κλα
 
 First and third declension of κλαίων; κλαίουσα; κλαῖον (Attic)
 Number Singular Dual Plural
@@ -7751,6 +7894,7 @@ dict: κληθείς • (klētheís) m (feminine κληθεῖσα, neuter κλ
  aorist passive participle of καλέω (kaléō)
  tense: pas.aor.part
  verb: καλέω
+ stem: καλ
 
 First and third declension of κληθείς; κληθεῖσα; κληθέν (Attic)
 Number Singular Dual Plural
@@ -7771,6 +7915,7 @@ dict: κλύων • (klúōn) m (feminine κλύουσα, neuter κλύον); f
  present active participle of κλύω (klúō)
  tense: act.pres.part
  verb: κλύω
+ stem: κλ
 
 First and third declension of κλύων; κλύουσα; κλύον (Attic)
 Number Singular Dual Plural
@@ -7791,6 +7936,7 @@ dict: κλυών • (kluṓn) m (feminine κλυοῦσα, neuter κλυόν); 
  aorist active participle of κλύω (klúō)
  tense: act.aor.part
  verb: κλύω
+ stem: κλ
 
 First and third declension of κλυών; κλυοῦσα; κλυόν (Attic)
 Number Singular Dual Plural
@@ -7810,7 +7956,8 @@ dict: κομόων • (komóōn) m (feminine κομόωσα, neuter κομόο�
 
  present active participle uncontracted of κομάω (komáō)
  tense: act.pres.part
- verb: κομάω
+ verb: κομάω # abs
+ stem: κομ
 
 Adjective
 
@@ -7836,7 +7983,8 @@ dict: κοσμῶν • (kosmôn) m (feminine κοσμοῦσα, neuter κοσμ
 
  present active participle contracted of κοσμέω (kosméō)
  tense: act.pres.part
- verb: κοσμέω
+ verb: κοσμέω # abs
+ stem: κοσμ
 
 First and third declension of κοσμῶν; κοσμοῦσα; κοσμοῦν (Attic)
 Number Singular Dual Plural
@@ -7857,6 +8005,7 @@ dict: κρατήσας • (kratḗsās) m (feminine κρατήσασα, neuter 
  aorist active participle of κρατέω (kratéō)
  tense: act.aor.part
  verb: κρατέω
+ stem: κρατ
 
 First and third declension of κρατήσας; κρατήσασα; κρατῆσαν (Attic)
 Number Singular Dual Plural
@@ -7877,6 +8026,7 @@ dict: κρατῶν • (kratôn) m (feminine κρατοῦσα, neuter κρατ
  present active participle of κρατέω (kratéō)
  tense: act.pres.part
  verb: κρατέω
+ stem: κρατ
 
 First and third declension of κρατῶν; κρατοῦσα; κρατοῦν (Attic)
 Number Singular Dual Plural
@@ -7897,6 +8047,7 @@ dict: κρινάμενος • (krīnámenos) m (feminine κριναμένη, ne
  aorist middle participle of κρίνω (krī́nō)
  tense: mid.aor.part
  verb: κρίνω
+ stem: κριν
 
 First and second declension of κρινάμενος; κριναμένη; κρινάμενον (Attic)
 Number Singular Dual Plural
@@ -7917,6 +8068,7 @@ dict: κρίνας • (krī́nās) m (feminine κρίνασα, neuter κρ�
  aorist active participle of κρίνω (krī́nō)
  tense: act.aor.part
  verb: κρίνω
+ stem: κριν
 
 First and third declension of κρίνας; κρίνασα; κρῖναν (Attic)
 Number Singular Dual Plural
@@ -7937,6 +8089,7 @@ dict: κρίνων • (krī́nōn) m (feminine κρίνουσα, neuter κ�
  present active participle of κρίνω (krínō)
  tense: act.pres.part
  verb: κρίνω
+ stem: κριν
 
 First and third declension of κρίνων; κρίνουσα; κρῖνον (Attic)
 Number Singular Dual Plural
@@ -7956,7 +8109,8 @@ dict: κτάμενος • (ktámenos) m (feminine κταμένη, neuter κτά
 
  (Epic) middle aorist participle of κτείνω (kteínō)
  tense: mid.aor.part
- verb: κτείνω
+ verb: κτείνω # есть, но нет стема κταμεν, κταμ
+ stem: κταμεν
 
 First and second declension of κτάμενος; κταμένη; κτάμενον (Epic)
 Number Singular Dual Plural
@@ -7977,6 +8131,7 @@ dict: κτείνας • (kteínās) m (feminine κτείνασα, neuter κτε
  aorist active participle of κτείνω (kteínō)
  tense: act.aor.part
  verb: κτείνω
+ stem: κτειν
 
 First and third declension of κτείνας; κτείνασα; κτεῖναν (Attic)
 Number Singular Dual Plural
@@ -7997,6 +8152,7 @@ dict: κτησάμενος • (ktēsámenos) m (feminine κτησαμένη, ne
  aorist middle participle of κτάομαι (ktáomai)
  tense: mid.aor.part
  verb: κτάομαι
+ stem: κτ
 
 First and second declension of κτησάμενος; κτησαμένη; κτησάμενον (Attic)
 Number Singular Dual Plural
@@ -8017,6 +8173,7 @@ dict: κυκλῶν • (kuklôn)
  present active participle of κυκλόω (kuklóō)
  tense: act.pres.part
  verb: κυκλόω
+ stem: κυκλ
 
 # no data
 
@@ -8025,7 +8182,8 @@ dict: κυμαίνων • (kūmaínōn) m (feminine κυμαίνουσα, neute
 
  present participle of κυμαίνω (kūmaínō)
  tense: act.pres.part
- verb: κυμαίνω
+ verb: κυμαίνω # abs
+ stem: κυμαιν
 
 First and third declension of κυμαίνων; κυμαίνουσα; κυμαῖνον (Attic)
 Number Singular Dual Plural
@@ -8066,6 +8224,7 @@ dict: λαβών • (labṓn) m (feminine λαβοῦσα, neuter λαβόν); 
  aorist active participle of λαμβάνω (lambánō)
  tense: act.aor.part
  verb: λαμβάνω
+ stem: λαβ
 
 First and third declension of λαβών; λαβοῦσα; λαβόν (Attic)
 Number Singular Dual Plural
@@ -8086,6 +8245,7 @@ dict: λανθάνων • (lanthánōn) m (feminine λανθάνουσα, neute
  present active participle of λανθάνω (lanthánō)
  tense: act.pres.part
  verb: λανθάνω
+ stem: λανθαν
 
 First and third declension of λανθάνων; λανθάνουσα; λανθάνον (Attic)
 Number Singular Dual Plural
@@ -8106,6 +8266,7 @@ dict: λεγόμενος • (legómenos) m (feminine λεγομένη, neuter �
  present mediopassive participle of λέγω (légō)
  tense: mid.pres.part
  verb: λέγω
+ stem: λεγ
 
 First and second declension of λεγόμενος; λεγομένη; λεγόμενον (Attic)
 Number Singular Dual Plural
@@ -8126,6 +8287,7 @@ dict: λέγων • (légōn) m (feminine λέγουσα, neuter λέγον); f
  present active participle of λέγω (légō)
  tense: act.pres.part
  verb: λέγω
+ stem: λεγ
 
 First and third declension of λέγων; λέγουσα; λέγον (Attic)
 Number Singular Dual Plural
@@ -8146,6 +8308,7 @@ dict: λείβων • (leíbōn) m (feminine λείβουσα, neuter λεῖβ
  present active participle of λείβω (leíbō)
  tense: act.pres.part
  verb: λείβω
+ stem: λειβ
 
 First and third declension of λείβων; λείβουσα; λεῖβον (Attic)
 Number Singular Dual Plural
@@ -8166,6 +8329,7 @@ dict: λειπόμενος • (leipómenos) m (feminine λειπομένη, neu
  present mediopassive participle of λείπω (leípō)
  tense: mid.pres.part
  verb: λείπω
+ stem: λειπ
 
 First and second declension of λειπόμενος; λειπομένη; λειπόμενον (Attic)
 Number Singular Dual Plural
@@ -8185,7 +8349,8 @@ dict: λελασμένος • (lelāsménos) m (feminine λελασμένη, ne
 
  perfect mediopassive participle of λάθω (lā́thō)
  tense: mid.pf.part
- verb: λάθω
+ verb: λάθω # abs
+ stem: λελασ # ?
 
 First and second declension of λελασμένος; λελασμένη; λελασμένον (Attic)
 Number Singular Dual Plural
@@ -8206,6 +8371,7 @@ dict: λελυκώς • (lelukṓs)
  perfect active participle of λύω (lū́ō)
  tense: act.pf.part
  verb: λύω
+ stem: λελυκ
 
 First and third declension of λελυκώς; λελυκυῖα; λελυκός (Attic)
 Number Singular Dual Plural
@@ -8226,6 +8392,7 @@ dict: λελυμένος • (leluménos) m (feminine λελυμένη, neuter �
  perfect mediopassive participle of λύω (lū́ō)
  tense: mid.pf.part
  verb: λύω
+ stem: λελυ # mid.pf TODO
 
 First and second declension of λελυμένος; λελυμένη; λελυμένον (Attic)
 Number Singular Dual Plural
@@ -8243,6 +8410,7 @@ dict: λεχθείς • (lekhtheís) m (feminine λεχθεῖσα, neuter λε
  aorist passive participle of λέγω (légō)
  tense: pas.aor.part
  verb: λέγω
+ stem: λεχ
 
 First and third declension of λεχθείς; λεχθεῖσα; λεχθέν (Attic)
 Number Singular Dual Plural
@@ -8263,6 +8431,7 @@ dict: ληφθείς • (lēphtheís) m (feminine ληφθεῖσα, neuter λ�
  aorist passive participle of λαμβάνω (lambánō)
  tense: pas.aor.part
  verb: λαμβάνω
+ stem: ληφ
 
 First and third declension of ληφθείς; ληφθεῖσα; ληφθέν (Attic)
 Number Singular Dual Plural
@@ -8283,6 +8452,7 @@ dict: ληψόμενος • (lēpsómenos) m (feminine ληψομένη, neuter
  future middle participle of λαμβάνω (lambánō)
  tense: mid.fut.part
  verb: λαμβάνω
+ stem: ληψ
 
 First and second declension of ληψόμενος; ληψομένη; ληψόμενον (Attic)
 Number Singular Dual Plural
@@ -8323,6 +8493,7 @@ dict: λιπών • (lipṓn) m (feminine λιποῦσα, neuter λιπόν); 
  aorist active participle of λείπω (leípō)
  tense: act.aor.part
  verb: λείπω
+ stem: λιπ
 
 First and third declension of λιπών; λιποῦσα; λιπόν (Attic)
 Number Singular Dual Plural
@@ -8342,7 +8513,8 @@ dict: λισσόμενος • (lissómenos) m (feminine λισσομένη, neu
 
  present middle participle of λίσσομαι (líssomai)
  tense: mid.pres.part
- verb: λίσσομαι
+ verb: λίσσομαι # abs
+ stem: λισσ
 
 First and second declension of λισσόμενος; λισσομένη; λισσόμενον (Attic)
 Number Singular Dual Plural
@@ -8365,6 +8537,7 @@ dict: λούσας • (loúsās) m (feminine λούσασα, neuter λοῦσα
  aorist active participle of λούω (loúō)
  tense: act.aor.part
  verb: λούω
+ stem: λο
 
 First and third declension of λούσας; λούσασα; λοῦσαν (Attic)
 Number Singular Dual Plural
@@ -8385,6 +8558,7 @@ dict: λυθείς • (lutheís) m (feminine λυθεῖσα, neuter λυθέν
  aorist passive participle of λύω (lū́ō)
  tense: pas.aor.part
  verb: λύω
+ stem: λ
 
 First and third declension of λυθείς; λυθεῖσα; λυθέν (Attic)
 Number Singular Dual Plural
@@ -8405,6 +8579,7 @@ dict: λυομένη • (lūoménē)
  present mediopassive participle of λύω (lū́ō)
  tense: mid.pres.part
  verb: λύω
+ stem: λ
 
 First and second declension of λυόμενος; λυομένη; λυόμενον (Attic)
 Number Singular Dual Plural
@@ -8427,6 +8602,7 @@ dict: λυόμενον • (lūómenon)
  present mediopassive participle of λύω (lū́ō)
  tense: mid.pres.part
  verb: λύω
+ stem: λ
 
 First and second declension of λυόμενος; λυομένη; λυόμενον (Attic)
 Number Singular Dual Plural
@@ -8449,6 +8625,7 @@ dict: λυόμενος • (lūómenos)
  present mediopassive participle of λύω (lū́ō)
  tense: mid.pres.part
  verb: λύω
+ stem: λ
 
 First and second declension of λυόμενος; λυομένη; λυόμενον (Attic)
 Number Singular Dual Plural
@@ -8471,6 +8648,7 @@ dict: λύσας • (lū́sās) m (feminine λύσασα, neuter λῦσα�
  aorist active participle of λύω (lúō)
  tense: act.aor.part
  verb: λύω
+ stem: λ
 
 First and third declension of λύσας; λύσασα; λῦσαν (Attic)
 Number Singular Dual Plural
@@ -8491,6 +8669,7 @@ dict: λύων • (lū́ōn)
  present active participle of λύω (lū́ō)
  tense: act.pres.part
  verb: λύω
+ stem: λ
 
 First and third declension of λύων; λύουσα; λῦον (Attic)
 Number Singular Dual Plural
@@ -8513,6 +8692,7 @@ dict: μαθών • (mathṓn) m (feminine μαθοῦσα, neuter μαθόν);
  aorist active participle of μανθάνω (manthánō)
  tense: act.aor.part
  verb: μανθάνω
+ stem: μαθ
 
 First and third declension of μαθών; μαθοῦσα; μαθόν (Attic)
 Number Singular Dual Plural
@@ -8533,6 +8713,7 @@ dict: μαρμαίρων • (marmaírōn) m (feminine μαρμαίρουσα, n
  present active participle of μαρμαίρω (marmaírō)
  tense: act.pres.part
  verb: μαρμαίρω
+ stem: μαρμαιρ
 
 First and third declension of μαρμαίρων; μαρμαίρουσα; μαρμαῖρον (Attic)
 Number Singular Dual Plural
@@ -8553,6 +8734,7 @@ dict: μαρνάμενος • (marnámenos) m (feminine μαρναμένη, neu
  present middle participle of μάρναμαι (márnamai)
  tense: mid.pres.part
  verb: μάρναμαι
+ stem: μαρν
 
 First and second declension of μαρνάμενος; μαρναμένη; μαρνάμενον (Attic)
 Number Singular Dual Plural
@@ -8573,6 +8755,7 @@ dict: μείνας • (meínās) m (feminine μείνασα, neuter μεῖνα
  aorist active participle of μένω (ménō)
  tense: act.aor.part
  verb: μένω
+ stem: μειν
 
 First and third declension of μείνας; μείνασα; μεῖναν (Attic)
 Number Singular Dual Plural
@@ -8593,6 +8776,7 @@ dict: μέλλων • (méllōn) m (feminine μέλλουσα, neuter μέλλ�
  present active participle of μέλλω (méllō)
  tense: act.pres.part
  verb: μέλλω
+ stem: μελ
 
 First and third declension of μέλλων; μέλλουσα; μέλλον (Attic)
 Number Singular Dual Plural
@@ -8613,6 +8797,7 @@ dict: μέλων • (mélōn) m (feminine μέλουσα, neuter μέλον); f
  present active participle of μέλω (mélō)
  tense: act.pres.part
  verb: μέλω
+ stem: μελ
 
 First and third declension of μέλων; μέλουσα; μέλον (Attic)
 Number Singular Dual Plural
@@ -8632,7 +8817,8 @@ dict: μεμαώς • (memaṓs) m (feminine μεμαυῖα, neuter μεμαό
 
  perfect active participle of μέμονα (mémona)
  tense: act.pf.part
- verb: μέμονα
+ verb: μέμονα # abs
+ stem: μεμ
 
 First and third declension of μεμαώς; μεμαυῖα; μεμαός (Attic)
 Number Singular Dual Plural
@@ -8668,6 +8854,7 @@ dict: μεμνημένος • (memnēménos) m (feminine μεμνημένη, ne
  perfect middle participle of μιμνήσκω (mimnḗskō)
  tense: mid.pf.part
  verb: μιμνήσκω
+ stem: μεμνημ # TODO mid.pf
 
 First and second declension of μεμνημένος; μεμνημένη; μεμνημένον (Attic)
 Number Singular Dual Plural
@@ -8687,7 +8874,8 @@ dict: μενεαίνων • (meneaínōn) m (feminine μενεαίνουσα, n
 
  present active participle of μενεαίνω (meneaínō)
  tense: act.pres.part
- verb: μενεαίνω
+ verb: μενεαίνω # abs
+ stem: μενεαιν
 
 First and third declension of μενεαίνων; μενεαίνουσα; μενεαῖνον (Attic)
 Number Singular Dual Plural
@@ -8708,6 +8896,7 @@ dict: μένων • (ménōn) m (feminine μένουσα, neuter μένον); f
  present active participle of μένω (ménō)
  tense: act.pres.part
  verb: μένω
+ stem: μεν
 
 First and third declension of μένων; μένουσα; μένον (Attic)
 Number Singular Dual Plural
@@ -8727,7 +8916,8 @@ dict: μερμηρίζων • (mermērízōn) m (feminine μερμηρίζου�
 
  present active participle of μερμηρίζω (mermērízō)
  tense: act.pres.part
- verb: μερμηρίζω
+ verb: μερμηρίζω # abs
+ stem: μερμηρ
 
 First and third declension of μερμηρίζων; μερμηρίζουσα; μερμηρίζον (Attic)
 Number Singular Dual Plural
@@ -8747,7 +8937,9 @@ dict: μετάλμενος • (metálmenos) m (feminine μεταλμένη, neu
 
  (Epic) aorist middle participle of μεθάλλομαι (methállomai)
  tense: mid.aor.part
- verb: μεθάλλομαι
+ verb: μεθάλλομαι # abs
+# =============== HERE stopped stems
+
 
 First and second declension of μετάλμενος; μεταλμένη; μετάλμενον (Epic)
 Number Singular Dual Plural
@@ -8767,7 +8959,7 @@ dict: μετελθών • (metelthṓn) m (feminine μετελθοῦσα, neut
 
  aorist active participle of μετέρχομαι (metérkhomai)
  tense: act.aor.part
- verb: μετέρχομαι
+ verb: μετέρχομαι # abs
 
 First and third declension of μετελθών; μετελθοῦσα; μετελθόν (Attic)
 Number Singular Dual Plural
@@ -8787,7 +8979,7 @@ dict: μετών • (metṓn) m (feminine μετοῦσα, neuter μετόν); 
 
  present active participle of μέτειμι (méteimi, “to have a share in”)
  tense: act.pres.part
- verb: μέτειμι
+ verb: μέτειμι # abs
 
 First and third declension of μετών; μετοῦσα; μετόν (Attic)
 Number Singular Dual Plural
@@ -8827,7 +9019,7 @@ dict: μογήσας • (mogḗsās) m (feminine μογήσασα, neuter μο�
 
  aorist active participle of μογέω (mogéō)
  tense: act.aor.part
- verb: μογέω
+ verb: μογέω # abs
 
 First and third declension of μογήσας; μογήσασα; μογῆσαν (Attic)
 Number Singular Dual Plural
@@ -8849,7 +9041,7 @@ dict: ναιετάων • (naietáōn) m (feminine ναιετάουσα, ναι
 
  present active participle of ναιετάω (naietáō)
  tense: act.pres.part
- verb: ναιετάω
+ verb: ναιετάω # abs
 
 First and third declension of ναιετάων; ναιετάουσα; ναιετάον (Epic)
 Number Singular Dual Plural
@@ -8908,7 +9100,7 @@ dict: ναυμαχῶν • (naumakhôn) m (feminine ναυμαχοῦσα, neut
 
  contracted present active participle of ναυμαχέω (naumakhéō)
  tense: act.pres.part
- verb: ναυμαχέω
+ verb: ναυμαχέω # abs
 
 First and third declension of ναυμαχῶν; ναυμαχοῦσα; ναυμαχοῦν (Attic)
 Number Singular Dual Plural
@@ -8968,7 +9160,7 @@ dict: νεμόμενος • (nemómenos) m (feminine νεμομένη, neuter �
 
  present mediopassive participle of νέμω (némō)
  tense: mid.pres.part
- verb: νέμω
+ verb: νέμω # abs
 
 First and second declension of νεμόμενος; νεμομένη; νεμόμενον (Attic)
 Number Singular Dual Plural
@@ -9148,7 +9340,7 @@ dict: νοστήσας • (nostḗsās) m (feminine νοστήσασα, neuter 
 
  aorist active participle of νοστέω (nostéō)
  tense: act.aor.part
- verb: νοστέω
+ verb: νοστέω # abs
 
 First and third declension of νοστήσας; νοστήσασα; νοστῆσαν (Attic)
 Number Singular Dual Plural
@@ -9230,7 +9422,7 @@ dict: ξυμπολεμήσας • (xumpolemḗsās) m (feminine ξυμπολε�
 
  (Old Attic) aorist active participle of ξυμπολεμέω (xumpoleméō)
  tense: act.aor.part
- verb: ξυμπολεμέω
+ verb: ξυμπολεμέω # abs
 
 First and third declension of ξυμπολεμήσας; ξυμπολεμήσασα; ξυμπολεμῆσαν (Attic)
 Number Singular Dual Plural
@@ -9250,7 +9442,7 @@ dict: ξυμφέρων • (xumphérōn) m (feminine ξυμφέρουσα, neute
 
  present active participle of ξυμφέρω (xumphérō): Old Attic form of συμφέρων (sumphérōn)
  tense: act.pres.part
- verb: ξυμφέρω
+ verb: ξυμφέρω # abs
 
 First and third declension of ξυμφέρων; ξυμφέρουσα; ξυμφέρον (Attic)
 Number Singular Dual Plural
@@ -9270,7 +9462,7 @@ dict: ξυναγογών • (xunagogṓn) m (feminine ξυναγογοῦσα, 
 
  aorist active participle of ξυνάγω (xunágō)
  tense: act.aor.part
- verb: ξυνάγω
+ verb: ξυνάγω # abs
 
 First and third declension of ξυναγογών; ξυναγογοῦσα; ξυναγογόν (Attic)
 Number Singular Dual Plural
@@ -9290,7 +9482,7 @@ dict: ξυνειδώς • (xuneidṓs) m (feminine ξυνειδυῖα, neuter 
 
  perfect active participle of ξύνοιδα (xúnoida)
  tense: act.pf.part
- verb: ξύνοιδα
+ verb: ξύνοιδα # abs
 
 First and third declension of ξυνειδώς; ξυνειδυῖα; ξυνειδός (Attic)
 Number Singular Dual Plural
@@ -9310,7 +9502,7 @@ dict: ξυνιστάμενος • (xunistámenos) m (feminine ξυνισταμ�
 
  present middle participle of ξυνίστημι (xunístēmi)
  tense: mid.pres.part
- verb: ξυνίστημι
+ verb: ξυνίστημι # abs
 
 First and second declension of ξυνιστάμενος; ξυνισταμένη; ξυνιστάμενον (Attic)
 Number Singular Dual Plural
@@ -9330,7 +9522,7 @@ dict: ξυνοικισθείς • (xunoikistheís) m (feminine ξυνοικισ
 
  aorist passive participle of ξυνοικίζω (xunoikízō)
  tense: pas.aor.part
- verb: ξυνοικίζω
+ verb: ξυνοικίζω # abs
 
 First and third declension of ξυνοικισθείς; ξυνοικισθεῖσα; ξυνοικισθέν (Attic)
 Number Singular Dual Plural
@@ -9350,7 +9542,7 @@ dict: ξυντεθαμμένος • (xuntethamménos) m (feminine ξυντεθ�
 
  perfect mediopassive participle of ξυνθάπτω (xuntháptō)
  tense: mid.pf.part
- verb: ξυνθάπτω
+ verb: ξυνθάπτω # abs
 
 First and second declension of ξυντεθαμμένος; ξυντεθαμμένη; ξυντεθαμμένον (Attic)
 Number Singular Dual Plural
@@ -9372,7 +9564,7 @@ dict: ὀδυρόμενος • (odūrómenos) m (feminine ὀδυρομένη, 
 
  present middle participle of ὀδύρομαι (odū́romai)
  tense: mid.pres.part
- verb: ὀδύρομαι
+ verb: ὀδύρομαι # abs
 
 First and second declension of ὀδυρόμενος; ὀδυρομένη; ὀδυρόμενον (Attic)
 Number Singular Dual Plural
@@ -9432,7 +9624,7 @@ dict: οἰκίζων • (oikízōn) m (feminine οἰκίζουσα, neuter ο
 
  present active participle of οἰκίζω (oikízō)
  tense: act.pres.part
- verb: οἰκίζω
+ verb: οἰκίζω # abs
 
 First and third declension of οἰκίζων; οἰκίζουσα; οἰκίζον (Attic)
 Number Singular Dual Plural
@@ -9452,7 +9644,7 @@ dict: οἰκισθείς • (oikistheís) m (feminine οἰκισθεῖσα, 
 
  aorist passive participle of οἰκίζω (oikízō)
  tense: pas.aor.part
- verb: οἰκίζω
+ verb: οἰκίζω # abs
 
 First and third declension of οἰκισθείς; οἰκισθεῖσα; οἰκισθέν (Attic)
 Number Singular Dual Plural
@@ -9512,7 +9704,7 @@ dict: οἰμώξας • (oimṓxās) m (feminine οἰμώξασα, neuter ο�
 
  aorist active participle of οἰμώζω (oimṓzō)
  tense: act.aor.part
- verb: οἰμώζω
+ verb: οἰμώζω # abs
 
 First and third declension of οἰμώξας; οἰμώξασα; οἰμῶξαν (Attic)
 Number Singular Dual Plural
@@ -9532,7 +9724,7 @@ dict: οἰόμενος • (oiómenos) m (feminine οἰομένη, neuter ο�
 
  present mediopassive participle of οἴομαι (oíomai)
  tense: mid.pres.part
- verb: οἴομαι
+ verb: οἴομαι #  TODO есть, но BUG - _id=''
 
 First and second declension of οἰόμενος; οἰομένη; οἰόμενον (Attic)
 Number Singular Dual Plural
@@ -9552,7 +9744,7 @@ dict: οἰχόμενος • (oikhómenos) m (feminine οἰχομένη, neute
 
  present mediopassive participle of οἴχομαι (oíkhomai)
  tense: mid.pres.part
- verb: οἴχομαι
+ verb: οἴχομαι # abs
 
 Adjective
 
@@ -9658,7 +9850,7 @@ dict: ὁμοκλήσας • (homoklḗsās) m (feminine ὁμοκλήσασα,
 
  aorist active participle of ὁμοκλέω (homokléō)
  tense: act.aor.part
- verb: ὁμοκλέω
+ verb: ὁμοκλέω # abs
 
 First and third declension of ὁμοκλήσας; ὁμοκλήσασα; ὁμοκλῆσαν (Attic)
 Number Singular Dual Plural
@@ -9678,7 +9870,7 @@ dict: ὀνειδίζων • (oneidízōn) m (feminine ὀνειδίζουσ�
 
  present active participle of ὀνειδίζω (oneidízō)
  tense: act.pres.part
- verb: ὀνειδίζω
+ verb: ὀνειδίζω # abs
 
 First and third declension of ὀνειδίζων; ὀνειδίζουσα; ὀνειδίζον (Attic)
 Number Singular Dual Plural
@@ -9718,7 +9910,7 @@ dict: ὀρούσας • (oroúsās) m (feminine ὀρούσασα, neuter ὀ�
 
  aorist active participle of ὀρούω (oroúō)
  tense: act.aor.part
- verb: ὀρούω
+ verb: ὀρούω # abs
 
 First and third declension of ὀρούσας; ὀρούσασα; ὀροῦσαν (Attic)
 Number Singular Dual Plural
@@ -9798,7 +9990,7 @@ dict: οὐτάμενος • (outámenos) m (feminine οὐταμένη, neuter
 
  (Epic) aorist middle participle of οὐτάω (outáō)
  tense: mid.aor.part
- verb: οὐτάω
+ verb: οὐτάω # abs
 
 First and second declension of οὐτάμενος; οὐταμένη; οὐτάμενον (Epic)
 Number Singular Dual Plural
@@ -9940,7 +10132,7 @@ dict: παπταίνων • (paptaínōn) m (feminine παπταίνουσα, n
 
  present active participle of παπταίνω (paptaínō)
  tense: act.pres.part
- verb: παπταίνω
+ verb: παπταίνω # abs
 
 First and third declension of παπταίνων; παπταίνουσα; παπταῖνον (Attic)
 Number Singular Dual Plural
@@ -9960,7 +10152,7 @@ dict: παπτήνας • (paptḗnās) m (feminine παπτήνασα, neuter 
 
  aorist active participle of παπταίνω (paptaínō)
  tense: act.aor.part
- verb: παπταίνω
+ verb: παπταίνω # abs
 
 First and third declension of παπτήνας; παπτήνασα; παπτῆναν (Attic)
 Number Singular Dual Plural
@@ -9980,7 +10172,7 @@ dict: παρακείμενος • (parakeímenos) m (feminine παρακειμ�
 
  perfect mediopassive participle of παράκειμαι (parákeimai)
  tense: mid.pf.part
- verb: παράκειμαι
+ verb: παράκειμαι # abs
 
 First and second declension of παρακείμενος; παρακειμένη; παρακείμενον (Attic)
 Number Singular Dual Plural
@@ -10040,7 +10232,7 @@ dict: παραταξάμενος • (parataxámenos) m (feminine παραταξ
 
  aorist middle participle of παρατάσσω (paratássō)
  tense: mid.aor.part
- verb: παρατάσσω
+ verb: παρατάσσω # abs
 
 First and second declension of παραταξάμενος; παραταξαμένη; παραταξάμενον (Attic)
 Number Singular Dual Plural
@@ -10060,7 +10252,7 @@ dict: παρατυχών • (paratukhṓn) m (feminine παρατυχοῦσα,
 
  aorist active participle of παρατυγχάνω (paratunkhánō)
  tense: act.aor.part
- verb: παρατυγχάνω
+ verb: παρατυγχάνω # abs
 
 First and third declension of παρατυχών; παρατυχοῦσα; παρατυχόν (Attic)
 Number Singular Dual Plural
@@ -10100,7 +10292,7 @@ dict: παρεσκευασμένος • (pareskeuasménos) m (feminine παρε
 
  perfect mediopassive participle of παρασκευάζω (paraskeuázō)
  tense: mid.pf.part
- verb: παρασκευάζω
+ verb: παρασκευάζω # abs
 
 First and second declension of παρεσκευασμένος; παρεσκευασμένη; παρεσκευασμένον (Attic)
 Number Singular Dual Plural
@@ -10241,7 +10433,7 @@ dict: πειθόμενος • (peithómenos) m (feminine πειθομένη, ne
 
  present mediopassive participle of πείθομαι (peíthomai)
  tense: mid.pres.part
- verb: πείθομαι
+ verb: πείθομαι # abs
 
 First and second declension of πειθόμενος; πειθομένη; πειθόμενον (Attic)
 Number Singular Dual Plural
@@ -10278,7 +10470,7 @@ dict: πειρητίζων • (peirētízōn) m (feminine πειρητίζου�
 
  present active participle of πειρητίζω (peirētízō)
  tense: act.pres.part
- verb: πειρητίζω
+ verb: πειρητίζω # abs
 
 First and third declension of πειρητίζων; πειρητίζουσα; πειρητίζον (Epic)
 Number Singular Dual Plural
@@ -10298,7 +10490,7 @@ dict: πειρώμενος • (peirṓmenos) m (feminine πειρωμένη, ne
 
  present mediopassive participle contracted of πειράω (peiráō)
  tense: mid.pres.part
- verb: πειράω
+ verb: πειράω # abs
 
 First and second declension of πειρώμενος; πειρωμένη; πειρώμενον (Attic)
 Number Singular Dual Plural
@@ -10418,7 +10610,7 @@ dict: πεπεισμένος • (pepeisménos) m (feminine πεπεισμένη
 
  perfect mediopassive participle of πείθομαι (peíthomai)
  tense: mid.pf.part
- verb: πείθομαι
+ verb: πείθομαι # abs
 
 First and second declension of πεπεισμένος; πεπεισμένη; πεπεισμένον (Attic)
 Number Singular Dual Plural
@@ -10529,7 +10721,7 @@ dict: περαιούμενος • (peraioúmenos) m (feminine περαιουμ�
 
  present mediopassive participle of περαιόω (peraióō)
  tense: mid.pres.part
- verb: περαιόω
+ verb: περαιόω # abs
 
 First and second declension of περαιούμενος; περαιουμένη; περαιούμενον (Attic)
 Number Singular Dual Plural
@@ -10549,7 +10741,7 @@ dict: περιιών • (periiṓn) m (feminine περιιοῦσα, neuter π�
 
  present active participle of περίειμι (períeimi, “to go around”)
  tense: act.pres.part
- verb: περίειμι
+ verb: περίειμι # abs
 
 First and third declension of περιιών; περιιοῦσα; περιιόν (Attic)
 Number Singular Dual Plural
@@ -10569,7 +10761,7 @@ dict: περιοδεύων • (periodeúōn) m (feminine περιοδεύουσ
 
  present active participle of περιοδεύω (periodeúō)
  tense: act.pres.part
- verb: περιοδεύω
+ verb: περιοδεύω # abs
 
 First and third declension of περιοδεύων; περιοδεύουσα; περιοδεῦον (Attic)
 Number Singular Dual Plural
@@ -10605,7 +10797,7 @@ dict: περιποιησάμενος • (peripoiēsámenos) m (feminine περ�
 
  aorist middle participle of περιποιέω (peripoiéō)
  tense: mid.aor.part
- verb: περιποιέω
+ verb: περιποιέω # abs
 
 First and second declension of περιποιησάμενος; περιποιησαμένη; περιποιησάμενον (Attic)
 Number Singular Dual Plural
@@ -10625,7 +10817,7 @@ dict: περισπαόμενος • (perispaómenos) m (feminine περισπα
 
  uncontracted present mediopassive participle of περισπάω (perispáō)
  tense: mid.pres.part
- verb: περισπάω
+ verb: περισπάω # abs
 
 First and second declension of περισπαόμενος; περισπαομένη; περισπαόμενον (Attic)
 Number Singular Dual Plural
@@ -10703,7 +10895,7 @@ dict: περιφρονῶν • (periphronôn) m (feminine περιφρονοῦ
 
  present active participle contracted of περιφρονέω (periphronéō)
  tense: act.pres.part
- verb: περιφρονέω
+ verb: περιφρονέω # abs
 
 First and third declension of περιφρονῶν; περιφρονοῦσα; περιφρονοῦν (Attic)
 Number Singular Dual Plural
@@ -10863,7 +11055,7 @@ dict: πλειστηριάσας • (pleistēriásās) m (feminine πλεισ
 
  aorist active participle of πλειστηριάζω (pleistēriázō): "who raised the price"
  tense: act.aor.part
- verb: πλειστηριάζω
+ verb: πλειστηριάζω # abs
 
 First and third declension of πλειστηριάσας; πλειστηριάσασα; πλειστηριάσαν (Attic)
 Number Singular Dual Plural
@@ -11028,7 +11220,7 @@ dict: πολεμησείων • (polemēseíōn) m (feminine πολεμησεί
 
  present active participle of πολεμησείω (polemēseíō)
  tense: act.pres.part
- verb: πολεμησείω
+ verb: πολεμησείω # abs
 
 First and third declension of πολεμησείων; πολεμησείουσα; πολεμησεῖον (Attic)
 Number Singular Dual Plural
@@ -11088,7 +11280,7 @@ dict: πολιορκῶν • (poliorkôn) m (feminine πολιορκοῦσα, 
 
  present active participle of πολιορκέω (poliorkéō)
  tense: act.pres.part
- verb: πολιορκέω
+ verb: πολιορκέω # abs
 
 First and third declension of πολιορκῶν; πολιορκοῦσα; πολιορκοῦν (Attic)
 Number Singular Dual Plural
@@ -11108,7 +11300,7 @@ dict: πολιτεύσων • (polīteúsōn) m (feminine πολιτεύσου�
 
  future active participle of πολιτεύω (polīteúō)
  tense: act.fut.part
- verb: πολιτεύω
+ verb: πολιτεύω # abs
 
 First and third declension of πολιτεύσων; πολιτεύσουσα; πολιτεῦσον (Attic)
 Number Singular Dual Plural
@@ -11128,7 +11320,7 @@ dict: ποππύζων • (poppúzōn) m (feminine ποππύζουσα, ne
 
  present active participle of ποππύζω (poppúzō)
  tense: act.pres.part
- verb: ποππύζω
+ verb: ποππύζω # abs
  smacking one's lips, clucking
 
 First and third declension of ποππύζων; ποππύζουσα; ποππύζον (Attic)
@@ -11189,7 +11381,7 @@ dict: πρεσβευσόμενος • (presbeusómenos) m (feminine πρεσβ�
 
  future middle participle of πρεσβεύω (presbeúō)
  tense: mid.fut.part
- verb: πρεσβεύω
+ verb: πρεσβεύω # abs
 
 First and second declension of πρεσβευσόμενος; πρεσβευσομένη; πρεσβευσόμενον (Attic)
 Number Singular Dual Plural
@@ -11209,7 +11401,7 @@ dict: προγεγενημένος • (progegenēménos) m (feminine προγε
 
  perfect middle participle of προγίγνομαι (progígnomai)
  tense: mid.pf.part
- verb: προγίγνομαι
+ verb: προγίγνομαι # abs
 
 First and second declension of προγεγενημένος; προγεγενημένη; προγεγενημένον (Attic)
 Number Singular Dual Plural
@@ -11229,7 +11421,7 @@ dict: προειδώς • (proeidṓs) m (feminine προειδυῖα, neuter 
 
  perfect active participle of πρόοιδα (próoida)
  tense: act.pf.part
- verb: πρόοιδα
+ verb: πρόοιδα # abs
 
 First and third declension of προειδώς; προειδυῖα; προειδός (Attic)
 Number Singular Dual Plural
@@ -11249,7 +11441,7 @@ dict: προελθών • (proelthṓn) m (feminine προελθοῦσα, neut
 
  aorist active participle of προέρχομαι (proérkhomai)
  tense: act.aor.part
- verb: προέρχομαι
+ verb: προέρχομαι # abs
 
 First and third declension of προελθών; προελθοῦσα; προελθόν (Attic)
 Number Singular Dual Plural
@@ -11269,7 +11461,7 @@ dict: προερῶν • (proerôn) m (feminine προεροῦσα, neuter π�
 
  future active participle of προερέω (proeréō)
  tense: act.fut.part
- verb: προερέω
+ verb: προερέω # abs
 
 First and third declension of προερῶν; προεροῦσα; προεροῦν (Attic)
 Number Singular Dual Plural
@@ -11312,7 +11504,7 @@ dict: προϊσχόμενος • (proïskhómenos) m (feminine προϊσχο�
 
  present mediopassive participle of προΐσχω (proḯskhō)
  tense: mid.pres.part
- verb: προΐσχω
+ verb: προΐσχω # abs
 
 First and second declension of προϊσχόμενος; προϊσχομένη; προϊσχόμενον (Attic)
 Number Singular Dual Plural
@@ -11332,7 +11524,7 @@ dict: προκαταλαμβάνων • (prokatalambánōn) m (feminine προ�
 
  present active participle of προκαταλαμβάνω (prokatalambánō)
  tense: act.pres.part
- verb: προκαταλαμβάνω
+ verb: προκαταλαμβάνω # abs
 
 First and third declension of προκαταλαμβάνων; προκαταλαμβάνουσα; προκαταλαμβάνον (Attic)
 Number Singular Dual Plural
@@ -11352,7 +11544,7 @@ dict: προκαταρχόμενος • (prokatarkhómenos) m (feminine προ�
 
  present mediopassive participle of προκατάρχω (prokatárkhō)
  tense: mid.pres.part
- verb: προκατάρχω
+ verb: προκατάρχω # abs
 
 First and second declension of προκαταρχόμενος; προκαταρχομένη; προκαταρχόμενον (Attic)
 Number Singular Dual Plural
@@ -11372,7 +11564,7 @@ dict: προκείμενος • (prokeímenos) m (feminine προκειμένη
 
  present middle participle of πρόκειμαι (prókeimai)
  tense: mid.pres.part
- verb: πρόκειμαι
+ verb: πρόκειμαι # abs
 
 First and second declension of προκείμενος; προκειμένη; προκείμενον (Attic)
 Number Singular Dual Plural
@@ -11392,7 +11584,7 @@ dict: προκληθείς • (proklētheís) m (feminine προκληθεῖσ
 
  aorist passive participle of προκαλέω (prokaléō)
  tense: pas.aor.part
- verb: προκαλέω
+ verb: προκαλέω # abs
 
 First and third declension of προκληθείς; προκληθεῖσα; προκληθέν (Attic)
 Number Singular Dual Plural
@@ -11412,7 +11604,7 @@ dict: προορώμενος • (proorṓmenos) m (feminine προορωμέν�
 
  present mediopassive participle contracted of προοράω (prooráō)
  tense: mid.pres.part
- verb: προοράω
+ verb: προοράω # abs
 
 First and second declension of προορώμενος; προορωμένη; προορώμενον (Attic)
 Number Singular Dual Plural
@@ -11432,7 +11624,7 @@ dict: προπέμψας • (propémpsās) m (feminine προπέμψασα, ne
 
  aorist active participle of προπέμπω (propémpō)
  tense: act.aor.part
- verb: προπέμπω
+ verb: προπέμπω # abs
 
 First and third declension of προπέμψας; προπέμψασα; προπέμψαν (Attic)
 Number Singular Dual Plural
@@ -11451,7 +11643,7 @@ Derived forms Adverb Comparative Superlative
 
  aorist active participle of προσβάλλω (prosbállō)
  tense: act.aor.part
- verb: προσβάλλω
+ verb: προσβάλλω # abs
 
 First and third declension of προσβαλών; προσβαλοῦσα; προσβαλόν (Attic)
 Number Singular Dual Plural
@@ -11471,7 +11663,7 @@ dict: προσγενόμενος • (prosgenómenos) m (feminine προσγεν
 
  aorist middle participle of προσγίγνομαι (prosgígnomai)
  tense: mid.aor.part
- verb: προσγίγνομαι
+ verb: προσγίγνομαι # abs
 
 First and second declension of προσγενόμενος; προσγενομένη; προσγενόμενον (Attic)
 Number Singular Dual Plural
@@ -11491,7 +11683,7 @@ dict: προσιών • (prosiṓn) m (feminine προσιοῦσα, neuter π�
 
  present active participle of πρόσειμι (próseimi)
  tense: act.pres.part
- verb: πρόσειμι
+ verb: πρόσειμι # abs
 
 First and third declension of προσιών; προσιοῦσα; προσιόν (Attic)
 Number Singular Dual Plural
@@ -11511,7 +11703,7 @@ dict: προσκαθεζόμενος • (proskathezómenos) m (feminine προ�
 
  present/aorist middle participle of προσκαθέζομαι (proskathézomai)
  tense: mid.aor.part
- verb: προσκαθέζομαι
+ verb: προσκαθέζομαι # abs
 
 First and second declension of προσκαθεζόμενος; προσκαθεζομένη; προσκαθεζόμενον (Attic)
 Number Singular Dual Plural
@@ -11546,7 +11738,7 @@ dict: προσλαβών • (proslabṓn) m (feminine προσλαβοῦσα, 
 
  aorist active participle of προσλαμβάνω (proslambánō)
  tense: act.aor.part
- verb: προσλαμβάνω
+ verb: προσλαμβάνω # abs
 
 First and third declension of προσλαβών; προσλαβοῦσα; προσλαβόν (Attic)
 Number Singular Dual Plural
@@ -11566,7 +11758,7 @@ dict: προσοικῶν • (prosoikôn) m (feminine προσοικοῦσα, 
 
  present active participle contracted of προσοικέω (prosoikéō)
  tense: act.pres.part
- verb: προσοικέω
+ verb: προσοικέω # abs
 
 First and third declension of προσοικῶν; προσοικοῦσα; προσοικοῦν (Attic)
 Number Singular Dual Plural
@@ -11586,7 +11778,7 @@ dict: προσπαρασχών • (prosparaskhṓn) m (feminine προσπαρ�
 
  aorist active participle of προσπαρέχω (prosparékhō)
  tense: act.aor.part
- verb: προσπαρέχω
+ verb: προσπαρέχω # abs
 
 First and third declension of προσπαρασχών; προσπαρασχοῦσα; προσπαρασχόν (Attic)
 Number Singular Dual Plural
@@ -11606,7 +11798,7 @@ dict: προσπεσών • (prospesṓn) m (feminine προσπεσοῦσα, 
 
  aorist active participle of προσπίπτω (prospī́ptō)
  tense: act.aor.part
- verb: προσπίπτω
+ verb: προσπίπτω # abs
 
 First and third declension of προσπεσών; προσπεσοῦσα; προσπεσόν (Attic)
 Number Singular Dual Plural
@@ -11626,7 +11818,7 @@ dict: προὐφειλόμενος • (proupheilómenos) m (feminine προὐ
 
  present mediopassive participle of προὐφείλω (proupheílō)
  tense: mid.pres.part
- verb: προὐφείλω
+ verb: προὐφείλω # abs
 
 First and second declension of προὐφειλόμενος; προὐφειλομένη; προὐφειλόμενον (Attic)
 Number Singular Dual Plural
@@ -11646,7 +11838,7 @@ dict: προὔχων • (proúkhōn) m (feminine προὔχουσα, neuter �
 
  present active participle of προὔχω (proúkhō)
  tense: act.pres.part
- verb: προὔχω
+ verb: προὔχω # abs
 
 First and third declension of προὔχων; προὔχουσα; προὖχον (Attic)
 Number Singular Dual Plural
@@ -11666,7 +11858,7 @@ dict: προχωρήσας • (prokhōrḗsās) m (feminine προχωρήσα�
 
  aorist active participle of προχωρέω (prokhōréō)
  tense: act.aor.part
- verb: προχωρέω
+ verb: προχωρέω # abs
 
 First and third declension of προχωρήσας; προχωρήσασα; προχωρῆσαν (Attic)
 Number Singular Dual Plural
@@ -11885,7 +12077,7 @@ dict: σπείρων • (speírōn) m (feminine σπείρουσα, neuter σπ
 
  present active participle of σπείρω (speírō)
  tense: act.pres.part
- verb: σπείρω
+ verb: σπείρω # abs
 
 First and third declension of σπείρων; σπείρουσα; σπεῖρον (Attic)
 Number Singular Dual Plural
@@ -11945,7 +12137,7 @@ dict: στασιάσας • (stasiásās) m (feminine στασιάσασα, neu
 
  aorist active participle of στασιάζω (stasiázō)
  tense: act.aor.part
- verb: στασιάζω
+ verb: στασιάζω # abs
 
 First and third declension of στασιάσας; στασιάσασα; στασιάσαν (Attic)
 Number Singular Dual Plural
@@ -11965,7 +12157,7 @@ dict: στενάχων • (stenákhōn) m (feminine στενάχουσα, neute
 
  present active participle of στενάχω (stenákhō)
  tense: act.pres.part
- verb: στενάχω
+ verb: στενάχω # abs
 
 First and third declension of στενάχων; στενάχουσα; στενάχον (Attic)
 Number Singular Dual Plural
@@ -12005,7 +12197,7 @@ dict: στρατευόμενος • (strateuómenos) m (feminine στρατευ
 
  present mediopassive participle of στρατεύω (strateúō)
  tense: mid.pres.part
- verb: στρατεύω
+ verb: στρατεύω # abs
 
 First and second declension of στρατευόμενος; στρατευομένη; στρατευόμενον (Attic)
 Number Singular Dual Plural
@@ -12025,7 +12217,7 @@ dict: στρατευσάμενος • (strateusámenos) m (feminine στρα�
 
  aorist middle participle of στρατεύω (strateúō)
  tense: mid.aor.part
- verb: στρατεύω
+ verb: στρατεύω # abs
 
 First and second declension of στρατευσάμενος; στρατευσαμένη; στρατευσάμενον (Attic)
 Number Singular Dual Plural
@@ -12045,7 +12237,7 @@ dict: στρατεύσας • (strateúsās) m (feminine στρατεύσασα
 
  aorist active participle of στρατεύω (strateúō)
  tense: act.aor.part
- verb: στρατεύω
+ verb: στρατεύω # abs
 
 First and third declension of στρατεύσας; στρατεύσασα; στρατεῦσαν (Attic)
 Number Singular Dual Plural
@@ -12065,7 +12257,7 @@ dict: στρατεύων • (strateúōn) m (feminine στρατεύουσα, n
 
  present active participle of στρατεύω (strateúō)
  tense: act.pres.part
- verb: στρατεύω
+ verb: στρατεύω # abs
 
 First and third declension of στρατεύων; στρατεύουσα; στρατεῦον (Attic)
 Number Singular Dual Plural
@@ -12085,7 +12277,7 @@ dict: στρατηγῶν • (stratēgôn) m (feminine στρατηγοῦσα,
 
  present active participle of στρατηγέω (stratēgéō)
  tense: act.pres.part
- verb: στρατηγέω
+ verb: στρατηγέω # abs
 
 First and third declension of στρατηγῶν; στρατηγοῦσα; στρατηγοῦν (Attic)
 Number Singular Dual Plural
@@ -12122,7 +12314,7 @@ dict: συγκρουόμενος • (sunkrouómenos) m (feminine συγκρου
 
  present mediopassive participle of συγκρούομαι (sunkroúomai)
  tense: mid.pres.part
- verb: συγκρούομαι
+ verb: συγκρούομαι # abs
 
 First and second declension of συγκρουόμενος; συγκρουομένη; συγκρουόμενον (Attic)
 Number Singular Dual Plural
@@ -12280,7 +12472,6 @@ dict: σχήσων • (skhḗsōn) m (feminine σχήσουσα, neuter σχῆ
  future active participle of ἔχω (ékhō)
  tense: act.fut.part
  verb: ἔχω
-
 First and third declension of σχήσων; σχήσουσα; σχῆσον (Attic)
 Number Singular Dual Plural
 Case/Gender Masculine Feminine Neuter Masculine Feminine Neuter Masculine Feminine Neuter
@@ -12361,7 +12552,7 @@ dict: ταρβήσας • (tarbḗsās) m (feminine ταρβήσασα, neuter 
 
  aorist active participle of ταρβέω (tarbéō)
  tense: act.aor.part
- verb: ταρβέω
+ verb: ταρβέω # abs
 
 First and third declension of ταρβήσας; ταρβήσασα; ταρβῆσαν (Attic)
 Number Singular Dual Plural
@@ -12435,7 +12626,7 @@ dict: τειρόμενος • (teirómenos) m (feminine τειρομένη, neu
 
  present mediopassive participle of τείρω (teírō)
  tense: mid.pres.part
- verb: τείρω
+ verb: τείρω # abs
 
 First and second declension of τειρόμενος; τειρομένη; τειρόμενον (Attic)
 Number Singular Dual Plural
@@ -12455,7 +12646,7 @@ dict: τεκμαιρόμενος • (tekmairómenos) m (feminine τεκμαιρ
 
  present middle participle of τεκμαίρομαι (tekmaíromai)
  tense: mid.pres.part
- verb: τεκμαίρομαι
+ verb: τεκμαίρομαι # abs
 
 First and second declension of τεκμαιρόμενος; τεκμαιρομένη; τεκμαιρόμενον (Attic)
 Number Singular Dual Plural
@@ -12562,7 +12753,7 @@ dict: τετιημένος • (tetiēménos) m (feminine τετιημένη, ne
 
  perfect middle participle of τετίημαι (tetíēmai)
  tense: mid.pf.part
- verb: τετίημαι
+ verb: τετίημαι # abs
 
 First and second declension of τετιημένος; τετιημένη; τετιημένον (Epic)
 Number Singular Dual Plural
@@ -12625,7 +12816,7 @@ dict: τετυγμένος • (tetugménos) m (feminine τετυγμένη, neu
 
  perfect mediopassive participle of τεύχω (teúkhō)
  tense: mid.pf.part
- verb: τεύχω
+ verb: τεύχω # abs
 
 First and second declension of τετυγμένος; τετυγμένη; τετυγμένον (Attic)
 Number Singular Dual Plural
@@ -12645,7 +12836,7 @@ dict: τεύχων • (teúkhōn) m (feminine τεύχουσα, neuter τεῦ�
 
  present active participle of τεύχω (teúkhō)
  tense: act.pres.part
- verb: τεύχω
+ verb: τεύχω # abs
 
 First and third declension of τεύχων; τεύχουσα; τεῦχον (Attic)
 Number Singular Dual Plural
@@ -12707,7 +12898,7 @@ dict: τισάμενος • (tīsámenos) m (feminine τισαμένη, neuter 
 
  aorist middle participle of τίω (tī́ō)
  tense: mid.aor.part
- verb: τίω
+ verb: τίω # abs
 
 First and second declension of τισάμενος; τισαμένη; τισάμενον (Attic)
 Number Singular Dual Plural
@@ -12727,7 +12918,7 @@ dict: τιτυσκόμενος • (tituskómenos) m (feminine τιτυσκομ�
 
  present mediopassive participle of τιτύσκομαι (titúskomai)
  tense: mid.pres.part
- verb: τιτύσκομαι
+ verb: τιτύσκομαι # abs
 
 First and second declension of τιτυσκόμενος; τιτυσκομένη; τιτυσκόμενον (Attic)
 Number Singular Dual Plural
@@ -12807,7 +12998,7 @@ dict: τυραννευθείς • (turanneutheís) m (feminine τυραννευ
 
  aorist passive participle of τυραννεύω (turanneúō)
  tense: pas.aor.part
- verb: τυραννεύω
+ verb: τυραννεύω # abs
 
 First and third declension of τυραννευθείς; τυραννευθεῖσα; τυραννευθέν (Attic)
 Number Singular Dual Plural
@@ -12827,7 +13018,7 @@ dict: τυραννῶν • (turannôn) m (feminine τυραννοῦσα, neute
 
  present active participle contracted of τυραννέω (turannéō)
  tense: act.pres.part
- verb: τυραννέω
+ verb: τυραννέω # abs
 
 First and third declension of τυραννῶν; τυραννοῦσα; τυραννοῦν (Attic)
 Number Singular Dual Plural
@@ -12891,7 +13082,7 @@ dict: ὑποβοηθούμενος • (hupoboēthoúmenos) m (feminine ὑπ
 
  perfect mediopassive participle of ὑποβοηθῶ (hupoboēthô) contracted form of ὑποβοηθέω (hupoboēthéō)
  tense: mid.pf.part
- verb: ὑποβοηθῶ
+ verb: ὑποβοηθῶ # abs
 
 First and second declension of ὑποβοηθούμενος; ὑποβοηθουμένη; ὑποβοηθούμενον (Attic)
 Number Singular Dual Plural
@@ -13010,7 +13201,7 @@ dict: ὑπολειπόμενος • (hupoleipómenos) m (feminine ὑπολε�
 
  present mediopassive participle of ὑπολείπω (hupoleípō)
  tense: mid.pres.part
- verb: ὑπολείπω
+ verb: ὑπολείπω # abs
 
 First and second declension of ὑπολειπόμενος; ὑπολειπομένη; ὑπολειπόμενον (Attic)
 Number Singular Dual Plural
@@ -13030,7 +13221,7 @@ dict: ὑποτοπήσας • (hupotopḗsās) m (feminine ὑποτοπήσα
 
  aorist active participle of ὑποτοπέω (hupotopéō)
  tense: act.aor.part
- verb: ὑποτοπέω
+ verb: ὑποτοπέω # abs
 
 First and third declension of ὑποτοπήσας; ὑποτοπήσασα; ὑποτοπῆσαν (Attic)
 Number Singular Dual Plural
@@ -13163,7 +13354,7 @@ dict: φάσκων • (pháskōn) m (feminine φάσκουσα, neuter φάσκ
 
  present active participle of φάσκω (pháskō)
  tense: act.pres.part
- verb: φάσκω
+ verb: φάσκω # abs
 
 First and third declension of φάσκων; φάσκουσα; φάσκον (Attic)
 Number Singular Dual Plural
@@ -13360,7 +13551,7 @@ dict: φυτεύων • (phuteúōn) m (feminine φυτεύουσα, neuter φ�
 
  present active participle of φυτεύω (phuteúō)
  tense: act.pres.part
- verb: φυτεύω
+ verb: φυτεύω # abs
 
 First and third declension of φυτεύων; φυτεύουσα; φυτεῦον (Attic)
 Number Singular Dual Plural
@@ -13422,7 +13613,7 @@ dict: χαριζόμενος • (kharizómenos) m (feminine χαριζομέν�
 
  present mediopassive participle of χαρίζομαι (kharízomai)
  tense: mid.pres.part
- verb: χαρίζομαι
+ verb: χαρίζομαι # abs
 
 First and second declension of χαριζόμενος; χαριζομένη; χαριζόμενον (Attic)
 Number Singular Dual Plural
@@ -13442,7 +13633,7 @@ dict: χατίζων • (khatízōn) m (feminine χατίζουσα, neuter χ�
 
  present active participle of χατίζω (khatízō)
  tense: act.pres.part
- verb: χατίζω
+ verb: χατίζω # abs
 
 Adjective
 
@@ -13468,7 +13659,7 @@ dict: χέων • (khéōn) m (feminine χέουσα, neuter χέον); first/t
 
  future active participle of χέω (khéō)
  tense: act.fut.part
- verb: χέω
+ verb: χέω # abs
 
 First and third declension of χέων; χέουσα; χέον (Attic)
 Number Singular Dual Plural
@@ -13488,7 +13679,7 @@ dict: χολωσάμενος • (kholōsámenos) m (feminine χολωσαμέν
 
  aorist middle participle of χολόω (kholóō)
  tense: mid.aor.part
- verb: χολόω
+ verb: χολόω # abs
 
 First and second declension of χολωσάμενος; χολωσαμένη; χολωσάμενον (Attic)
 Number Singular Dual Plural
@@ -13508,7 +13699,7 @@ dict: χρησάμενος • (khrēsámenos) m (feminine χρησαμένη, n
 
  aorist middle participle of χράω (khráō, “to use”)
  tense: mid.aor.part
- verb: χράω
+ verb: χράω # abs
 
 First and second declension of χρησάμενος; χρησαμένη; χρησάμενον (Attic)
 Number Singular Dual Plural
@@ -13548,7 +13739,7 @@ dict: χωόμενος • (khōómenos) m (feminine χωομένη, neuter χω
 
  present middle participle of χώομαι (khṓomai)
  tense: mid.pres.part
- verb: χώομαι
+ verb: χώομαι # abs
 
 Adjective
 
@@ -13594,7 +13785,7 @@ dict: ὤσας • (ṓsās) m (feminine ὤσασα, neuter ὦσαν); first/
 
  aorist active participle of ὠθέω (ōthéō)
  tense: act.aor.part
- verb: ὠθέω
+ verb: ὠθέω # abs
 
 First and third declension of ὤσας; ὤσασα; ὦσαν (Attic)
 Number Singular Dual Plural
