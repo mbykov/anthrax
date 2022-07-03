@@ -1,4 +1,4 @@
-0# https://en.wiktionary.org/w/index.php?title=Category:Ancient_Greek_participles
+# https://en.wiktionary.org/w/index.php?title=Category:Ancient_Greek_participles
 #, replaced: ᾰα, ᾱα, ῑι, ῐι, ῠυ, ῡυ
 # ί̄-ί
 # ᾹΑ ᾸΑ ἰ̄ἴ
