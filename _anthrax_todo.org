@@ -11,6 +11,7 @@
 
 * 25 мая - вчерне готово
   - [X] тесты simple и verb.fls start
+  - [X] part.terms в файл
   - [ ] participle, inf
   - [ ] name снова
   - [ ] test compound
