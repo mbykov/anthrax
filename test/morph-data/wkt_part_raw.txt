@@ -540,7 +540,7 @@ adv,comp,sup: ἀγαπώντως
 # --------------------
 dict: ἀγασσάμενος • (agassámenos) m (feminine ἀγασσαμένη, neuter ἀγασσάμενον); first/second declension
 
- aorist middle participle of ἄγαμαι (ágamai)
+ aorist middle participle of ἄγαμαι (ágamai) # 1
  tense: mid.aor.part
  verb: ἄγαμαι # abs
  stem: γαμ
@@ -918,7 +918,7 @@ voc: ἀγγελῶν, ἀγγελοῦσα, ἀγγελοῦν, ἀγγελ
 adv,comp,sup: ἀγγελούντως
 
 # --------------------
-dict: ἀγειράμενος • (ageirámenos) m (feminine ἀγειραμένη, neuter ἀγειράμενον); first/second declension
+dict: ἀγειράμενος • (ageirámenos) m (feminine ἀγειραμένη, neuter ἀγειράμενον); first/second declension # tmp
 
  aorist middle participle of ἀγείρω (ageírō)
  tense: mid.aor.part
@@ -1190,8 +1190,6 @@ dict: ἀγρόμενος • (agrómenos) m (feminine ἀγρομένη, neut
  aorist middle participle of ἀγείρω (ageírō)
  tense: mid.aor.part
  verb: ἀγείρω
- stem: γρ
-# но такого стема нет
 
 # First and second declension of ἀγρόμενος; ἀγρομένη; ἀγρόμενον (Attic)
 
