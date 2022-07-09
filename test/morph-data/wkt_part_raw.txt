@@ -117,11 +117,14 @@ voc: ἀγαθοποιήσας, ἀγαθοποιήσασα, ἀγαθοποι�
 # Derived forms Adverb Comparative Superlative
 adv,comp,sup: ἀγαθοποιησάντως
 
-Verb
-
-ἀγαθοποιησόμενος • (agathopoiēsómenos) m (feminine ἀγαθοποιησομένη, neuter ἀγαθοποιησόμενον); first/second declension
+# Verb
+# --------------------
+dict: ἀγαθοποιησόμενος • (agathopoiēsómenos) m (feminine ἀγαθοποιησομένη, neuter ἀγαθοποιησόμενον); first/second declension
 
  future mediopassive infinitive of ἀγαθοποιέω (agathopoiéō)
+ tense: mid.fut.part
+ verb: ἀγαθοποιέω
+ stem: γαθοποι
 
 # First and second declension of ἀγαθοποιησόμενος; ἀγαθοποιησομένη; ἀγαθοποιησόμενον (Attic)
 
@@ -1465,14 +1468,11 @@ acc: ἁ̆λισκόμενον, ἁ̆λισκομένην, ἁ̆λισκόμεν
 voc: ἁ̆λισκόμενε, ἁ̆λισκομένη, ἁ̆λισκόμενον, ἁ̆λισκομένω, ἁ̆λισκομένα, ἁ̆λισκομένω, ἁ̆λισκόμενοι, ἁ̆λισκόμεναι, ἁ̆λισκόμενα
 
 # Derived forms Adverb Comparative Superlative
-adv,comp,sup: ἁ̆λισκομένως
-haliskoménōs ἁ̆λισκομενώτερος
-haliskomenṓteros ἁ̆λισκομενώτατος
-haliskomenṓtatos
+adv,comp,sup: ἁ̆λισκομένως, ἁ̆λισκομενώτερος, ἁ̆λισκομενώτατος
 
-Verb
-
-ἀλύξας • (alúxās) m (feminine ἀλύξασα, neuter ἀλύξαν); first/third declension
+# Verb
+# --------------------
+dict: ἀλύξας • (alúxās) m (feminine ἀλύξασα, neuter ἀλύξαν); first/third declension
 
  aorist active participle of ἀλύσκω (alúskō)
  tense: act.aor.part
@@ -5108,13 +5108,13 @@ voc: ἐποιχόμενε, ἐποιχομένη, ἐποιχόμενον, ἐ�
 adv,comp,sup: ἐποιχομένως, ἐποιχομενώτερος, ἐποιχομενώτατος
 
 # --------------------
-dict: ἐποτρύνας • (epotrū́nās) m (feminine ἐποτρύνασα, neuter ἐποτρῦναν); first/third declension
+# dict: ἐποτρύνας • (epotrū́nās) m (feminine ἐποτρύνασα, neuter ἐποτρῦναν); first/third declension
 
- aorist active participle of ἐποτρύνω (epotrū́nō)
- tense: act.aor.part
- verb: ἐποτρύνω
+ # aorist active participle of ἐποτρύνω (epotrū́nō)
+ # tense: act.aor.part
+ # verb: ἐποτρύνω
 
-# нет данных
+# no data
 
 # --------------------
 dict: ἐποτρύνων • (epotrū́nōn) m (feminine ἐποτρύνουσα, neuter ἐποτρῦνον); first/third declension
@@ -7335,12 +7335,12 @@ voc: κτησάμενε, κτησαμένη, κτησάμενον, κτησ�
 adv,comp,sup: κτησαμένως, κτησαμενώτερος, κτησαμενώτατος
 
 # --------------------
-dict: κυκλῶν • (kuklôn)
+# dict: κυκλῶν • (kuklôn)
 
- present active participle of κυκλόω (kuklóō)
- tense: act.pres.part
- verb: κυκλόω
- stem: κυκλ
+# present active participle of κυκλόω (kuklóō)
+# tense: act.pres.part
+# verb: κυκλόω
+# stem: κυκλ
 
 # no data
 
@@ -9593,11 +9593,11 @@ adv,comp,sup: πεποιθότως
 # no data
 
 # --------------------
-dict: πεπονθώς • (peponthṓs) m (feminine πεπονθυῖα/πεπαθυῖα, neuter πεπονθός); first/second declension
+# dict: πεπονθώς • (peponthṓs) m (feminine πεπονθυῖα/πεπαθυῖα, neuter πεπονθός); first/second declension
 
- perfect active participle of πάσχω (páskhō)
- tense: act.pf.part
- verb: πάσχω
+# perfect active participle of πάσχω (páskhō)
+# tense: act.pf.part
+# verb: πάσχω
 
 # no data
 
@@ -9995,9 +9995,9 @@ dict: πληγείς • (plēgeís) m (feminine πληγεῖσα, neuter πλ�
  aorist passive participle of πλήσσω (plḗssō)
  tense: pas.aor.part
  verb: πλήσσω
- # aorist passive participle of πλήττω (plḗttō)
- # tense: pas.aor.part
- # verb: πλήττω
+# aorist passive participle of πλήττω (plḗttō)
+# tense: pas.aor.part
+# verb: πλήττω
 
 # First and third declension of πληγείς; πληγεῖσα; πληγέν (Attic)
 
@@ -10031,9 +10031,9 @@ poiēsaménōs ποιησαμενώτερος
 poiēsamenṓteros ποιησαμενώτατος
 poiēsamenṓtatos
 
-Verb
-
-ποιήσας • (poiḗsās)
+# Verb
+# --------------------
+dict: ποιήσας • (poiḗsās)
 
  aorist active participle of ποιέω (poiéō)
  tense: act.aor.part
@@ -11441,9 +11441,9 @@ voc: τερπόμενε, τερπομένη, τερπόμενον, τερπομ�
 adv,comp,sup: τερπομένως, τερπομενώτερος, τερπομενώτατος
 
 # --------------------
-dict: τεταγών • (tetagṓn) m (tetagōn)
+# dict: τεταγών • (tetagṓn) m (tetagōn)
 
- having seized
+# having seized
 
 # no data
 
