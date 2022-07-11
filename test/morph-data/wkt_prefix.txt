@@ -136,7 +136,7 @@ pref: ἐν •
       in
 #      = ἐγ
       = ἐμ
-      = ἐλ
+#    = ἐλ
 
 pref: ἐφ •
       translation?
