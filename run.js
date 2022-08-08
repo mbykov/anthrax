@@ -66,7 +66,7 @@ function compactAdvFls(flexes) {
     return _.uniq(flexes.map(flex=> ['adv', flex.degree].join('.')))
 }
 
-function compactNamesFls(dicts) {
+function compactNamesFls_(dicts) {
     let fls = dicts.map(dict=> {
         return dict.fls.map(flex=> [flex.gend, flex.num, flex.case].join('.'))
     })

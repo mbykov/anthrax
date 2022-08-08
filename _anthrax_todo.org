@@ -1,19 +1,47 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
-Сезоны сериала
-1 сезон, «Эра стрельца»2 серии, 2020
-2 сезон, «Смерть по сценарию»2 серии, 2020
-3 сезон, «Черная кошка в темной комнате»2 серии, 2021
-4 сезон, «Ничего личного»2 серии, 2021
-5 сезон, «Дуэль»2 серии, 2021
 
+* = формат results
+verb: _chain: [
+  { seg: 'ἀ', aug: true },
+  {
+    seg: 'γαθοεργ',
+    cdict: {
+      verb: true,
+      rdict: 'ἀγαθοεργέω',
+      dict: 'ἀγαθοεργέω',
+      type: 'έω',
+      regstem: 'γαθοεργ',
+      stem: 'γαθοεργ',
+      keys: [Array],
+      trns: [Array],
+      augs: [Array],
+      forms: [Array],
+      dname: 'wkt'
+    },
+    mainseg: true
+  },
+  { seg: 'έω', fls: [ [Object], [Object] ] }
+]
+_res: [
+  {
+    segs: 'ἀ-γαθοεργ-έω',
+    rdict: 'ἀγαθοεργέω',
+    stem: 'γαθοεργ',
+    fls: '["act.pres.ind.sg.1","act.pres.sub.sg.1"]'
+  }
+]
+
+
+* 8 августа - собираю все вместе
+  - [ ] name
 
 * 25 мая - вчерне готово
   - [X] тесты simple и verb.fls start
   - [X] part.terms в файл
-  - [ ] participle, inf
   - [ ] name снова
+  - [ ] participle, inf
   - [ ] test compound
   - [ ] lsj, souda
   - [ ] adj

@@ -59,6 +59,7 @@ async function anthraxChains(wf) {
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
+    // log('_DAG', dag)
     // теперь связка может быть сложной, aug+pref+vows, но ἀδικέω
     // в словаре pref отдельно. То есть искать длинный стем pref+stem не имеет смысла
     // если stem не найден, то и pref+stem не будет найден
@@ -75,8 +76,9 @@ async function anthraxChains(wf) {
         let aug = parseAug(dag.pcwf)
         let re = new RegExp('^' + aug)
         let pcwf = dag.pcwf.replace(re, '')
-        p('_\n==scheme aug== :', dag.pcwf, 'aug_:', aug, 'pcwf', pcwf)
+        log('_\n==scheme aug== :', dag.pcwf, 'aug_:', aug, 'pcwf', pcwf)
         let {breaks, dicts} = await cleanBreaks(pcwf, dag)
+        // log('_B', breaks, dicts)
 
         for (let br of breaks) {
             if (!br.conn) br.conn = ''
@@ -127,7 +129,7 @@ async function anthraxChains(wf) {
         pcwf = pcwf.replace(re, '')
 
         // let {conn, pcwf} = schemePref(pref, dag.pcwf)
-        p('_\n==scheme pref== .seg:', pref.seg, 'conn:', pref.conn, 'pcwf', pcwf)
+        // p('_\n==scheme pref== .seg:', pref.seg, 'conn:', pref.conn, 'pcwf', pcwf)
 
         let {breaks, dicts} = await cleanBreaks(pcwf, dag)
 
@@ -185,20 +187,19 @@ function dict2flexFilter(aug, dicts, fls) {
     let cfls = []
     for (let dict of dicts) {
         // if (!dict.verb) continue
-        // log('_____dict____:', dict.verb, dict.rdict, dict.stem)
+        // log('_____dict____:', dict.name, dict.rdict, dict.stem, dict)
         let dfls = []
         for(let flex of fls) {
             // if (!flex.verb) continue
             // if (!!dict.pref != !!flex.pref) continue // нельзя в случае pref.trns + cdict.trns
-            // log('_____flex____:', flex.numper, flex.tense, flex.term, flex.aug, flex.key)
+            // log('_____flex____:', flex.name, flex.term, flex.aug, flex.key, flex.gend)
             let ok = false
-            if (dict.name && flex.name && dict.keys.find(key=> key.gend == flex.gend && key.md5 == flex.md5) && dict.aug == flex.aug) ok = true
-            else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
-            else if (dict.part && flex.part ) ok = true
+            if (dict.name && flex.name && dict.keys.find(key=> key == flex.key) && dict.aug == flex.aug) ok = true
+            // else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
+            // else if (dict.part && flex.part ) ok = true
 
             // else if (dict.verb && flex.verb) ok = true
             else if (dict.verb && flex.verb && dict.keys.includes(flex.key)) ok = true
-            // else if (dict.verb && flex.verb && dict.keys.find(tense=> tense == flex.tense)) ok = true
 
             // if (dict.stem == 'γραφ' && flex.tense =='act.aor.sub') log('======= FLX', flex)
 
@@ -252,9 +253,9 @@ function makeChains(br, cdicts, cfls, mainseg, headdicts, pref) {
 
 async function cleanBreaks(pcwf, dag) {
     let breaks = makeBreaks(pcwf, dag.flexes)
-    // p('_breaks', breaks)
+    p('_breaks', breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    // p('_breaks-ids', breaksids)
+    p('_breaks-ids', breaksids)
 
     // dicts - те, что есть в словарях
     let dicts = await findDicts(breaks)
