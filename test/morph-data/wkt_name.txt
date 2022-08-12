@@ -11621,6 +11621,11 @@ dict: ἑξήκοντα • (hexḗkonta), (ordinal, ἑξηκοστός, adverb
     (cardinal) sixty
 
 # ----------------------------------
+dict: ἑξ • (hex)  (ordinal ἕκτος, adverbial ἑξᾰ́κῐς)
+
+    six
+
+# ----------------------------------
 dict: ἑξηκονταμοιρία • (hexēkontamoiríā) f (genitive ἑξηκονταμοιρίας); first declension
 
     an arc of sixty degrees (60°)

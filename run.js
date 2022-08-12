@@ -2,7 +2,7 @@
 
 import _  from 'lodash'
 import { anthrax } from './index.js'
-import { prettyVerbRes } from './lib/utils.js'
+import { prettyRes } from './lib/utils.js'
 import Debug from 'debug'
 const d = Debug('dicts')
 
@@ -17,8 +17,7 @@ async function run() {
     log('\n_run chains:', wordform, chains.length)
     for (let chain of chains) {
         log('_chain:', chain)
-        let prettyres = prettyVerbRes(chain)
-        // log('_r:', prettyres)
+        let prettyres = prettyRes(chain)
         res.push(prettyres)
     }
     log('_res:', res)

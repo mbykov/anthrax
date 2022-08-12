@@ -47,7 +47,6 @@ conj: γάρ • (gár)
     because (postpositive)
 
 conj: δέ • (dé)
-
     but, and
     = δ᾽ • (d᾽)
 
@@ -306,12 +305,6 @@ conj: πλήν • (plḗn)
             (to break off and pass to another subject) only
             (late prose)
 
-conj: πρίν  • (prín)
-
-    before, sooner, formerly
-        (of future time, with future indicative)
-        (of past time) formerly, once
-
 conj: ῥα • (rha)
 
     aphetic form of ἄρα (ára)
@@ -381,7 +374,8 @@ particle: οὐκοῦν
           sets up an expectation to agree
 particle: πέρ
           enclitic, an emphatic suffix following relatives and conjunctions
-
+particle: γάρ
+         for, postpos. a milder way of saying because
 
 particle: ἆρα
           turns a statement into a yes/no question.

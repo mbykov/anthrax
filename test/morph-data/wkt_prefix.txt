@@ -113,9 +113,9 @@ pref: ἐκ- • (ek-)
       = ἐξ
 
 # pref: ἑξα- • (hexa-)
-pref: ἑξ- • (hexa-)
-    Forming compound words with the sense of "six"
-    = ἐσ
+# pref: ἑξ- • (hexa-)
+#    Forming compound words with the sense of "six"
+#    = ἐσ
 
 # pref: ἐπι- • (epi-)
 pref: ἐπ- • (epi-)
@@ -281,8 +281,8 @@ pref: συν- • (sun-)
 # ============================================= T =======================
 
 # pref: τρι- • (tri-)
-pref: τρι • (tri-)
-    tri- (three, thrice)
+# pref: τρι • (tri-)
+#    tri- (three, thrice)
 
 # pref: τοπο
 # pref: τοπ-
@@ -290,8 +290,8 @@ pref: τρι • (tri-)
 
 # ============================================= F ==============================
 # pref: φιλο
-pref: φιλ-
-      fond of ...
+# pref: φιλ-
+#      fond of ...
 
 
 
