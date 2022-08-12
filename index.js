@@ -268,20 +268,41 @@ async function cleanBreaks(pcwf, dag) {
   let dictstems = _.uniq(dicts.map(dict=> dict.stem))
   p('_dictstems_uniq_:', dictstems)
 
+  let regkeys = []
   breaks.forEach(br=> {
     let headdicts = dicts.filter(dict=> dict.stem == br.head)
     if (headdicts.length) br.headdicts = headdicts
+    let headregs = headdicts.filter(verb=> verb.stem != verb.regstem)
+    if (headregs.length) regkeys.push(...headregs)
     let taildicts = dicts.filter(dict=> dict.stem == br.tail)
     if (taildicts.length) br.taildicts = headdicts
+    let tailsregs = taildicts.filter(verb=> verb.stem != verb.regstem)
+    if (tailsregs.length) regkeys.push(...tailsregs)
   })
 
   breaks = breaks.filter(br=> {
     let ok = false
     if (br.headdicts && !br.tail) ok = true
-    if (br.headdicts && br.taildicts) ok = false
+    if (br.headdicts && br.taildicts) ok = true
     return ok
   })
 
+  regkeys = _.uniq(_.compact(regkeys.map(dict=> dict.regstem)))
+  regkeys = ['πυνθαν']
+  let regdicts = await getDicts(regkeys)
+  log('_regkeys', regkeys, regdicts.length)
+  if (regdicts.length) {
+    breaks.forEach(br=> {
+      // ===================================== что, искать по dict.rdict? stem-то другой
+      // let headregs = regdicts.filter(dict=> dict.stem == br.head)
+      // log('_headregs', br.head, headregs.length)
+      // if (headregs.length) br.headregs = headregs
+      // let tailsregs = regdicts.filter(dict=> dict.stem == br.tail)
+      // if (tailsregs.length) br.tailsregs = tailsregs
+    })
+  }
+
+  log('_BREAKS', breaks)
   return breaks
 }
 
