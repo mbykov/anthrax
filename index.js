@@ -78,9 +78,8 @@ async function anthraxChains(wf) {
     let re = new RegExp('^' + aug)
     let pcwf = dag.pcwf.replace(re, '')
     log('_\n==scheme aug== :', dag.pcwf, 'aug_:', aug, 'pcwf', pcwf)
-    // let {breaks, dicts} = await cleanBreaks(pcwf, dag)
-    let breaks = await cleanBreaks(pcwf, dag)
-    // log('_B', breaks, dicts)
+    let {breaks, regdicts} = await cleanBreaks(pcwf, dag)
+    // log('_B', breaks, regdicts)
 
     for (let br of breaks) {
       // if (!br.conn) br.conn = ''
@@ -118,7 +117,7 @@ async function anthraxChains(wf) {
 
       if (!cdicts.length) continue
       let augseg = (aug) ? {seg: aug} : {}
-      let brchains = makeChains(br, cdicts, cfls, mainseg, headdicts, augseg)
+      let brchains = makeChains(br, cdicts, cfls, mainseg, headdicts, augseg, regdicts)
       // log('_C', chain)
       chains.push(...brchains)
     }
@@ -135,8 +134,7 @@ async function anthraxChains(wf) {
     // let {conn, pcwf} = schemePref(pref, dag.pcwf)
     // p('_\n==scheme pref== .seg:', pref.seg, 'conn:', pref.conn, 'pcwf', pcwf)
 
-    // let {breaks, dicts} = await cleanBreaks(pcwf, dag)
-    let breaks = await cleanBreaks(pcwf, dag)
+    let {breaks, regdicts} = await cleanBreaks(pcwf, dag)
 
     for (let br of breaks) {
       if (!br.conn) br.conn = ''
@@ -171,7 +169,7 @@ async function anthraxChains(wf) {
       b('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
 
       if (!cdicts.length) continue
-      let brchains = makeChains(br, cdicts, cfls, mainseg, headdicts, pref)
+      let brchains = makeChains(br, cdicts, cfls, mainseg, headdicts, pref, regdicts)
       chains.push(...brchains)
     } // br
   } // pref
@@ -191,14 +189,15 @@ function dict2flexFilter(aug, dicts, fls) {
   let cfls = []
   for (let dict of dicts) {
     // if (!dict.verb) continue
-    // log('_____dict____:', dict.name, dict.rdict, dict.stem, dict)
+    // log('_____dict____:', dict.name, dict.rdict, dict.stem, dict.aug)
     let dfls = []
     for(let flex of fls) {
       // if (!flex.verb) continue
       // if (!!dict.pref != !!flex.pref) continue // нельзя в случае pref.trns + cdict.trns
-      // log('_____flex____:', flex.name, flex.term, flex.aug, flex.key, flex.gend)
+      // log('_____flex____:', flex.name, flex.term, 'aug:', flex.aug, 'key:', flex.key, flex.gend)
       let ok = false
-      if (dict.name && flex.name && dict.keys.find(key=> key == flex.key) && dict.aug == flex.aug) ok = true
+      // if (dict.name && flex.name && dict.keys.find(key=> key == flex.key) && dict.aug == flex.aug) ok = true
+      if (dict.name && flex.name && dict.keys.find(key=> key == flex.key) ) ok = true
       // else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
       // else if (dict.part && flex.part ) ok = true
 
@@ -219,8 +218,7 @@ function dict2flexFilter(aug, dicts, fls) {
   return {cdicts, cfls}
 }
 
-
-function makeChains(br, cdicts, cfls, mainseg, headdicts, pref) {
+function makeChains(br, cdicts, cfls, mainseg, headdicts, pref, regdicts) {
   let chains = []
   let idx = 0
   for (let cdict of cdicts) {
@@ -231,6 +229,8 @@ function makeChains(br, cdicts, cfls, mainseg, headdicts, pref) {
     chain.push(flsseg)
 
     let tailseg = {seg: mainseg, cdict, mainseg: true}
+    let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
+    if (regdict) tailseg.regdict = regdict
     chain.unshift(tailseg)
 
     if (br.head && br.tail) {
@@ -290,20 +290,9 @@ async function cleanBreaks(pcwf, dag) {
   regkeys = _.uniq(_.compact(regkeys.map(dict=> dict.regstem)))
   regkeys = ['πυνθαν']
   let regdicts = await getDicts(regkeys)
-  log('_regkeys', regkeys, regdicts.length)
-  if (regdicts.length) {
-    breaks.forEach(br=> {
-      // ===================================== что, искать по dict.rdict? stem-то другой
-      // let headregs = regdicts.filter(dict=> dict.stem == br.head)
-      // log('_headregs', br.head, headregs.length)
-      // if (headregs.length) br.headregs = headregs
-      // let tailsregs = regdicts.filter(dict=> dict.stem == br.tail)
-      // if (tailsregs.length) br.tailsregs = tailsregs
-    })
-  }
-
-  log('_BREAKS', breaks)
-  return breaks
+  // log('_regkeys', regkeys, regdicts.length)
+  // log('_BREAKS', breaks)
+  return {breaks, regdicts}
 }
 
 function prettyBeakIDs(breaks) {
