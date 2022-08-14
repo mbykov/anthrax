@@ -5,21 +5,22 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, parseAug, aug2vow } from './lib/utils.js'
-import { getTerms, getFlexes, getDicts, getPrefs } from './lib/remote.js'
+import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
 const d = Debug('dag')
 const p = Debug('pref')
 const b = Debug('break')
 
-// terms: πρίν
 let dag = {}
 
 export async function anthrax(wf) {
   let chains = []
   let cwf = oxia(comb(wf).toLowerCase())
   let termcdicts = await getTerms(cwf)
-  // log('_TD', termcdicts)
+  log('_TD', termcdicts)
+  let termcdictsnew = await getTermsNew(cwf)
+  log('_TD NEW', termcdictsnew)
   let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, term: true}, {indecl: true}])
   let tchains_ =  [[{cdicts: termcdicts}]]
   if (termcdicts.length) chains.push(...tchains)
@@ -28,6 +29,8 @@ export async function anthrax(wf) {
   if (dchains) chains.push(...dchains)
   return chains
 }
+
+// terms: πρίν
 
 // ἀδικέω - здесь δι не префикс
 // αἱρέω,
@@ -288,14 +291,14 @@ async function cleanBreaks(pcwf, dag) {
   })
 
   regkeys = _.uniq(_.compact(regkeys.map(dict=> dict.regstem)))
-  regkeys = ['πυνθαν']
+  // regkeys = ['πυνθαν']
   let regdicts = await getDicts(regkeys)
   // log('_regkeys', regkeys, regdicts.length)
   // log('_BREAKS', breaks)
   return {breaks, regdicts}
 }
 
-function prettyBeakIDs(breaks) {
+function prettyBeakIDs_(breaks) {
   return breaks.map(br=> {
     let strs = []
     if (br.head) strs.push(br.head)
@@ -307,7 +310,7 @@ function prettyBeakIDs(breaks) {
 }
 
 // return словарное значение pref.term и коннектор до stem
-function schemePref(pref, pcwf) {
+function schemePref_(pref, pcwf) {
   let re = new RegExp('^' + pref.seg)
   pcwf = pcwf.replace(re, '')
   let conn = findConnection(pcwf)
