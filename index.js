@@ -31,6 +31,7 @@ export async function anthrax(wf) {
 }
 
 // terms: πρίν
+// ψευδο - убрать из префиксов!
 
 // ἀδικέω - здесь δι не префикс
 // αἱρέω,
@@ -43,6 +44,7 @@ export async function anthrax(wf) {
 // ἀμφίβραχυς - adj
 // προσδιαγράφω, προσδιαφορέω, προσεπεισφορέω
 // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза.
+// συγκαθαιρέω - а теперь бред
 
 
 async function anthraxChains(wf) {
@@ -200,7 +202,8 @@ function dict2flexFilter(aug, dicts, fls) {
       // log('_____flex____:', flex.name, flex.term, 'aug:', flex.aug, 'key:', flex.key, flex.gend)
       let ok = false
       // if (dict.name && flex.name && dict.keys.find(key=> key == flex.key) && dict.aug == flex.aug) ok = true
-      if (dict.name && flex.name && dict.keys.find(key=> key == flex.key) ) ok = true
+      if (dict.keys && dict.name && flex.name && dict.keys.find(key=> key == flex.key) ) ok = true
+      if (dict.name && flex.name && dict.type == flex.type ) ok = true
       // else if (dict.name && flex.adv && dict.keys.adv && dict.keys.adv == flex.key) ok = true
       // else if (dict.part && flex.part ) ok = true
 
