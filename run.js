@@ -17,8 +17,8 @@ async function run() {
     log('\n_run chains:', wordform, chains.length)
     for (let chain of chains) {
         log('_chain:', chain)
-        let prettyres = prettyRes(chain)
-        res.push(prettyres)
+        // let prettyres = prettyRes(chain)
+        // res.push(prettyres)
     }
     log('_res:', res)
 }
