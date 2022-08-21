@@ -10382,14 +10382,14 @@ acc: ἔθος, ἔθεε, ἔθεα
 voc: ἔθος, ἔθεε, ἔθεα
 
 # ----------------------------------
-dict: εἶ • (eî)
+# dict: εἶ • (eî)
 
-    Old name of the letter ε (epsilon, see ἒ ψιλόν (è psilón), έψιλον).
+#    Old name of the letter ε (epsilon, see ἒ ψιλόν (è psilón), έψιλον).
 
 # ----------------------------------
-dict: εἰδοί • (eidoí), m
+# dict: εἰδοί • (eidoí), m
 
-    (historical) The ides, used in reckoning Roman dates: the 15th day of March, May, Quintilis or July, and October and the 13th day of the other months.
+#    (historical) The ides, used in reckoning Roman dates: the 15th day of March, May, Quintilis or July, and October and the 13th day of the other months.
 
 # ----------------------------------
 dict: εἶδος • (eîdos) n (genitive εἴδεος or εἴδους); third declension
@@ -16396,9 +16396,9 @@ acc: κάλαμον, καλάμω, καλάμους
 voc: κάλαμε, καλάμω, κάλαμοι
 
 # ----------------------------------
-dict: καλανδαί • (kalandaí), f
+# dict: καλανδαί • (kalandaí), f
 
-    (historical) The calends, used in reckoning Roman dates: the 1st day of a month.
+#     (historical) The calends, used in reckoning Roman dates: the 1st day of a month.
 
 # ----------------------------------
 dict: Καληδόνιος • (Kalēdónios) m (genitive Καληδονίου); second declension
@@ -16855,6 +16855,7 @@ restrict: sg
 # acc: κάρπασον
 # voc: κάρπασε
 
+# ----------------------------------
 dict: κάρπασοι • (kárpasos) n (genitive καρπάσων); second declension
 
     flax (Linum usitatissimum or Linum bienne)
@@ -19196,11 +19197,10 @@ acc: Κρῆτα, Κρῆτε, Κρῆτας
 voc: Κρής, Κρῆτε, Κρῆτες
 
 # ----------------------------------
-dict: κρῖ • (krî) n (genitive)
+# dict: κρῖ • (krî) n (genitive)
 
-    Epic form of κριθή (krithḗ)
-
-# Only, the, nominative, and, accusative, singular, κρῖ, is, attested.
+#     Epic form of κριθή (krithḗ)
+#     Only the nominative and accusative singular κρῖ is attested.
 
 # ----------------------------------
 dict: κριθή • (krīthḗ) f (genitive κριθῆς); first declension
@@ -20389,9 +20389,9 @@ acc: Λάκωνα, Λάκωνε, Λάκωνας
 voc: Λάκων, Λάκωνε, Λάκωνες
 
 # ----------------------------------
-dict: λάλ • (lál) n (indeclinable)
+# dict: λάλ • (lál) n (indeclinable)
 
-    (Koine) Synonym of λάβδα (lábda, “the letter Λ, λ”, “lambda”)
+#     (Koine) Synonym of λάβδα (lábda, “the letter Λ, λ”, “lambda”)
 
 # ----------------------------------
 dict: λάλαξ • (lálax) m (genitive λάλαγος); third declension
@@ -24559,9 +24559,9 @@ dict: νοῦς • (noûs) m (genitive νοῦ); second declension, (Attic)
     contracted form of νόος (nóos)
 
 # ----------------------------------
-dict: νῦ • (nû) n (indeclinable)
+# dict: νῦ • (nû) n (indeclinable)
 
-    The letter nu (Ν ν).
+#    The letter nu (Ν ν).
 
 # ----------------------------------
 dict: νυκτερίς • (nukterís) f (genitive νυκτερίδος); third declension
@@ -24649,9 +24649,9 @@ acc: Νωλανόν, Νωλανώ, Νωλανούς
 voc: Νωλανέ, Νωλανώ, Νωλανοί
 
 # ----------------------------------
-dict: νωναί • (nōnaí), f
+# dict: νωναί • (nōnaí), f
 
-    (historical) The nones, used in reckoning Roman dates: the 7th day of March, May, Quintilis or July, and October and the 5th day of all other months.
+#    (historical) The nones, used in reckoning Roman dates: the 7th day of March, May, Quintilis or July, and October and the 5th day of all other months.
 
 # ----------------------------------
 dict: νῶτον • (nôton) n (genitive νώτου); second declension
@@ -24678,9 +24678,9 @@ acc: ξάνθην, ξάνθα, ξάνθας
 voc: ξάνθη, ξάνθα, ξάνθαι
 
 # ----------------------------------
-dict: ξεῖ • (xeî) n (indeclinable)
+# dict: ξεῖ • (xeî) n (indeclinable)
 
-    xi, the name of the letter Ξ (X), ξ (x)
+#    xi, the name of the letter Ξ (X), ξ (x)
 
 # ----------------------------------
 dict: ξεῖνος • (xeînos) m (genitive ξείνου); second declension
@@ -24763,9 +24763,9 @@ acc: ξηρίον, ξηρίω, ξηρία
 voc: ξηρίον, ξηρίω, ξηρία
 
 # ----------------------------------
-dict: ξῖ • (xî) n (indeclinable)
+# dict: ξῖ • (xî) n (indeclinable)
 
-    Alternative spelling of ξεῖ (xeî, “xi”)
+#    Alternative spelling of ξεῖ (xeî, “xi”)
 
 # ----------------------------------
 dict: ξιφίας • (xiphíās) m (genitive ξιφίου); first declension
@@ -27619,9 +27619,9 @@ acc: πέδον, πέδω, πέδα
 voc: πέδον, πέδω, πέδα
 
 # ----------------------------------
-dict: πεῖ • (peî) n (indeclinable)
+# dict: πεῖ • (peî) n (indeclinable)
 
-    pi, the letter π (p), Π (P)
+#    pi, the letter π (p), Π (P)
 
 # ----------------------------------
 dict: πειθώ • (peithṓ) f (genitive πειθόος or πειθοῦς); third declension
@@ -30465,19 +30465,19 @@ voc: πῶυ, -
 # ============================================ R ===============================
 
 # ----------------------------------
-dict: ῥαββί • (rhabbī́) m (indeclinable)
+# dict: ῥαββί • (rhabbī́) m (indeclinable)
 
-    (biblical) O my Master
-
-#
-dict: ῥαββονί • (rhabbonī́) m (indeclinable)
-
-    Alternative form of ῥαββί (rhabbī́)
+#    (biblical) O my Master
 
 #
-dict: ῥαββουνί • (rhabbounī́) m (indeclinable)
+# dict: ῥαββονί • (rhabbonī́) m (indeclinable)
 
-    Alternative form of ῥαββί (rhabbí)
+#    Alternative form of ῥαββί (rhabbī́)
+
+#
+# dict: ῥαββουνί • (rhabbounī́) m (indeclinable)
+
+#    Alternative form of ῥαββί (rhabbí)
 
 # ------------------------------------
 dict: ῥαβδομαντεία • (rhabdomanteíā) f (genitive ῥαβδομαντείας); first declension
@@ -30888,9 +30888,9 @@ acc: ῥυτίδα, ῥυτίδε, ῥυτίδας
 voc: ῥυτίς, ῥυτίδε, ῥυτίδες
 
 # ----------------------------------
-dict: ῥῶ • (rhô) n (indeclinable)
+# dict: ῥῶ • (rhô) n (indeclinable)
 
-    rho, the letter Ρ (R), ρ (r)
+#x    rho, the letter Ρ (R), ρ (r)
 
 # ----------------------------------
 dict: Ῥωμαῖος • (Rhōmaîos) m (genitive Ῥωμαίου); second declension
@@ -34902,14 +34902,14 @@ acc: τάσιν, τάσει, τάσεις
 voc: τάσι, τάσει, τάσεις
 
 # ----------------------------------
-dict: ταῦ • (taû) n (indeclinable)
+# dict: ταῦ • (taû) n (indeclinable)
 
-    Tau, the 19th letter of the Euclidean alphabet, usually romanized as t.
+#    Tau, the 19th letter of the Euclidean alphabet, usually romanized as t.
 
 # ----------------------------------
-dict: ταυροκαθάψια • (taurokathápsia), f
+# dict: ταυροκαθάψια • (taurokathápsia), f
 
-    bull leaping - a Minoan sport in which athletes performed jumps over a bull, touching its back whilst passing.
+#    bull leaping - a Minoan sport in which athletes performed jumps over a bull, touching its back whilst passing.
 
 # ----------------------------------
 dict: Ταυρομενίτης • (Tauromenī́tēs) m (genitive Ταυρομενίτου); first declension
@@ -37225,9 +37225,9 @@ acc: φάτταν, φάττα, φάττας
 voc: φάττα, φάττα, φάτται
 
 # ----------------------------------
-dict: φεῖ • (pheî) n (indeclinable)
+# dict: φεῖ • (pheî) n (indeclinable)
 
-    Phi, the 21st letter of the Euclidean alphabet, usually romanized as "ph".
+#    Phi, the 21st letter of the Euclidean alphabet, usually romanized as "ph".
 
 # ----------------------------------
 dict: φεῖλος • (pheîlos) n (genitive φείλεος); third declension

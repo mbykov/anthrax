@@ -95,7 +95,7 @@ pref: δίσ-
 # pref: δύο
 pref: δύ
      (cardinal): two
-      = δύ'
+#      = δύ'
 # ========= NB check this
 
 # pref: δώδεκα

@@ -76,7 +76,7 @@ async function anthraxChains(wf) {
     // если stem не найден, то и pref+stem не будет найден
 
     dag.prefs = await findPrefs(dag)
-    p('_dag.prefs', dag.prefs)
+    log('_dag.prefs', dag.prefs)
 
     // ἀδικέω - odd δικάζω
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
@@ -144,6 +144,7 @@ async function anthraxChains(wf) {
         re = new RegExp('^' + pref.conn)
         pcwf = pcwf.replace(re, '')
 
+        // log('_dag.prefs:', pref)
         // let {conn, pcwf} = schemePref(pref, dag.pcwf)
         // p('_\n==scheme pref== .seg:', pref.seg, 'conn:', pref.conn, 'pcwf', pcwf)
 
@@ -166,7 +167,7 @@ async function anthraxChains(wf) {
             // == PRE FILTER ==
             let pfls = br.fls.docs
             let cpdicts = pdicts.filter(pdict=> {
-                log('_pre filter', pdict.rdict, pdict.pref, pref.seg, pdict.pref == pref.seg)
+                // log('_pre filter', pdict.rdict, pdict.pref, pref.seg, pdict.pref == pref.seg)
                 if (!pdict.pref) return true // compound, i.e. pref.seg + stem.wo.pref, ἀπο.trns + δείκνυμι.trns
                 if (pdict.pref && pref.seg == pdict.pref) return true // ἀποδείκνυμι.trns
                 // if (pdict.aug && strip(pdict.aug) == strip(conn)) return true
@@ -384,24 +385,24 @@ async function findDicts(breaks) {
   return dicts
 }
 
-export async function findPrefs(dag) {
-  let headkeys = dag.flakes.map(flake=> plain(flake.head))
-  // log('_headkeys', headkeys)
-  let prefs = await getPrefs(headkeys)
-  // log('_find_prefs=', prefs)
-  // compound - προσδιαιρέω
-  // выбрать compound-prefs, если есть - найти длиннейший
-  // и забрать исходники
-  let cprefs = prefs.filter(pref=> pref.cpref)
-  if (cprefs.length) {
-    let compound = _.maxBy(cprefs, function(pref) { return pref.term.length; })
-    prefs = await getPrefs(compound.prefs)
-    prefs.unshift(compound)
-    prefs = prefs.filter(pref=> pref.term[0] == dag.pcwf[0])
-  }
-  /* log('_PREFS', prefs) */
+async function findPrefs(dag) {
+    let headkeys = dag.flakes.map(flake=> plain(flake.head))
+    log('_headkeys', headkeys)
+    let prefs = await getPrefs(_.uniq(headkeys))
+    // log('_find_prefs=', prefs)
+    // compound - προσδιαιρέω
+    // выбрать compound-prefs, если есть - найти длиннейший
+    // и забрать исходники
+    let cprefs = prefs.filter(pref=> pref.cpref)
+    if (cprefs.length) {
+        let compound = _.maxBy(cprefs, function(pref) { return pref.term.length; })
+        prefs = await getPrefs(compound.prefs)
+        prefs.unshift(compound)
+        prefs = prefs.filter(pref=> pref.term[0] == dag.pcwf[0])
+    }
+    /* log('_PREFS', prefs) */
 
-  prefs.forEach(pref=> pref.plain = plain(pref.term))
-  prefs = prefs.map(pref=> {return {seg: pref.plain, cdicts: [pref], pref: true}})
-  return prefs
+    prefs.forEach(pref=> pref.plain = plain(pref.term))
+    prefs = prefs.map(pref=> {return {seg: pref.plain, cdicts: [pref], pref: true}})
+    return prefs
 }
