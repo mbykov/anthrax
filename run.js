@@ -12,14 +12,22 @@ const log = console.log
 // let fls = process.argv[3]
 
 async function run() {
-    let res = []
-    let chains = await anthrax(wordform)
-    log('\n_run chains:', wordform, chains.length)
-    for (let chain of chains) {
-        log('_chain:', chain)
-        // let prettyres = prettyRes(chain)
-        // res.push(prettyres)
-    }
+  let res = []
+  let chains = await anthrax(wordform)
+  log('\n_run chains:', wordform, chains)
+
+  let indecls = chains.find(chain=> chain.length == 1)
+  let indecl = indecls[0]
+  if (indecl) {
+    log('_INDECL', indecl.seg, indecl.cdict)
+  }
+  chains = chains.filter(chain=> chain.length > 1)
+  log('\n_run chains:', wordform, chains.length)
+  for (let chain of chains) {
+    log('_chain:', chain)
+    // let prettyres = prettyRes(chain)
+    // res.push(prettyres)
+  }
     log('_res:', res)
 }
 

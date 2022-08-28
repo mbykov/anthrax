@@ -21,7 +21,7 @@ export async function anthrax(wf) {
   // log('_TD', termcdicts)
   let termcdicts = await getTermsNew(cwf)
   // log('_TD NEW', termcdictsnew)
-  let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, term: true}, {indecl: true}])
+  let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, indecl: true}])
   let tchains_ =  [[{cdicts: termcdicts}]]
   if (termcdicts.length) chains.push(...tchains)
 
