@@ -16,7 +16,7 @@ async function run() {
   let chains = await anthrax(wordform)
   log('\n_run chains:', wordform, chains)
 
-  let indecls = chains.find(chain=> chain.length == 1)
+  let indecls = chains.filter(chain=> chain.length == 1)
   let indecl = indecls[0]
   if (indecl) {
     log('_INDECL', indecl.seg, indecl.cdict)
