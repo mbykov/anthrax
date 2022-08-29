@@ -127,7 +127,7 @@ async function anthraxChains(wf) {
                 let augseg = (aug) ? {seg: aug} : {}
                 let brchains = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, augseg, regdicts)
                 // log('_brCh', brchains)
-                chains.push(...brchains)
+                chains.push(brchains)
             }
         }
     }
@@ -200,9 +200,10 @@ function filterProbe(dict, pfls) {
         if (dict.name && flex.name && dict.type == flex.type && dict.gens.includes(flex.gen)) ok = true
         // if (dict.name && flex.name) ok = true
         // if (dict.keys && !flex.key) ok = false
-        if (dict.keys && dict.keys[flex.gend] != flex.key) ok = false
+        if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
+        if (!flex.key) ok = false
         if (ok) cfls.push(flex)
-        // if (ok) log('_F=================', flex)
+        if (ok) log('_F=================', flex)
     }
     // log('_D', dict, 'cfls', cfls.length)
     return cfls
