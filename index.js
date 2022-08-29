@@ -15,24 +15,23 @@ const b = Debug('break')
 let dag = {}
 
 export async function anthrax(wf) {
-  let chains = []
-  let cwf = oxia(comb(wf).toLowerCase())
-  // let termcdicts = await getTerms(cwf)
-  // log('_TD', termcdicts)
-  let termcdicts = await getTermsNew(cwf)
-  // log('_TD NEW', termcdictsnew)
-  let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, indecl: true}])
-  let tchains_ =  [[{cdicts: termcdicts}]]
-  if (termcdicts.length) chains.push(...tchains)
+    let chains = []
+    let cwf = oxia(comb(wf).toLowerCase())
+    // let termcdicts = await getTerms(cwf)
+    // log('_TD', termcdicts)
+    let termcdicts = await getTermsNew(cwf)
+    // log('_TD NEW', termcdictsnew)
+    let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, indecl: true}])
+    let tchains_ =  [[{cdicts: termcdicts}]]
+    if (termcdicts.length) chains.push(...tchains)
 
-  let dchains = await anthraxChains(wf)
+    let dchains = await anthraxChains(wf)
     if (dchains) chains.push(...dchains)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1
     if (chains.length > 1) {
         // chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
     }
-  chains = []
-  return chains
+    return chains
 }
 
 // terms: πρίν
@@ -89,140 +88,49 @@ async function anthraxChains(wf) {
         let pcwf = dag.pcwf.replace(re, '')
         // log('_\n==scheme aug== :', dag.pcwf, 'aug_:', aug, 'pcwf', pcwf)
         let {breaks, regdicts} = await cleanBreaks(pcwf, dag)
-        // log('_CL BREAKS', breaks, regdicts.length)
+        // log('_CL BREAKS', breaks)
+        let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
+        log('_breaks-ids', breaksids)
 
         for (let br of breaks) {
-            // if (!br.conn) br.conn = ''
-            // let headdicts = dicts.filter(dict=> dict.stem == br.head)
-            // let taildicts = dicts.filter(dict=> dict.stem == br.tail)
             let headdicts = br.headdicts
             let taildicts = br.taildicts
+            // pdicts - совсем грязные
+            // by aug / pref - cognates
+            //  = by fls - name-name; key-key / gen-gen
             let pdicts = (br.tail) ? taildicts : headdicts
             let mainseg = (br.tail) ? (br.tail) : (br.head)
-            // let conn = (br.tail) ? br.conn : ''
-            // b('\n_==BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg)
-            // log('_br headdicts:', headdicts.length)
+            log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg)
 
-          let pfls = br.fls.docs
-          // pdicts - совсем грязные
-          // by aug / pref - cognates
-          //  = by fls - name-name; key-key / gen-gen
+            let pfls = br.fls.docs
 
-          pfls = pfls.filter(flex=> {
-            // здесь, кажется, если wkt - точное соответствие aug, а dvr - только наличие aug
-            // или вообще выкинуть aug из flex?
-            if (!!flex.aug != !!aug) return false
-            return true
-          })
-
-          // остались prefs для cognates:
-          pdicts = pdicts.filter(dict=> {
-            if (dict.aug != aug) return false
-            return true
-          })
-
-          let dictgroups = _.groupBy(pdicts, 'dict')
-          // log('_gr', dictgroups)
-
-          for (let dict in dictgroups) {
-            let grdicts = dictgroups[dict]
-            // log('_grDD', dict, grdicts.length)
-            let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
-            // log('_PROBE', !!probe)
-            // log('_PROBE', probe.rdict)
-            let cfls = filterProbe(probe, pfls)
-
-            if (!cfls.length) continue
-            log('_PROBE-CFLS', cfls.length)
-
-            let augseg = (aug) ? {seg: aug} : {}
-            let brchains = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, augseg, regdicts)
-            log('_brCh', brchains)
-            chains.push(...brchains)
-          }
-
-          function makeChain(br, probe, cdicts, fls, mainseg, headdicts, pref, regdicts) {
-            let chains = []
-            let chain = []
-            let flsseg = {seg: br.fls._id, fls}
-            chain.push(flsseg)
-
-            let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, mainseg: true}
-            // если нужен regdict для одного из cdicts, перенести trns
-            // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
-            // if (regdict) tailseg.regdict = regdict
-            chain.unshift(tailseg)
-
-            if (br.head && br.tail) {
-              let connseg = {seg: br.conn, conn: true}
-              if (br.conn) chain.unshift(connseg)
-              if (headdicts.length) {
-                let headseg = {seg: br.head, cdicts: headdicts, head: true}
-                chain.unshift(headseg)
-              }
-            }
-
-            if (pref.seg) {
-              let seg = pref.seg
-              if (pref.conn) seg = [seg, pref.conn].join('')
-              let prefseg
-              if (pref.cdicts) prefseg = {seg: seg, cdicts: pref.cdicts, pref: true}
-              else prefseg = {seg: seg, aug: true}
-              chain.unshift(prefseg)
-            }
-            return chain
-          }
-
-          function filterProbe(dict, pfls) {
-            let cfls = []
-            for(let flex of pfls) {
-              let ok = false
-              if (dict.name && flex.name && dict.type == flex.type && dict.gens.includes(flex.gen)) ok = true
-              // if (dict.keys && !flex.key) ok = false
-              // if (dict.keys && dict.keys[flex.gend] != flex.key) ok = false
-              if (ok) cfls.push(flex)
-              if (ok) log('_F', flex)
-            }
-            log('_D', dict)
-            return cfls
-          }
-
-
-
-          // log('_CDICTS',  'CFLS', cfls.length)
-          continue
-
-          // log('_====P', pfls.length)
-            pfls = pfls.filter(flex=> {
-                if (!flex.aug) flex.aug = ''
-                if (flex.pref) return flase
-                // if (!flex.verb) return false
-                // if (flex.tense == 'mid.aor.ind' && flex.numper == 'sg.2') log('_=====', flex, aug)
-                if (aug && flex.aug == aug) return true
-                if (!aug && !flex.aug) return true
-            })
-            // log('_====P2', pfls.length)
-
+            // остались prefs для cognates:
             pdicts = pdicts.filter(dict=> {
-                // log('_aug', aug, dict.aug, dict.aug != aug)
-                if (dict.pref) return false
                 if (dict.aug != aug) return false
                 return true
             })
 
-            let {cdicts_, cfls_} = dict2flexFilter(aug, pdicts, pfls)
-            b('_pdicts:', pdicts.length, '_pfls:', pfls.length)
-            b('_after_filter: cdicts:', cdicts.length, 'cfls:', cfls.length)
+            let dictgroups = _.groupBy(pdicts, 'dict')
+            // log('_gr', dictgroups)
 
-            if (!cdicts.length) continue
-            let augseg_ = (aug) ? {seg: aug} : {}
-            let brchains_ = makeChains(br, cdicts, cfls, mainseg, headdicts, augseg, regdicts)
-            // log('_C', chain)
-            chains.push(...brchains)
-            // chains = []
+            for (let dict in dictgroups) {
+                let grdicts = dictgroups[dict]
+                // log('_grDD', dict, grdicts.length)
+                let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
+                // log('_PROBE', !!probe)
+                // log('_PROBE', probe.rdict)
+                let cfls = filterProbe(probe, pfls)
+
+                if (!cfls.length) continue
+                log('_PROBE-CFLS', dict, cfls.length)
+
+                let augseg = (aug) ? {seg: aug} : {}
+                let brchains = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, augseg, regdicts)
+                // log('_brCh', brchains)
+                chains.push(...brchains)
+            }
         }
     }
-
 
     for (let pref of dag.prefs) {
         let re = new RegExp('^' + pref.seg)
@@ -255,7 +163,7 @@ async function anthraxChains(wf) {
           // == PRE FILTER ==
 
           let groups = _.groupBy(pdicts, 'dict')
-          log('_gr', groups)
+          // log('_gr', groups)
 
           continue
 
@@ -281,12 +189,62 @@ async function anthraxChains(wf) {
         } // br
     } // pref
 
+    // return []
     return chains
 }
 
+function filterProbe(dict, pfls) {
+    let cfls = []
+    for(let flex of pfls) {
+        let ok = false
+        if (dict.name && flex.name && dict.type == flex.type && dict.gens.includes(flex.gen)) ok = true
+        // if (dict.name && flex.name) ok = true
+        // if (dict.keys && !flex.key) ok = false
+        if (dict.keys && dict.keys[flex.gend] != flex.key) ok = false
+        if (ok) cfls.push(flex)
+        // if (ok) log('_F=================', flex)
+    }
+    // log('_D', dict, 'cfls', cfls.length)
+    return cfls
+}
+
+function makeChain(br, probe, cdicts, fls, mainseg, headdicts, pref, regdicts) {
+    let chains = []
+    let chain = []
+    let flsseg = {seg: br.fls._id, fls}
+    chain.push(flsseg)
+
+    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, mainseg: true}
+    // если нужен regdict для одного из cdicts, перенести trns
+    // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
+    // if (regdict) tailseg.regdict = regdict
+    chain.unshift(tailseg)
+
+    if (br.head && br.tail) {
+        let connseg = {seg: br.conn, conn: true}
+        if (br.conn) chain.unshift(connseg)
+        if (headdicts.length) {
+            let headseg = {seg: br.head, cdicts: headdicts, head: true}
+            chain.unshift(headseg)
+        }
+    }
+
+    if (pref.seg) {
+        let seg = pref.seg
+        if (pref.conn) seg = [seg, pref.conn].join('')
+        let prefseg
+        if (pref.cdicts) prefseg = {seg: seg, cdicts: pref.cdicts, pref: true}
+        else prefseg = {seg: seg, aug: true}
+        chain.unshift(prefseg)
+    }
+    return chain
+}
+
+
+
 // ======== FILTERS ========================================================
 function dict2flexFilter(aug, dicts, fls) {
-  return {cdicts: [], cfls: []}
+    return {cdicts: [], cfls: []}
 
     let cdicts = []
     let cfls = []
@@ -324,24 +282,24 @@ function dict2flexFilter(aug, dicts, fls) {
 }
 
 function makeChains(br, cdicts, fls, mainseg, headdicts, pref, regdicts) {
-  let chains = []
-  // let idx = 0
-  // for (let cdict of cdicts) {
-  let chain = []
-  // let fls = cfls[idx]
-  // idx++
-  let flsseg = {seg: br.fls._id, fls}
-  chain.push(flsseg)
+    let chains = []
+    // let idx = 0
+    // for (let cdict of cdicts) {
+    let chain = []
+    // let fls = cfls[idx]
+    // idx++
+    let flsseg = {seg: br.fls._id, fls}
+    chain.push(flsseg)
 
-  let tailseg = {seg: mainseg, cdicts, mainseg: true}
-  // если нужен regdict для одного из cdicts, перенести trns
-  // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
-  // if (regdict) tailseg.regdict = regdict
-  chain.unshift(tailseg)
+    let tailseg = {seg: mainseg, cdicts, mainseg: true}
+    // если нужен regdict для одного из cdicts, перенести trns
+    // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
+    // if (regdict) tailseg.regdict = regdict
+    chain.unshift(tailseg)
 
-  if (br.head && br.tail) {
-    let connseg = {seg: br.conn, conn: true}
-    if (br.conn) chain.unshift(connseg)
+    if (br.head && br.tail) {
+        let connseg = {seg: br.conn, conn: true}
+        if (br.conn) chain.unshift(connseg)
     if (headdicts.length) {
       let headseg = {seg: br.head, cdicts: headdicts, head: true}
       chain.unshift(headseg)
@@ -366,8 +324,6 @@ function makeChains(br, cdicts, fls, mainseg, headdicts, pref, regdicts) {
 async function cleanBreaks(pcwf, dag) {
   let breaks = makeBreaks(pcwf, dag.flexes)
   // p('_breaks', breaks)
-  let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-  p('_breaks-ids', breaksids)
 
   // dicts - только те, что есть в словарях
   let dicts = await findDicts(breaks)
