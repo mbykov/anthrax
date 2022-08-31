@@ -17,9 +17,10 @@ async function run() {
     log('\n_run chains:', wordform, chains.length)
 
     let indecls = chains.filter(chain=> chain.length == 1)
-    let indecl = indecls[0]
+    let indecl = indecls[0][0]
     if (indecl) {
-        log('_INDECL', indecl.seg, indecl.cdict)
+        log('_INDECL', indecl.seg, indecl.cdicts)
+        return
     }
     // chains = chains.filter(chain=> chain.length > 1)
     log('\n_run chains:', wordform, chains.length)

@@ -21,9 +21,9 @@ export async function anthrax(wf) {
     // log('_TD', termcdicts)
     let termcdicts = await getTermsNew(cwf)
     // log('_TD NEW', termcdictsnew)
-    let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, indecl: true}])
-    let tchains_ =  [[{cdicts: termcdicts}]]
-    if (termcdicts.length) chains.push(...tchains)
+    // let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, indecl: true}])
+    let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
+    if (termcdicts.length) chains.push(termchain)
 
     let dchains = await anthraxChains(wf)
     if (dchains) chains.push(...dchains)
@@ -199,9 +199,8 @@ function filterProbe(dict, pfls) {
         let ok = false
         if (dict.name && flex.name && dict.type == flex.type && dict.gens.includes(flex.gen)) ok = true
         // if (dict.name && flex.name) ok = true
-        // if (dict.keys && !flex.key) ok = false
         if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
-        if (!flex.key) ok = false
+        // if (!flex.key) ok = false
         if (ok) cfls.push(flex)
         if (ok) log('_F=================', flex)
     }
