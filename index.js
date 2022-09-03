@@ -29,7 +29,7 @@ export async function anthrax(wf) {
     if (dchains) chains.push(...dchains)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1
     if (chains.length > 1) {
-        // chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
+        chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
     }
     return chains
 }
@@ -94,19 +94,22 @@ async function anthraxChains(wf) {
 
         for (let br of breaks) {
             let headdicts = br.headdicts
+            let headdictslist = headdicts.map(dict=> dict.rdict)
+            // log('_HEADDICTS', headdictslist)
             let taildicts = br.taildicts
             // pdicts - совсем грязные
             // by aug / pref - cognates
             //  = by fls - name-name; key-key / gen-gen
             let pdicts = (br.tail) ? taildicts : headdicts
             let mainseg = (br.tail) ? (br.tail) : (br.head)
-            log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg)
+            // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg)
 
             let pfls = br.fls.docs
 
             // остались prefs для cognates:
             pdicts = pdicts.filter(dict=> {
-                if (dict.aug != aug) return false
+                if (dict.name && dict.aug != aug) return false
+                else if (dict.verb && !dict.augs.includes(aug)) return false
                 return true
             })
 
@@ -115,11 +118,13 @@ async function anthraxChains(wf) {
 
             for (let dict in dictgroups) {
                 let grdicts = dictgroups[dict]
-                // log('_grDD', dict, grdicts.length)
+                // log('_grDicts', dict, grdicts.length)
                 let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
                 // log('_PROBE', !!probe)
                 // log('_PROBE', probe.rdict)
-                let cfls = filterProbe(probe, pfls)
+                let cfls = []
+                if (probe.verb) cfls = filterProbeVerb(probe, pfls)
+                else cfls = filterProbe(probe, pfls)
 
                 if (!cfls.length) continue
                 log('_PROBE-CFLS', dict, cfls.length)
@@ -191,6 +196,22 @@ async function anthraxChains(wf) {
 
     // return []
     return chains
+}
+
+function filterProbeVerb(dict, pfls) {
+    let cfls = []
+    for(let flex of pfls) {
+        let ok = true
+        // log('_F=================', flex.type, '_D', dict.type)
+        if (!flex.verb) ok = false
+        if (dict.type !== flex.type) ok = false
+        // if (dict.name && flex.name) ok = true
+        if (dict.keys && !dict.keys.includes(flex.key)) ok = false
+        if (ok) cfls.push(flex)
+        // if (ok) log('_F=================', flex)
+    }
+    // log('_D', dict, 'cfls', cfls.length)
+    return cfls
 }
 
 function filterProbe(dict, pfls) {
@@ -326,9 +347,11 @@ async function cleanBreaks(pcwf, dag) {
   // p('_breaks', breaks)
 
   // dicts - только те, что есть в словарях
-  let dicts = await findDicts(breaks)
-  let dictstems = _.uniq(dicts.map(dict=> dict.stem))
-  p('_dictstems_uniq_:', dictstems)
+    let dicts = await findDicts(breaks)
+    // let dictstems = _.uniq(dicts.map(dict=> dict.stem))
+    // let dictrdicts = _.uniq(dicts.map(dict=> dict.rdict))
+    // p('_dictstems_uniq_:', dictstems)
+    // log('_dictrdicts_uniq_:', dictrdicts)
 
   let regkeys = []
   breaks.forEach(br=> {

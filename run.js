@@ -17,9 +17,10 @@ async function run() {
     log('\n_run chains:', wordform, chains.length)
 
     let indecls = chains.filter(chain=> chain.length == 1)
-    let indecl = indecls[0][0]
-    if (indecl) {
+    if (indecls.length) {
+        let indecl = indecls[0][0]
         log('_INDECL', indecl.seg, indecl.cdicts)
+        // log('_fls:', indecl.cdicts[0].fls)
         return
     }
     // chains = chains.filter(chain=> chain.length > 1)
@@ -29,8 +30,9 @@ async function run() {
         let prettyres = prettyRes(chain)
         log('_prettyres:', prettyres)
         // res.push(prettyres)
+        // log('_fls:', chain[2].fls)
     }
-    log('_res:', res)
+    // log('_res:', res)
 }
 
 run()
