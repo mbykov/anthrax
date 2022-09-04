@@ -14,8 +14,6 @@ const log = console.log
 async function run() {
     let res = []
     let chains = await anthrax(wordform)
-    log('\n_run chains:', wordform, chains.length)
-
     let indecls = chains.filter(chain=> chain.length == 1)
     if (indecls.length) {
         let indecl = indecls[0][0]
