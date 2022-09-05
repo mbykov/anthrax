@@ -14,6 +14,21 @@ const b = Debug('break')
 
 let dag = {}
 
+// terms: πρίν
+// ψευδο - убрать из префиксов!
+// ἀδικέω - здесь δι не префикс
+// αἱρέω,
+// συγκαθαιρέω, καθαιρέω - нет в словаре, есть καθαίρω
+// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
+// πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
+// εὐχαριστία,
+// προσαναμιμνήσκω, προσδιαιρέω
+// παραγγέλλω = vow
+// ἀμφίβραχυς - adj
+// προσδιαγράφω, προσδιαφορέω, προσεπεισφορέω
+// note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза.
+// συγκαθαιρέω - а теперь бред
+
 export async function anthrax(wf) {
     let chains = []
     let cwf = oxia(comb(wf).toLowerCase())
@@ -29,28 +44,20 @@ export async function anthrax(wf) {
     if (dchains) chains.push(...dchains)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1
     if (chains.length > 1) {
-        // chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
+        chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
         // ломается на ἀγαπητός
     }
+
+    for (let chain of chains) {
+        let pref = chain.find(seg=> seg.pref)
+        if (!pref.cdicts) continue
+        for (let cdict of pref.cdicts.reverse()) {
+            log('_XXX', cdict.term)
+        }
+    }
+
     return chains
 }
-
-// terms: πρίν
-// ψευδο - убрать из префиксов!
-
-// ἀδικέω - здесь δι не префикс
-// αἱρέω,
-// συγκαθαιρέω, καθαιρέω - нет в словаре, есть καθαίρω
-// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
-// πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
-// εὐχαριστία,
-// προσαναμιμνήσκω, προσδιαιρέω
-// παραγγέλλω = vow
-// ἀμφίβραχυς - adj
-// προσδιαγράφω, προσδιαφορέω, προσεπεισφορέω
-// note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза.
-// συγκαθαιρέω - а теперь бред
-
 
 async function anthraxChains(wf) {
     dag = new Map();
@@ -70,7 +77,7 @@ async function anthraxChains(wf) {
 
     dag.prefs = []
     dag.pref = await findPrefs(dag)
-    log('_dag.pref', dag.pref)
+    // log('_dag.pref', dag.pref)
 
     let augseg
 
@@ -82,7 +89,6 @@ async function anthraxChains(wf) {
             re = new RegExp('^' + conn)
             dag.pcwf = dag.pcwf.replace(re, '')
         }
-        log('_============================', dag.pcwf)
         dag.aug = parseAug(dag.pcwf)
         dag.connector = true
         augseg = dag.pref
@@ -100,7 +106,7 @@ async function anthraxChains(wf) {
 
     let {breaks, regdicts} = await cleanBreaks(dag)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    log('_breaks-ids', breaksids)
+    // log('_breaks-ids', breaksids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
@@ -314,7 +320,7 @@ async function findPrefs(dag) {
     // log('_headkeys', headkeys)
     let prefs = await getPrefs(headkeys)
     if (!prefs.length) return
-    // log('_find_prefs_=', prefs.length)
+    // log('_find_prefs_=', prefs)
     let max = _.maxBy(prefs, function(pref) { return pref.term.length; })
     if (max.cpref) {
         let cprefs = await getPrefs(max.prefs)

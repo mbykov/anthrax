@@ -246,7 +246,6 @@ pref: προσ- • (pros-)
 # pref: παρα
 pref: παρ-
       from
-     = παρ
 
 # pref: περι
 pref: περ-
