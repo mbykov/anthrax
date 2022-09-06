@@ -49,11 +49,19 @@ export async function anthrax(wf) {
     }
 
     for (let chain of chains) {
-        let pref = chain.find(seg=> seg.pref)
-        if (!pref.cdicts) continue
-        for (let cdict of pref.cdicts.reverse()) {
-            log('_XXX', cdict.term)
-        }
+        // let prefseg = chain.find(seg=> seg.pref)
+        // let mainseg = chain.find(seg=> seg.mainseg)
+        // if (!prefseg.cdicts) continue
+        // for (let pref of prefseg.cdicts.reverse()) {
+        //     // ========================== TODO ====================
+        //     let long = ''
+        //     let parts = []
+        //     parts.push(pref.term)
+        //     if (prefseg.conn) parts.push(prefseg.conn)
+        //     parts.push(mainseg.rdict)
+        //     long = parts.join('')
+        //     log('_XXX', pref.term, long)
+        // }
     }
 
     return chains
@@ -75,22 +83,12 @@ async function anthraxChains(wf) {
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
-    dag.prefs = []
-    dag.pref = await findPrefs(dag)
+    dag.pref = await makePrefSegs(dag)
     // log('_dag.pref', dag.pref)
 
     let augseg
 
     if (dag.pref) {
-        let re = new RegExp('^' + dag.pref.seg)
-        dag.pcwf = dag.pcwf.replace(re, '')
-        let conn = findConnection(dag.pcwf)
-        if (conn) {
-            re = new RegExp('^' + conn)
-            dag.pcwf = dag.pcwf.replace(re, '')
-        }
-        dag.aug = parseAug(dag.pcwf)
-        dag.connector = true
         augseg = dag.pref
     } else {
         dag.aug = parseAug(dag.pcwf)
@@ -143,7 +141,7 @@ async function anthraxChains(wf) {
         }
     }
     chains.forEach(chain=> {
-        if (augseg) chain.unshift(augseg)
+        if (augseg) chain.unshift(...augseg)
     })
 
     return chains
@@ -314,17 +312,49 @@ async function findDicts(breaks) {
   return dicts
 }
 
-// compound - προσαναβαίνω
-async function findPrefs(dag) {
+// compound - προσαναβαίνω; ἀντιπαραγράφω
+async function makePrefSegs(dag) {
+    let prefsegs = []
     let headkeys = _.uniq(dag.flakes.map(flake=> plain(flake.head)))
-    // log('_headkeys', headkeys)
-    let prefs = await getPrefs(headkeys)
-    if (!prefs.length) return
+    log('_headkeys', headkeys)
+    let cprefs = await getPrefs(headkeys)
+    if (!cprefs.length) return
+    let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
+    let prefs = await getPrefs(max.prefs)
     // log('_find_prefs_=', prefs)
-    let max = _.maxBy(prefs, function(pref) { return pref.term.length; })
-    if (max.cpref) {
-        let cprefs = await getPrefs(max.prefs)
-        max.prefs = cprefs.filter(pref=> pref.pref && !pref.cpref)
+    // log('_PCWF', dag.pcwf)
+    // [{seg: term}, {seg: conn}, {seg: term}, {seg: conn}]
+
+    let pcwf = dag.pcwf
+    for (let pref of prefs) {
+        let re = new RegExp(pref.term)
+        pcwf = pcwf.replace(re, "-$&-")
     }
-    return {seg: max.term, cdicts: max.prefs, pref: true}
+    // log('_PCWF_2', pcwf)
+    let parts = pcwf.split('-').slice(1, -1)
+    // log('_PARTS', parts)
+    let segs = [], seg
+    for (let part of parts) {
+        let pref = prefs.find(pref=> pref.term == part)
+        if (pref) seg = {seg: part, cdicts: [pref], pref: true}
+        else seg = {seg: part, conn: true}
+        segs.push(seg)
+    }
+    // log('_SEGS', segs)
+    log('_XXX', dag.pcwf, max.term)
+    let re = new RegExp('^' + max.term)
+    dag.pcwf = dag.pcwf.replace(re, '')
+    let conn = findConnection(dag.pcwf)
+    if (conn) {
+        re = new RegExp('^' + conn)
+        dag.pcwf = dag.pcwf.replace(re, '')
+        let augseg = {seg: conn, conn: true, aug: true}
+        segs.push(augseg)
+    }
+
+    return segs
+
+    max.prefs = cprefs.filter(pref=> pref.pref && !pref.cpref)
+    // return {seg: max.term, cdicts: max.prefs, pref: true}
+    return {seg: max.term, segs, pref: true}
 }
