@@ -42,28 +42,15 @@ export async function anthrax(wf) {
 
     let dchains = await anthraxChains(wf)
     if (dchains) chains.push(...dchains)
-    // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1
-    if (chains.length > 1) {
-        chains = chains.filter(chain=> chain.slice(-2,-1)[0].seg.length > 1)
-        // ломается на ἀγαπητός
-    }
+    // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
+    let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
 
-    for (let chain of chains) {
-        // let prefseg = chain.find(seg=> seg.pref)
-        // let mainseg = chain.find(seg=> seg.mainseg)
-        // if (!prefseg.cdicts) continue
-        // for (let pref of prefseg.cdicts.reverse()) {
-        //     // ========================== TODO ====================
-        //     let long = ''
-        //     let parts = []
-        //     parts.push(pref.term)
-        //     if (prefseg.conn) parts.push(prefseg.conn)
-        //     parts.push(mainseg.rdict)
-        //     long = parts.join('')
-        //     log('_XXX', pref.term, long)
-        // }
-    }
+    // the whole compounds:
 
+    let whcomps = wholeCompounds(bestchain)
+    // log('_WHC', whcomps)
+
+    return []
     return chains
 }
 
@@ -95,7 +82,7 @@ async function anthraxChains(wf) {
         let re = new RegExp('^' + dag.aug)
         dag.pcwf = dag.pcwf.replace(re, '')
         dag.connector = false
-        augseg = {seg: dag.aug, aug: true}
+        augseg = [{seg: dag.aug, aug: true}]
     }
 
     // ἀδικέω - odd δικάζω
@@ -185,7 +172,7 @@ function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts) {
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
-    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, mainseg: true}
+    let tailseg = {seg: mainseg, cdicts, stem: probe.stem, mainseg: true} // rdict: probe.rdict,
     // если нужен regdict для одного из cdicts, перенести trns
     // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
     // if (regdict) tailseg.regdict = regdict
@@ -322,7 +309,7 @@ async function makePrefSegs(dag) {
     let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
     let prefs = await getPrefs(max.prefs)
     // log('_find_prefs_=', prefs)
-    // log('_PCWF', dag.pcwf)
+    // log('_MAX', max)
     // [{seg: term}, {seg: conn}, {seg: term}, {seg: conn}]
 
     let pcwf = dag.pcwf
@@ -330,13 +317,14 @@ async function makePrefSegs(dag) {
         let re = new RegExp(pref.term)
         pcwf = pcwf.replace(re, "-$&-")
     }
+    pcwf = pcwf.replace('--', '-')
     // log('_PCWF_2', pcwf)
     let parts = pcwf.split('-').slice(1, -1)
-    // log('_PARTS', parts)
+    log('_PARTS', parts)
     let segs = [], seg
     for (let part of parts) {
         let pref = prefs.find(pref=> pref.term == part)
-        if (pref) seg = {seg: part, cdicts: [pref], pref: true}
+        if (pref) seg = {seg: part, pref}
         else seg = {seg: part, conn: true}
         segs.push(seg)
     }
@@ -357,4 +345,28 @@ async function makePrefSegs(dag) {
     max.prefs = cprefs.filter(pref=> pref.pref && !pref.cpref)
     // return {seg: max.term, cdicts: max.prefs, pref: true}
     return {seg: max.term, segs, pref: true}
+}
+
+async function wholeCompounds(chain) {
+    log('_BEST', chain)
+    let whstems = []
+    let fromIndex = 0
+    let pref_id = 0
+    while (pref_id > -1) {
+        pref_id = _.findIndex(chain, function(seg) { return seg.pref; }, fromIndex);
+        fromIndex += pref_id +1
+        if (pref_id < 0) continue
+        let rsegs = chain.slice(pref_id)
+        let whstem = rsegs.map(seg=> {
+            if (seg.pref || seg.conn || seg.mainseg) return seg.seg
+        })
+        whstem = _.compact(whstem).join('')
+        // log('_PREF', pref_id)
+        let aug = parseAug(whstem)
+        if (aug) whstem = whstem.replace(aug, '')
+        whstems.push(whstem)
+    }
+    let whdicts = await getDicts(whstems)
+    log('_WHSTEMS', whstems)
+    log('_WHDICTS', whdicts)
 }
