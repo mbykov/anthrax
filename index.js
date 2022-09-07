@@ -46,7 +46,8 @@ export async function anthrax(wf) {
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
     let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
 
-    let wholecomps = await wholeCompounds(bestchain)
+    let wholecomps = []
+    // wholecomps = await wholeCompounds(bestchain)
     wholecomps.push(bestchain)
 
     return wholecomps
@@ -69,14 +70,19 @@ async function anthraxChains(wf) {
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
-    dag.pref = await makePrefSegs(dag)
-    // log('_dag.pref', dag.pref)
+    // let prefsegs, pcwf
+    let prefsegs = await makePrefSegs(dag)
     // return [{}] /////// ======= RETURN
+    log('_prefsegs', prefsegs.length)
+    dag.prefsegs = prefsegs
+    dag.prefsegs = false
+    // log('_dag.pref', dag.pref)
 
     let augseg
-
-    if (dag.pref) {
-        augseg = dag.pref
+    if (dag.prefsegs) {
+        augseg = dag.prefsegs
+        let prefhead = dag.prefsegs.map(seg=> seg.seg).join('')
+        dag.pcwf = dag.pcwf.replace(prefhead, '')
     } else {
         dag.aug = parseAug(dag.pcwf)
         let re = new RegExp('^' + dag.aug)
@@ -128,7 +134,7 @@ async function anthraxChains(wf) {
         }
     }
     chains.forEach(chain=> {
-        if (augseg) chain.unshift(...augseg)
+        if (augseg.seg) chain.unshift(...augseg)
     })
 
     return chains
@@ -304,10 +310,17 @@ async function makePrefSegs(dag) {
     let prefsegs = []
     let headkeys = _.uniq(dag.flakes.map(flake=> plain(flake.head)))
     let cprefs = await getPrefs(headkeys)
-    // log('_find_prefs_=', cprefs)
+    // log('_find_cprefs_=', cprefs)
     if (!cprefs.length) return
     let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
-    log('_prefs_max_=', max.prefs)
+    log('_max_prefs_=', max.prefs)
+    let seg
+
+    if (!max.prefs) {
+        prefsegs = [{seg: max.term, pref: max}]
+        return prefsegs
+    }
+
     let prefs = await getPrefs(max.prefs)
     // log('_find_prefs_=', prefs)
 
@@ -318,25 +331,24 @@ async function makePrefSegs(dag) {
     }
     pcwf = pcwf.replace(/--/g, '-')
     let parts = pcwf.split('-').slice(1, -1)
-    let segs = [], seg
     for (let part of parts) {
         let pref = prefs.find(pref=> pref.term == part)
         if (pref) seg = {seg: pref.term, pref}
         else seg = {seg: part, conn: true}
-        segs.push(seg)
+        prefsegs.push(seg)
     }
 
     // last connector btw prefs & stem
     let re = new RegExp('^' + max.term)
-    dag.pcwf = dag.pcwf.replace(re, '')
-    let conn = findConnection(dag.pcwf)
+    pcwf = pcwf.replace(re, '')
+    let conn = findConnection(pcwf)
     if (conn) {
         re = new RegExp('^' + conn)
-        dag.pcwf = dag.pcwf.replace(re, '')
+        pcwf = pcwf.replace(re, '')
         let augseg = {seg: conn, conn: true, aug: true}
-        segs.push(augseg)
+        prefsegs.push(augseg)
     }
-    return segs
+    return prefsegs
 }
 
 async function wholeCompounds(chain) {
