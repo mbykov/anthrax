@@ -4,7 +4,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { scrape, vowels, parseAug, aug2vow } from './lib/utils.js'
+import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
@@ -28,6 +28,7 @@ let dag = {}
 // προσδιαγράφω, προσδιαφορέω, προσεπεισφορέω
 // note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза.
 // συγκαθαιρέω - а теперь бред
+// προσεπεισφορέω
 
 export async function anthrax(wf) {
     let chains = []
@@ -45,10 +46,7 @@ export async function anthrax(wf) {
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
     let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
 
-    // the whole compounds:
-
     let wholecomps = await wholeCompounds(bestchain)
-    // log('_WHC', wholecomps)
     wholecomps.push(bestchain)
 
     return wholecomps
@@ -73,6 +71,7 @@ async function anthraxChains(wf) {
 
     dag.pref = await makePrefSegs(dag)
     // log('_dag.pref', dag.pref)
+    // return [{}] /////// ======= RETURN
 
     let augseg
 
@@ -305,8 +304,10 @@ async function makePrefSegs(dag) {
     let prefsegs = []
     let headkeys = _.uniq(dag.flakes.map(flake=> plain(flake.head)))
     let cprefs = await getPrefs(headkeys)
+    // log('_find_prefs_=', cprefs)
     if (!cprefs.length) return
     let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
+    log('_prefs_max_=', max.prefs)
     let prefs = await getPrefs(max.prefs)
     // log('_find_prefs_=', prefs)
 
@@ -315,7 +316,7 @@ async function makePrefSegs(dag) {
         let re = new RegExp(pref.term)
         pcwf = pcwf.replace(re, "-$&-")
     }
-    pcwf = pcwf.replace('--', '-')
+    pcwf = pcwf.replace(/--/g, '-')
     let parts = pcwf.split('-').slice(1, -1)
     let segs = [], seg
     for (let part of parts) {
@@ -336,10 +337,6 @@ async function makePrefSegs(dag) {
         segs.push(augseg)
     }
     return segs
-
-    // max.prefs = cprefs.filter(pref=> pref.pref && !pref.cpref)
-    // // return {seg: max.term, cdicts: max.prefs, pref: true}
-    // return {seg: max.term, segs, pref: true}
 }
 
 async function wholeCompounds(chain) {
@@ -350,23 +347,28 @@ async function wholeCompounds(chain) {
     let pref_id = 0
     while (pref_id > -1) {
         pref_id = _.findIndex(chain, function(seg) { return seg.pref; }, fromIndex);
-        fromIndex += pref_id +1
-        if (pref_id < 0) continue
+        fromIndex += pref_id
+        if (fromIndex == 0) fromIndex = 1
         let rsegs = chain.slice(pref_id)
         let whstem = rsegs.map(seg=> {
             if (seg.pref || seg.conn || seg.mainseg) return seg.seg
         })
         whstem = _.compact(whstem).join('')
-        // log('_whstem', whstem)
+        log('_whstem___before', whstem)
         let aug = parseAug(whstem)
+        log('_aug', aug)
         if (aug) whstem = whstem.replace(aug, '')
         whstems.push(whstem)
     }
+    whstems = _.compact(whstems)
     log('_whstems', whstems)
     let whdicts = await getDicts(whstems)
     let dictgroups = _.groupBy(whdicts, 'dict')
     // log('_WDG', dictgroups)
     let whchains = []
+
+    let mainseg = chain.find(seg=> seg.mainseg)
+    let probe = mainseg.cdicts[0]
 
     chain.forEach((seg, idx)=> {
         if (!seg.pref) return
@@ -374,6 +376,7 @@ async function wholeCompounds(chain) {
         for (let dict in dictgroups) {
             let cdicts = dictgroups[dict]
             let cdict = dictgroups[dict][0]
+            if (cdict.type != probe.type) continue
             let strdict = strip(cdict.dict)
             if (strdict.startsWith(pref.term)) {
                 log('_START WITH', cdict.rdict, pref.term)
