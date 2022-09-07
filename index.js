@@ -47,11 +47,12 @@ export async function anthrax(wf) {
 
     // the whole compounds:
 
-    let whcomps = wholeCompounds(bestchain)
-    // log('_WHC', whcomps)
+    let wholecomps = await wholeCompounds(bestchain)
+    // log('_WHC', wholecomps)
+    wholecomps.push(bestchain)
 
-    return []
-    return chains
+    return wholecomps
+    // return chains
 }
 
 async function anthraxChains(wf) {
@@ -172,7 +173,7 @@ function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts) {
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
-    let tailseg = {seg: mainseg, cdicts, stem: probe.stem, mainseg: true} // rdict: probe.rdict,
+    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, mainseg: true}
     // если нужен regdict для одного из cdicts, перенести trns
     // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
     // if (regdict) tailseg.regdict = regdict
@@ -303,14 +304,11 @@ async function findDicts(breaks) {
 async function makePrefSegs(dag) {
     let prefsegs = []
     let headkeys = _.uniq(dag.flakes.map(flake=> plain(flake.head)))
-    log('_headkeys', headkeys)
     let cprefs = await getPrefs(headkeys)
     if (!cprefs.length) return
     let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
     let prefs = await getPrefs(max.prefs)
     // log('_find_prefs_=', prefs)
-    // log('_MAX', max)
-    // [{seg: term}, {seg: conn}, {seg: term}, {seg: conn}]
 
     let pcwf = dag.pcwf
     for (let pref of prefs) {
@@ -318,18 +316,16 @@ async function makePrefSegs(dag) {
         pcwf = pcwf.replace(re, "-$&-")
     }
     pcwf = pcwf.replace('--', '-')
-    // log('_PCWF_2', pcwf)
     let parts = pcwf.split('-').slice(1, -1)
-    log('_PARTS', parts)
     let segs = [], seg
     for (let part of parts) {
         let pref = prefs.find(pref=> pref.term == part)
-        if (pref) seg = {seg: part, pref}
+        if (pref) seg = {seg: pref.term, pref}
         else seg = {seg: part, conn: true}
         segs.push(seg)
     }
-    // log('_SEGS', segs)
-    log('_XXX', dag.pcwf, max.term)
+
+    // last connector btw prefs & stem
     let re = new RegExp('^' + max.term)
     dag.pcwf = dag.pcwf.replace(re, '')
     let conn = findConnection(dag.pcwf)
@@ -339,16 +335,16 @@ async function makePrefSegs(dag) {
         let augseg = {seg: conn, conn: true, aug: true}
         segs.push(augseg)
     }
-
     return segs
 
-    max.prefs = cprefs.filter(pref=> pref.pref && !pref.cpref)
-    // return {seg: max.term, cdicts: max.prefs, pref: true}
-    return {seg: max.term, segs, pref: true}
+    // max.prefs = cprefs.filter(pref=> pref.pref && !pref.cpref)
+    // // return {seg: max.term, cdicts: max.prefs, pref: true}
+    // return {seg: max.term, segs, pref: true}
 }
 
 async function wholeCompounds(chain) {
-    log('_BEST', chain)
+    // log('_BEST', chain)
+    let flseg = chain.find(seg=> seg.fls)
     let whstems = []
     let fromIndex = 0
     let pref_id = 0
@@ -361,12 +357,39 @@ async function wholeCompounds(chain) {
             if (seg.pref || seg.conn || seg.mainseg) return seg.seg
         })
         whstem = _.compact(whstem).join('')
-        // log('_PREF', pref_id)
+        // log('_whstem', whstem)
         let aug = parseAug(whstem)
         if (aug) whstem = whstem.replace(aug, '')
         whstems.push(whstem)
     }
+    log('_whstems', whstems)
     let whdicts = await getDicts(whstems)
-    log('_WHSTEMS', whstems)
-    log('_WHDICTS', whdicts)
+    let dictgroups = _.groupBy(whdicts, 'dict')
+    // log('_WDG', dictgroups)
+    let whchains = []
+
+    chain.forEach((seg, idx)=> {
+        if (!seg.pref) return
+        let pref = seg.pref
+        for (let dict in dictgroups) {
+            let cdicts = dictgroups[dict]
+            let cdict = dictgroups[dict][0]
+            let strdict = strip(cdict.dict)
+            if (strdict.startsWith(pref.term)) {
+                log('_START WITH', cdict.rdict, pref.term)
+                let whchain = [{seg: cdict.stem, cdicts, rdict: cdict.rdict, mainseg: true }, flseg]
+                let pdict = plain(cdict.dict)
+                let aug = parseAug(pdict)
+                if (aug) {
+                    let augseg = {seg: strip(aug), conn: true}
+                    whchain.unshift(augseg)
+                }
+                let beforesegs = chain.slice(0, idx)
+                if (beforesegs.length) whchain.unshift(...beforesegs)
+                whchains.push(whchain)
+            }
+        }
+    })
+
+    return whchains
 }
