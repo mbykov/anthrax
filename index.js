@@ -44,11 +44,12 @@ export async function anthrax(wf) {
     let dchains = await anthraxChains(wf)
     if (dchains) chains.push(...dchains)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
-    let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
+    // let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
 
     let wholecomps = []
     // wholecomps = await wholeCompounds(bestchain)
-    wholecomps.push(bestchain)
+    // wholecomps.push(bestchain)
+    wholecomps.push(...chains)
 
     return wholecomps
     // return chains
@@ -73,7 +74,7 @@ async function anthraxChains(wf) {
     // let prefsegs, pcwf
     let prefsegs = await makePrefSegs(dag)
     // return [{}] /////// ======= RETURN
-    log('_prefsegs', prefsegs.length)
+    if (prefsegs) log('_prefsegs', prefsegs.length)
     dag.prefsegs = prefsegs
     dag.prefsegs = false
     // log('_dag.pref', dag.pref)
@@ -88,7 +89,7 @@ async function anthraxChains(wf) {
         let re = new RegExp('^' + dag.aug)
         dag.pcwf = dag.pcwf.replace(re, '')
         dag.connector = false
-        augseg = [{seg: dag.aug, aug: true}]
+        augseg = {seg: dag.aug, aug: true}
     }
 
     // ἀδικέω - odd δικάζω
@@ -110,8 +111,9 @@ async function anthraxChains(wf) {
 
         // остались prefs для cognates:
         pdicts = pdicts.filter(dict=> {
+            if (!dict.augs) return false // todo: добавить augs в dvr
             if (dict.name && dict.aug != dag.aug) return false
-            // else if (dict.verb && !dict.augs.includes(aug)) return false
+            else if (dict.verb && dict.augs && dag.aug && !dict.augs.includes(dag.aug)) return false
             return true
         })
 
@@ -121,27 +123,31 @@ async function anthraxChains(wf) {
             let grdicts = dictgroups[dict]
             // log('_grDicts', dict, grdicts.length)
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
-            // log('_PROBE', probe.rdict)
+            // log('_PROBE', dict, probe.rdict)
             let cfls = []
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbe(probe, pfls)
 
             if (!cfls.length) continue
-            // log('_PROBE-CFLS', dict, cfls.length)
-
+            // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
             let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts)
             chains.push(chain)
         }
     }
-    chains.forEach(chain=> {
-        if (augseg.seg) chain.unshift(...augseg)
+
+    let min= _.min(chains.map(chain=> chain.length))
+    log('_MIN', min)
+    let shorts = chains.filter(chain=> chain.length == min)
+    log('_AUGSEG', augseg)
+    shorts.forEach(chain=> {
+        if (augseg.seg) chain.unshift(augseg)
     })
 
-    return chains
+    return shorts
 }
 
 function filterProbeVerb(dict, pfls) {
-    // log('_D=================', dict.rdict, dict.type)
+    // log('_D=====', dict.rdict, dict.stem, dict.type)
     let cfls = []
     for(let flex of pfls) {
         let ok = true
@@ -151,9 +157,8 @@ function filterProbeVerb(dict, pfls) {
         // if (dict.name && flex.name) ok = true
         if (dict.keys && !dict.keys.includes(flex.key)) ok = false
         if (ok) cfls.push(flex)
-        // if (ok) log('_F=================', flex)
+        // if (ok) log('_F=================', dict.rdict, dict.stem, dict.type, dict.augs, dict.dname, flex.type, flex.term)
     }
-    // log('_D', dict, 'cfls', cfls.length)
     return cfls
 }
 
@@ -173,8 +178,8 @@ function filterProbe(dict, pfls) {
 }
 
 function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts) {
-    let chains = []
     let chain = []
+    // chain.push(br)
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
