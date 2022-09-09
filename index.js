@@ -76,7 +76,7 @@ async function anthraxChains(wf) {
     // return [{}] /////// ======= RETURN
     if (prefsegs) log('_prefsegs', prefsegs.length)
     dag.prefsegs = prefsegs
-    dag.prefsegs = false
+    // dag.prefsegs = false
     // log('_dag.pref', dag.pref)
 
     let augseg
@@ -84,6 +84,7 @@ async function anthraxChains(wf) {
         augseg = dag.prefsegs
         let prefhead = dag.prefsegs.map(seg=> seg.seg).join('')
         dag.pcwf = dag.pcwf.replace(prefhead, '')
+        // log('_PREF', dag.pcwf)
     } else {
         dag.aug = parseAug(dag.pcwf)
         let re = new RegExp('^' + dag.aug)
@@ -109,11 +110,13 @@ async function anthraxChains(wf) {
         let pfls = br.fls.docs
         // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg)
 
+        // log('_DAG.AUG', dag.aug)
         // остались prefs для cognates:
         pdicts = pdicts.filter(dict=> {
-            if (!dict.augs) return false // todo: добавить augs в dvr
-            if (dict.name && dict.aug != dag.aug) return false
+            if (dict.verb && !dict.augs) return false // todo: добавить augs в dvr
+            if (dict.name && dict.aug && dict.aug != dag.aug) return false
             else if (dict.verb && dict.augs && dag.aug && !dict.augs.includes(dag.aug)) return false
+            // else if (dict.verb && dict.augs.length && !dag.aug) return false
             return true
         })
 
@@ -137,7 +140,8 @@ async function anthraxChains(wf) {
 
     let min= _.min(chains.map(chain=> chain.length))
     log('_MIN', min)
-    let shorts = chains.filter(chain=> chain.length == min)
+    // let shorts = chains.filter(chain=> chain.length == min)
+    let shorts = chains
     log('_AUGSEG', augseg)
     shorts.forEach(chain=> {
         if (augseg.seg) chain.unshift(augseg)
@@ -157,12 +161,13 @@ function filterProbeVerb(dict, pfls) {
         // if (dict.name && flex.name) ok = true
         if (dict.keys && !dict.keys.includes(flex.key)) ok = false
         if (ok) cfls.push(flex)
-        // if (ok) log('_F=================', dict.rdict, dict.stem, dict.type, dict.augs, dict.dname, flex.type, flex.term)
+        if (ok) log('_F=================', dict.rdict, dict.stem, dict.type, dict.augs, dict.dname, flex.type, flex.term)
     }
     return cfls
 }
 
 function filterProbe(dict, pfls) {
+    // log('_D-name=====', dict.rdict, dict.stem, dict.type)
     let cfls = []
     for(let flex of pfls) {
         let ok = false
@@ -319,28 +324,26 @@ async function makePrefSegs(dag) {
     if (!cprefs.length) return
     let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
     log('_max_prefs_=', max.prefs)
+
+    let pcwf = dag.pcwf
     let seg
 
     if (!max.prefs) {
         prefsegs = [{seg: max.term, pref: max}]
-        return prefsegs
-    }
-
-    let prefs = await getPrefs(max.prefs)
-    // log('_find_prefs_=', prefs)
-
-    let pcwf = dag.pcwf
-    for (let pref of prefs) {
-        let re = new RegExp(pref.term)
-        pcwf = pcwf.replace(re, "-$&-")
-    }
-    pcwf = pcwf.replace(/--/g, '-')
-    let parts = pcwf.split('-').slice(1, -1)
-    for (let part of parts) {
-        let pref = prefs.find(pref=> pref.term == part)
-        if (pref) seg = {seg: pref.term, pref}
-        else seg = {seg: part, conn: true}
-        prefsegs.push(seg)
+    } else {
+        let prefs = await getPrefs(max.prefs)
+        for (let pref of prefs) {
+            let re = new RegExp(pref.term)
+            pcwf = pcwf.replace(re, "-$&-")
+        }
+        pcwf = pcwf.replace(/--/g, '-')
+        let parts = pcwf.split('-').slice(1, -1)
+        for (let part of parts) {
+            let pref = prefs.find(pref=> pref.term == part)
+            if (pref) seg = {seg: pref.term, pref}
+            else seg = {seg: part, conn: true}
+            prefsegs.push(seg)
+        }
     }
 
     // last connector btw prefs & stem
@@ -350,7 +353,7 @@ async function makePrefSegs(dag) {
     if (conn) {
         re = new RegExp('^' + conn)
         pcwf = pcwf.replace(re, '')
-        let augseg = {seg: conn, conn: true, aug: true}
+        let augseg = {seg: conn, conn: true} // , aug: true
         prefsegs.push(augseg)
     }
     return prefsegs
