@@ -12,10 +12,14 @@ const log = console.log
 // let fls = process.argv[3]
 
 async function run() {
-    let chain = await anthrax(wordform)
-    log('_run_chain_:', chain)
-    let prettyres = prettyRes(chain)
-    log('_prettyres:', prettyres)
+    let chains = await anthrax(wordform)
+    log('_run_chains_:', chains)
+    for (let chain of chains) {
+        let segs = chain.map(seg=> seg.seg).join('-')
+        log('_segments:', segs)
+    }
+    // let prettyres = prettyRes(chain)
+    // log('_prettyres:', prettyres)
 }
 
 async function run_() {

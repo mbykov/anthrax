@@ -99,7 +99,7 @@ async function anthraxChains(wf) {
 
     let {breaks, regdicts} = await cleanBreaks(dag)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    log('_breaks-ids', breaksids)
+    // log('_breaks-ids', breaksids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
@@ -110,7 +110,7 @@ async function anthraxChains(wf) {
         let pfls = br.fls.docs
 
         // if (br.tail != 'ποι') continue
-        log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg, pdicts.length)
+        // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg, pdicts.length)
         // log('_PDICT FILTER', pdicts.map(dict=> dict.rdict))
         // log('_DAG.AUG', dag.aug)
 
@@ -119,12 +119,12 @@ async function anthraxChains(wf) {
             if (dict.dname == 'dvr') return false
             // ============================= по разному для heads и tails
             // if (dict.verb && !dict.augs) return false // todo: добавить augs в dvr
-            // if (dict.name && dict.aug && dict.aug != dag.aug) return false
+            if (dict.name && dict.aug && dict.aug != dag.aug) return false
             // else if (dict.verb && dict.augs && dag.aug && !dict.augs.includes(dag.aug)) return false
             // else if (dict.verb && dict.augs.length && !dag.aug) return false
             return true
         })
-        log('_pdicts', pdicts.length)
+        // log('_pdicts', pdicts.length)
 
         let dictgroups = _.groupBy(pdicts, 'dict')
 
@@ -132,7 +132,7 @@ async function anthraxChains(wf) {
             let grdicts = dictgroups[dict]
             // log('_grDicts', dict, grdicts.length)
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
-            log('_PROBE', dict, probe.rdict)
+            // log('_PROBE', dict, probe.rdict)
             let cfls = []
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbe(probe, pfls)
@@ -145,10 +145,10 @@ async function anthraxChains(wf) {
     }
 
     let min= _.min(chains.map(chain=> chain.length))
-    log('_MIN', min)
+    // log('_MIN', min)
     // let shorts = chains.filter(chain=> chain.length == min)
     let shorts = chains
-    log('_AUGSEG', augseg)
+    // log('_AUGSEG', augseg)
     shorts.forEach(chain=> {
         if (augseg.seg) chain.unshift(augseg)
     })
@@ -167,7 +167,7 @@ function filterProbeVerb(dict, pfls) {
         // if (dict.name && flex.name) ok = true
         if (dict.keys && !dict.keys.includes(flex.key)) ok = false
         if (ok) cfls.push(flex)
-        if (ok) log('_FV=================', dict.rdict, dict.stem, dict.type, dict.augs, dict.dname, flex.type, flex.term)
+        // if (ok) log('_FV=================', dict.rdict, dict.stem, dict.type, dict.augs, dict.dname, flex.type, flex.term)
     }
     return cfls
 }
@@ -329,7 +329,7 @@ async function makePrefSegs(dag) {
     // log('_find_cprefs_=', cprefs)
     if (!cprefs.length) return
     let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
-    log('_max_prefs_=', max.prefs)
+    // log('_max_prefs_=', max.prefs)
 
     let pcwf = dag.pcwf
     let seg
