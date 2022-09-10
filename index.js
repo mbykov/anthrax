@@ -72,18 +72,11 @@ async function anthraxChains(wf) {
     dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
-    // let prefsegs, pcwf
     let prefsegs = await makePrefSegs(dag)
     dag.prefsegs = prefsegs
-
-    // if (prefsegs) log('_prefsegs', prefsegs.length)
-
-    // let augseg
     if (dag.prefsegs) {
-        // augseg = dag.prefsegs
         let prefhead = dag.prefsegs.map(seg=> seg.seg).join('')
         dag.pcwf = dag.pcwf.replace(prefhead, '')
-        // log('_PREF', dag.pcwf)
     } else {
         let aug = parseAug(dag.pcwf)
         if (aug) {
@@ -94,7 +87,7 @@ async function anthraxChains(wf) {
             dag.prefsegs = [augseg]
         }
     }
-    // log('_AUGSEG', augseg)
+    p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf)
 
     // ἀδικέω - odd δικάζω
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
@@ -103,7 +96,7 @@ async function anthraxChains(wf) {
     let breaks = await cleanBreaks(dag)
     let regdicts = await getRegVerbs(breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    // log('_breaks-ids', breaksids)
+    p('_breaks-ids', breaksids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
@@ -227,11 +220,18 @@ async function getRegVerbs(breaks) {
 async function cleanBreaks(dag) {
     let breaks = makeBreaks(dag.pcwf, dag.flexes)
     let dicts = await findDicts(breaks)
+    let prefconn
+    if (dag.prefsegs) {
+        let conns = dag.prefsegs.filter(seg=> seg.conn)
+        prefconn = _.last(conns)
+    }
+    let vow = (prefconn) ? prefconn.seg : dag.aug
+    p('_VOW', vow)
 
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
-        headdicts = headdicts.filter(dict=> vowDictMapping(dag.aug, dict))
+        headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
         if (headdicts.length) br.headdicts = headdicts
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
@@ -252,11 +252,16 @@ function vowDictMapping(conn, dict) {
     let mapping = false
     if (dict.name) {
         if (dict.aug == conn) mapping = true
+        else if (!dict.aug && ['υ', 'xxx'].includes(conn))  mapping = true // βαρύτονος
+        // else if (!dict.aug && conn) mapping = true // βαρύτονος - или сделать includes, как в verb?
     } else if (dict.verb) {
         if (!dict.reg) return // === DVR
+        if (!dict.aug) dict.aug = ''
         // log('_MAPPING', dict.rdict, 1, conn, 2, dict.aug)
         if (!dict.aug && !conn)  mapping = true
-        else if (dict.aug == conn)  mapping = true
+        else if (!dict.aug && ['ο', 'α'].includes(conn))  mapping = true // ἀγαθοποιέω
+        else if (strip(dict.aug) == strip(conn))  mapping = true //
+        // mapping = true
     }
     return mapping
 }
@@ -326,7 +331,6 @@ async function makePrefSegs(dag) {
     // log('_find_cprefs_=', cprefs)
     if (!cprefs.length) return
     let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
-    // log('_max_prefs_=', max.prefs)
 
     let pcwf = dag.pcwf
     if (!max.prefs) {
