@@ -138,13 +138,15 @@ async function anthraxChains(wf) {
 
     let min= _.min(chains.map(chain=> chain.length))
     // log('_MIN', min)
-    // let shorts = chains.filter(chain=> chain.length == min)
-    let shorts = chains
-    shorts.forEach(chain=> {
-        if (dag.prefsegs) chain.unshift(...dag.prefsegs)
-    })
+    // let shorts = chains.filter(chain=> chain.length == min) // пока не нужно???
+    // let shorts = chains
+    if (dag.prefsegs) {
+        chains.forEach(chain=> {
+            chain.unshift(...dag.prefsegs)
+        })
+    }
 
-    return shorts
+    return chains
 }
 
 function filterProbeVerb(dict, pfls) {
@@ -158,7 +160,7 @@ function filterProbeVerb(dict, pfls) {
         // if (dict.name && flex.name) ok = true
         if (dict.keys && !dict.keys.includes(flex.key)) ok = false
         if (ok) cfls.push(flex)
-        // if (ok) log('_FV=================', dict.rdict, dict.stem, dict.type, dict.augs, dict.dname, flex.type, flex.term)
+        // if (ok) log('_FV=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
     }
     return cfls
 }
@@ -229,7 +231,7 @@ async function cleanBreaks(dag) {
     p('_VOW', vow)
 
     breaks.forEach(br=> {
-        // log('_BR', br.head, br.conn, br.tail)
+        // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
         headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
         if (headdicts.length) br.headdicts = headdicts
@@ -280,38 +282,37 @@ function findConnection(pstr) {
 // only two parts, but the second can be divided into connector and a tail itself
 // last part may begin with accent
 function makeBreaks(pcwf, flexes) {
-  let breaks = []
-  for (let fls of flexes) {
-    let pterm = plain(fls._id)
-    // if (pterm != 'εω') continue
-    let phead = pcwf.slice(0, -pterm.length)
-    let pos = phead.length + 1
-    let head, tail, vow, conn = '', res
-    while (pos > 0) {
-      pos--
-      head = phead.slice(0, pos)
-      if (!head) continue
-      // if (!head || vowels.includes(_.last(head))) continue // зачем я это добавил?
-      // todo: наверное, на след шагу в conn чтобы сразу добавить гласную
-      // но в простейшем ἀγαθοποιέω окончание έω, а head заканчивается на гласную, отбросить гласную здесь нельзя
-      tail = phead.slice(pos)
-      conn = findConnection(tail)
-      if (conn) {
-        let re = new RegExp('^' + conn)
-        tail = tail.replace(re, '')
-        if (!tail) continue
-        res = {head, conn, tail, fls}
-        // log('_BR_c', head, conn, fls._id)
-      } else {
-        // log('_BR', head, tail, fls._id)
-        res = {head, conn, tail, fls}
-      }
-      /* if (!tail) continue */ // нельзя, если simple
-      if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
-      breaks.push(res)
+    let breaks = []
+    for (let fls of flexes) {
+        let pterm = plain(fls._id)
+        let phead = pcwf.slice(0, -pterm.length)
+        let pos = phead.length + 1
+        let head, tail, vow, conn = '', res
+        while (pos > 0) {
+            pos--
+            head = phead.slice(0, pos)
+            if (!head) continue
+            // if (!head || vowels.includes(_.last(head))) continue // зачем я это добавил?
+            // todo: наверное, на след шагу в conn чтобы сразу добавить гласную
+            // но в простейшем ἀγαθοποιέω окончание έω, а head заканчивается на гласную, отбросить гласную здесь нельзя
+            tail = phead.slice(pos)
+            conn = findConnection(tail)
+            if (conn) {
+                let re = new RegExp('^' + conn)
+                tail = tail.replace(re, '')
+                if (!tail) continue
+                res = {head, conn, tail, fls}
+                // log('_BR_c', head, conn, fls._id)
+            } else {
+                // log('_BR', head, tail, fls._id)
+                res = {head, conn, tail, fls}
+            }
+            /* if (!tail) continue */ // нельзя, если simple
+            if (tail && head.length < 3) continue // в компаундах FC не короткие, но в simple короткие м.б.
+            breaks.push(res)
+        }
     }
-  }
-  return breaks
+    return breaks
 }
 
 async function findDicts(breaks) {
