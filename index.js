@@ -17,10 +17,7 @@ let dag = {}
 
 // terms: πρίν
 // ψευδο - убрать из префиксов!
-// ἀδικέω - здесь δι не префикс
-// αἱρέω,
-// συγκαθαιρέω, καθαιρέω - нет в словаре, есть καθαίρω
-// ἀντιπαραγράφω, προσαπαγγέλλω, ἐπεξήγησις
+// ἐπεξήγησις
 // πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
 // εὐχαριστία,
 // προσαναμιμνήσκω, προσδιαιρέω
@@ -47,16 +44,6 @@ export async function anthrax(wf) {
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
     // let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
 
-    // whole compound
-    if (dictchains.length == 1) {
-        let chain = dictchains[0]
-        let preffed = chain.find(seg=> seg.pref)
-        if (preffed) {
-            let whcomps = await wholeCompounds(chain)
-            chains.unshift(...whcomps)
-        }
-    }
-
     chains.push(...dictchains)
     return chains
 }
@@ -77,12 +64,24 @@ async function anthraxChains(wf) {
     // dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
+    // ἀδικέω - odd δικάζω
+    // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
+    let chains = []
+
     let prefsegs = await makePrefSegs(dag)
     dag.prefsegs = prefsegs
+    // dag.prefsegs = ''
+
+    let breaks = []
     if (dag.prefsegs) {
-        let prefhead = dag.prefsegs.map(seg=> seg.seg).join('')
-        dag.pcwf = dag.pcwf.replace(prefhead, '')
-    } else {
+        // let prefhead = dag.prefsegs.map(seg=> seg.seg).join('')
+        // dag.pcwf = dag.pcwf.replace(prefhead, '')
+        // dag.pcwf = dag.pref_pcwf
+        breaks = await cleanBreaks(dag, dag.pref_pcwf)
+        p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf)
+    }
+
+    if (!breaks.length) {
         let aug = parseAug(dag.pcwf)
         if (aug) {
             dag.aug = aug
@@ -91,14 +90,9 @@ async function anthraxChains(wf) {
             let augseg = {seg: dag.aug, aug: true}
             dag.prefsegs = [augseg]
         }
+        breaks = await cleanBreaks(dag, dag.pcwf)
     }
-    p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf)
 
-    // ἀδικέω - odd δικάζω
-    // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
-    let chains = []
-
-    let breaks = await cleanBreaks(dag)
     let regdicts = await getRegVerbs(breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
     p('_breaks-ids', breaksids)
@@ -141,14 +135,19 @@ async function anthraxChains(wf) {
         }
     }
 
-    let min= _.min(chains.map(chain=> chain.length))
+    // let min= _.min(chains.map(chain=> chain.length))
     // log('_MIN', min)
     // let shorts = chains.filter(chain=> chain.length == min) // пока не нужно???
     // let shorts = chains
+
+    // whole compound
     if (dag.prefsegs) {
-        chains.forEach(chain=> {
+        let whcomps = []
+        for await (let chain of chains) {
             chain.unshift(...dag.prefsegs)
-        })
+            whcomps = await wholeCompounds(chain)
+        }
+        chains.unshift(...whcomps)
     }
 
     return chains
@@ -179,6 +178,7 @@ function filterProbe(dict, pfls) {
         // if (dict.name && flex.name) ok = true
         if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
         // if (!flex.key) ok = false
+        // ok = true
         if (ok) cfls.push(flex)
         // if (ok) log('_F=================', flex)
     }
@@ -224,8 +224,8 @@ async function getRegVerbs(breaks) {
 }
 
 // clean breaks - только те, которые состоят из обнаруженных в словарях stems
-async function cleanBreaks(dag) {
-    let breaks = makeBreaks(dag.pcwf, dag.flexes)
+async function cleanBreaks(dag, pcwf) {
+    let breaks = makeBreaks(pcwf, dag.flexes)
     let dicts = await findDicts(breaks)
     let prefconn
     if (dag.prefsegs) {
@@ -367,6 +367,7 @@ async function makePrefSegs(dag) {
         let connseg = {seg: conn, conn: true} // , aug: true
         prefsegs.push(connseg)
     }
+    dag.pref_pcwf = pcwf
     return prefsegs
 }
 
