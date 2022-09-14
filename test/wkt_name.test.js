@@ -10,6 +10,8 @@ import {oxia, comb, plain, strip} from 'orthos'
 import { nameTests } from './lib/makeNameTests.js'
 import { adjTests } from './lib/makeAdjTests.js'
 
+import { prettyName } from '../lib/utils.js'
+
 import { anthrax } from '../index.js'
 
 import Debug from 'debug'
@@ -40,7 +42,9 @@ log('_ATESTS', atests.length)
 
 let tests = ntests.concat(atests)
 /* let tests = ntests */
-/* log('_TESTS', tests.slice(0,2)) */
+
+// tests = tests.slice(0,2)
+// log('_TESTS', tests.slice(0,2))
 log('_TESTS', tests.length)
 /* tests = [] */
 
@@ -62,18 +66,13 @@ for (let wfkey in cache) {
 async function testWF(wf, exp) {
     it(`wf: ${wf.rdict} - ${wf.form} - ${wf.descr}`, async () => {
         let chains = await anthrax(wf.form)
-        /* log('_EXP', wf.key, exp) */
+        // log('_EXP', wf.key, exp)
+        let chain = chains.find(chain=> chain.find(seg=> seg.mainseg).name)
         /* log('_WF', wf) */
-        /* log('_CHS', chains) */
-        let dicts = []
-        for (let chain of chains) {
-            let chdicts = chain[0].cdicts.filter(cdict=> cdict.dict == wf.dict)
-            dicts.push(...chdicts)
-        }
-        /* let chain = chains[0][0] // потом prefs */
-        /* let dicts = chain.cdicts.filter(cdict=> cdict.dict == wf.dict) */
-        let fls = compactNamesFls(dicts)
-        assert.deepEqual(fls, exp)
+        // log('_CHAIN', chains.length, chain)
+        let fls = chain.find(seg=> seg.fls).fls
+        let morphs = prettyName(fls)
+        assert.deepEqual(morphs, exp)
     })
 }
 

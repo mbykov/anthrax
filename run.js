@@ -2,25 +2,40 @@
 
 import _  from 'lodash'
 import { anthrax } from './index.js'
-import { prettyRes } from './lib/utils.js'
+import { prettyName } from './lib/utils.js'
 import Debug from 'debug'
 const d = Debug('dicts')
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
+let prettyfls = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
 const log = console.log
 // let fls = process.argv[3]
+
+log('_FLS', prettyfls)
 
 async function run() {
     let chains = await anthrax(wordform)
     log('_run_chains_:', chains)
     for (let chain of chains) {
         let segs = chain.map(seg=> seg.seg).join('-')
-        log('_segments:', segs)
+        log('_scheme:', segs)
+        let pretty = prettyFLS(chain)
+        log('_morphs:', pretty)
     }
+
     // let prettyres = prettyRes(chain)
     // log('_prettyres:', prettyres)
 }
+
+function prettyFLS(chain) {
+    let mseg = chain.find(seg=> seg.mainseg)
+    let fls = chain.find(seg=> seg.fls).fls
+    let morphs = ''
+    if (mseg.name) morphs = prettyName(fls)
+    return morphs
+}
+
 
 async function run_() {
     let res = []

@@ -103,23 +103,23 @@ async function anthraxChains(wf) {
         let headdicts = br.headdicts
         let headdictslist = headdicts.map(dict=> dict.rdict)
         let taildicts = br.taildicts
-        let pdicts = (br.tail) ? taildicts : headdicts            // pdicts - совсем грязные
+        let cognates = (br.tail) ? taildicts : headdicts            // cognates - совсем грязные
         let mainseg = (br.tail) ? (br.tail) : (br.head)
         let pfls = br.fls.docs
 
         // if (br.tail != 'ποι') continue
-        // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg, pdicts.length)
-        log('_PDICT FILTER', pdicts.map(dict=> dict.rdict))
+        // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg, cognates.length)
+        p('_PDICT FILTER', cognates.map(dict=> dict.rdict))
         // log('_DAG.AUG', dag.aug)
 
         // todo: вообще не нужно
-        pdicts = pdicts.filter(dict=> {
+        cognates = cognates.filter(dict=> {
             if (dict.dname == 'dvr') return false
             return true
         })
-        // log('_pdicts', pdicts)
+        // log('_cognates', cognates)
 
-        let dictgroups = _.groupBy(pdicts, 'dict')
+        let dictgroups = _.groupBy(cognates, 'dict')
 
         for (let dict in dictgroups) {
             let grdicts = dictgroups[dict]
@@ -129,10 +129,9 @@ async function anthraxChains(wf) {
             let cfls = []
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbe(probe, pfls)
-
             if (!cfls.length) continue
             // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
-            let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts)
+            let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cognates)
             chains.push(chain)
         }
     }
@@ -187,13 +186,16 @@ function filterProbe(dict, pfls) {
     return cfls
 }
 
-function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts) {
+function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognates) {
     let chain = []
     // chain.push(br)
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
-    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, mainseg: true}
+    // let cogns = cognates.filter(dict=> dict.stem == probe.stem)
+    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, cognates, mainseg: true}
+    if (probe.verb) tailseg.verb = true
+    else if (probe.name) tailseg.name = true
     // если нужен regdict для одного из cdicts, перенести trns
     // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
     // if (regdict) tailseg.regdict = regdict
@@ -203,10 +205,11 @@ function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts) {
         let connseg = {seg: br.conn, conn: true}
         if (br.conn) chain.unshift(connseg)
         if (headdicts.length) {
-            let headseg = {seg: br.head, cdicts: headdicts, head: true}
+            let headseg = {seg: br.head, cdicts: headdicts, cognates: headdicts, head: true}
             chain.unshift(headseg)
         }
     }
+
     return chain
 }
 
@@ -403,8 +406,8 @@ async function wholeCompounds(chain) {
     }
     whstems = _.compact(whstems)
     h('_whstems', whstems)
-    let cogns = await getDicts(whstems)
-    let rcogns = cogns.map(dict=> dict.rdict)
+    let cognates = await getDicts(whstems)
+    let rcogns = cognates.map(dict=> dict.rdict)
     h('_cognates', rcogns)
 
     let whchains = []
@@ -412,7 +415,7 @@ async function wholeCompounds(chain) {
     let mainseg = chain.find(seg=> seg.mainseg)
     let probe = mainseg.cdicts[0]
 
-    let dictgroups = _.groupBy(cogns, 'dict')
+    let dictgroups = _.groupBy(cognates, 'dict')
     // h('_WH DG', dictgroups)
     chain.forEach((seg, idx)=> {
         if (!seg.pref) return
@@ -424,8 +427,8 @@ async function wholeCompounds(chain) {
             if (cdict.type != probe.type) continue
             // let strdict = strip(cdict.dict)
             if (cdict.dict.startsWith(pref.term)) {
-                h('_START WITH', cdict.rdict, pref.term)
-                let whchain = [{seg: cdict.stem, cdicts, rdict: cdict.rdict, mainseg: true, cogns, rcogns }, flseg]
+                // h('_START WITH', cdict.rdict, pref.term)
+                let whchain = [{seg: cdict.stem, cdicts, rdict: cdict.rdict, mainseg: true, cognates, rcogns }, flseg]
                 let pdict = plain(cdict.dict)
                 let aug = parseAug(pdict)
                 if (aug) {
