@@ -40,11 +40,10 @@ log('_NTESTS', ntests.length)
 let atests = adjTests(arows, limit)
 log('_ATESTS', atests.length)
 
-let tests = ntests.concat(atests)
-/* let tests = ntests */
+// let tests = ntests.concat(atests)
+let tests = ntests
 
 // tests = tests.slice(0,2)
-// log('_TESTS', tests.slice(0,2))
 log('_TESTS', tests.length)
 /* tests = [] */
 
@@ -87,7 +86,7 @@ describe('test names:', () => {
 })
 
 
-function compactNamesFls(dicts) {
+function compactNamesFls_(dicts) {
     let fls = dicts.map(dict=> {
         return dict.fls.filter(flex=> !flex.adv).map(flex=> [flex.gend, flex.num, flex.case].join('.'))
     })
