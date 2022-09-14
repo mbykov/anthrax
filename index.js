@@ -10,7 +10,6 @@ import Debug from 'debug'
 
 const d = Debug('app')
 const p = Debug('pref')
-const b = Debug('break')
 const h = Debug('whole')
 
 let dag = {}
@@ -72,13 +71,16 @@ async function anthraxChains(wf) {
     dag.prefsegs = prefsegs
     // dag.prefsegs = ''
 
+    // ========================== TODO: везде cognates, и интерфейс обновить
+    // == TODO: == затем тесты подряд
+
     let breaks = []
     if (dag.prefsegs) {
         // let prefhead = dag.prefsegs.map(seg=> seg.seg).join('')
         // dag.pcwf = dag.pcwf.replace(prefhead, '')
         // dag.pcwf = dag.pref_pcwf
         breaks = await cleanBreaks(dag, dag.pref_pcwf)
-        p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf)
+        p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf, dag.pref_pcwf)
     }
 
     if (!breaks.length) {
@@ -107,7 +109,7 @@ async function anthraxChains(wf) {
 
         // if (br.tail != 'ποι') continue
         // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg, pdicts.length)
-        // log('_PDICT FILTER', pdicts.map(dict=> dict.rdict))
+        log('_PDICT FILTER', pdicts.map(dict=> dict.rdict))
         // log('_DAG.AUG', dag.aug)
 
         // todo: вообще не нужно
@@ -154,14 +156,13 @@ async function anthraxChains(wf) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    // log('_D=====', dict.rdict, dict.stem, dict.type)
+    // log('_filter Probe Verb=====', dict.rdict, dict.stem, dict.type)
     let cfls = []
     for(let flex of pfls) {
         let ok = true
         // log('_F=================', flex.type, '_D', dict.type)
         if (!flex.verb) ok = false
         if (dict.type !== flex.type) ok = false
-        // if (dict.name && flex.name) ok = true
         if (dict.keys && !dict.keys.includes(flex.key)) ok = false
         if (ok) cfls.push(flex)
         // if (ok) log('_FV=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
@@ -226,18 +227,27 @@ async function getRegVerbs(breaks) {
 // clean breaks - только те, которые состоят из обнаруженных в словарях stems
 async function cleanBreaks(dag, pcwf) {
     let breaks = makeBreaks(pcwf, dag.flexes)
+    // log('_BR', breaks)
     let dicts = await findDicts(breaks)
-    let prefconn
+    let rdicts = dicts.map(dict=> dict.rdict)
+    // log('_BR-RDICTS', rdicts)
+    let prefcon
     if (dag.prefsegs) {
         let conns = dag.prefsegs.filter(seg=> seg.conn)
-        prefconn = _.last(conns)
+        prefcon = _.last(conns)
     }
 
-    let vow = (prefconn) ? prefconn.seg : dag.aug
+    let vow = (prefcon) ? prefcon.seg : dag.aug ? dag.aug : ''
+    // log('_VOW', vow)
+
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
+        let rhdicts = headdicts.map(dict=> dict.rdict)
+        // log('_HEAD-RDICTS', rhdicts)
         headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
+        rhdicts = headdicts.map(dict=> dict.rdict)
+        // log('_HEAD-RDICTS_2', rhdicts)
         if (headdicts.length) br.headdicts = headdicts
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
@@ -258,6 +268,7 @@ function vowDictMapping(conn, dict) {
     let mapping = false
     if (dict.name) {
         if (dict.aug == conn) mapping = true
+        else if (!dict.aug && !conn) mapping = true
         else if (!dict.aug && ['υ', 'xxx'].includes(conn))  mapping = true // βαρύτονος
         // else if (!dict.aug && conn) mapping = true // βαρύτονος - или сделать includes, как в verb?
     } else if (dict.verb) {
