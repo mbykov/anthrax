@@ -36,8 +36,11 @@ export async function anthrax(wf) {
     let termcdicts = await getTermsNew(cwf)
     // log('_TD NEW', termcdictsnew)
     // let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, indecl: true}])
-    let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
-    if (termcdicts.length) chains.push(termchain)
+    if (termcdicts.length) {
+        let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
+        chains.push(termchain)
+        return chains
+    }
 
     let dictchains = await anthraxChains(wf)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
@@ -98,8 +101,7 @@ async function anthraxChains(wf) {
         chains = await eachBreak(dag, breaks)
     }
 
-    // chains = await eachBreak(dag, breaks)
-
+    log('_XXXX', chains.length)
 
     // whole compound
     if (dag.prefsegs) {
@@ -160,7 +162,7 @@ async function eachBreak(dag, breaks) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    log('_filter Probe Verb=====', dict.rdict, dict.stem, dict.type, dict.dname)
+    // log('_filter Probe Verb=====', dict.rdict, dict.stem, dict.type, dict.dname)
     let cfls = []
     for(let flex of pfls) {
         let ok = true
@@ -262,13 +264,20 @@ async function cleanBreaks(dag, pcwf) {
         if (headdicts.length) br.headdicts = headdicts
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
-        if (taildicts.length) br.taildicts = taildicts
+        if (taildicts.length) {
+            headdicts = headdicts.filter(dict=> {
+                if (dict.name) return true
+                else if (dict.verb && dict.reg) return true
+            })
+            br.headdicts = headdicts
+            br.taildicts = taildicts
+        }
     })
 
     breaks = breaks.filter(br=> {
         let ok = false
-        if (br.headdicts && !br.tail) ok = true
-        if (br.headdicts && br.taildicts) ok = true
+        if (br.headdicts?.length && !br.tail) ok = true
+        if (br.headdicts?.length && br.taildicts?.length) ok = true
         return ok
     })
 
