@@ -63,27 +63,28 @@ async function anthraxChains(wf) {
     // dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
+    // ========================== TODO: везде cognates проверить, и интерфейс обновить
+
     // ἀδικέω - odd δικάζω
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
-    let chains = []
-
     let prefsegs = await makePrefSegs(dag)
     dag.prefsegs = prefsegs
     // dag.prefsegs = ''
 
-    // ========================== TODO: везде cognates, и интерфейс обновить
-    // == TODO: == затем тесты подряд
-
+    let chains = []
     let breaks = []
     if (dag.prefsegs) {
-        // let prefhead = dag.prefsegs.map(seg=> seg.seg).join('')
-        // dag.pcwf = dag.pcwf.replace(prefhead, '')
-        // dag.pcwf = dag.pref_pcwf
         breaks = await cleanBreaks(dag, dag.pref_pcwf)
         p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf, dag.pref_pcwf)
+        let prefchains = await eachBreak(dag, breaks)
+        chains.push(...prefchains)
     }
+    // log('_CH', chains.length)
+    // log('_DAG', dag)
 
-    if (!breaks.length) {
+    if (!breaks.length || !chains.length) {
+        dag.prefsegs = ''
+        breaks = []
         let aug = parseAug(dag.pcwf)
         if (aug) {
             dag.aug = aug
@@ -93,8 +94,30 @@ async function anthraxChains(wf) {
             dag.prefsegs = [augseg]
         }
         breaks = await cleanBreaks(dag, dag.pcwf)
+        // log('_B', breaks.length)
+        chains = await eachBreak(dag, breaks)
     }
 
+    // chains = await eachBreak(dag, breaks)
+
+
+    // whole compound
+    if (dag.prefsegs) {
+        // log('_X_DDD', dag.prefsegs.length, '_CH', chains.length)
+        let whcomps = []
+        for await (let chain of chains) {
+            chain.unshift(...dag.prefsegs)
+            whcomps = await wholeCompounds(chain)
+            // log('_X_WH', whcomps.length)
+        }
+        chains.unshift(...whcomps)
+    }
+
+    return chains
+}
+
+async function eachBreak(dag, breaks) {
+    let chains = []
     let regdicts = await getRegVerbs(breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
     p('_breaks-ids', breaksids)
@@ -110,11 +133,9 @@ async function anthraxChains(wf) {
         // if (br.tail != 'ποι') continue
         // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg, cognates.length)
         p('_PDICT FILTER', cognates.map(dict=> dict.rdict))
-        // log('_DAG.AUG', dag.aug)
 
-        // todo: вообще не нужно
         cognates = cognates.filter(dict=> {
-            if (dict.dname == 'dvr') return false
+            // if (dict.dname == 'dvr') return false
             return true
         })
         // log('_cognates', cognates)
@@ -131,26 +152,11 @@ async function anthraxChains(wf) {
             else cfls = filterProbe(probe, pfls)
             if (!cfls.length) continue
             // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
-            let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cognates)
+            let cogns = cognates.filter(cdict=> cdict.dict == dict)
+            let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cogns)
             chains.push(chain)
         }
     }
-
-    // let min= _.min(chains.map(chain=> chain.length))
-    // log('_MIN', min)
-    // let shorts = chains.filter(chain=> chain.length == min) // пока не нужно???
-    // let shorts = chains
-
-    // whole compound
-    if (dag.prefsegs) {
-        let whcomps = []
-        for await (let chain of chains) {
-            chain.unshift(...dag.prefsegs)
-            whcomps = await wholeCompounds(chain)
-        }
-        chains.unshift(...whcomps)
-    }
-
     return chains
 }
 
@@ -192,8 +198,8 @@ function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognate
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
-    // let cogns = cognates.filter(dict=> dict.stem == probe.stem)
-    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, cognates, mainseg: true}
+    let rcogns = cognates.map(dict=> dict.rdict).join(',')
+    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, cognates, rcogns, mainseg: true}
     if (probe.verb) tailseg.verb = true
     else if (probe.name) tailseg.name = true
     // если нужен regdict для одного из cdicts, перенести trns
@@ -205,7 +211,8 @@ function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognate
         let connseg = {seg: br.conn, conn: true}
         if (br.conn) chain.unshift(connseg)
         if (headdicts.length) {
-            let headseg = {seg: br.head, cdicts: headdicts, cognates: headdicts, head: true}
+            let rcogns = headdicts.map(dict=> dict.rdict).join(',')
+            let headseg = {seg: br.head, cdicts: headdicts, cognates: headdicts, rcogns, head: true}
             chain.unshift(headseg)
         }
     }
@@ -334,12 +341,12 @@ function makeBreaks(pcwf, flexes) {
 }
 
 async function findDicts(breaks) {
-  let headkeys = _.uniq(breaks.map(br=> br.head))
-  let tailkeys = _.uniq(breaks.map(br=> br.tail))
-  let keys = _.compact(headkeys.concat(tailkeys))
-  let dicts = await getDicts(keys)
-  dag.dictids = dicts.map(ddict=> ddict.stem)
-  return dicts
+    let headkeys = _.uniq(breaks.map(br=> br.head))
+    let tailkeys = _.uniq(breaks.map(br=> br.tail))
+    let keys = _.compact(headkeys.concat(tailkeys))
+    let dicts = await getDicts(keys)
+    dag.dictids = _.uniq(dicts.map(ddict=> ddict.stem))
+    return dicts
 }
 
 // compound - προσαναβαίνω; ἀντιπαραγράφω; ἀποδείκνυμι
