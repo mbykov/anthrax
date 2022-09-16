@@ -112,7 +112,6 @@ async function anthraxChains(wf) {
         }
         chains.unshift(...whcomps)
     }
-
     return chains
 }
 
@@ -161,7 +160,7 @@ async function eachBreak(dag, breaks) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    // log('_filter Probe Verb=====', dict.rdict, dict.stem, dict.type)
+    log('_filter Probe Verb=====', dict.rdict, dict.stem, dict.type, dict.dname)
     let cfls = []
     for(let flex of pfls) {
         let ok = true
@@ -240,7 +239,8 @@ async function cleanBreaks(dag, pcwf) {
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
     let rdicts = dicts.map(dict=> dict.rdict)
-    // log('_BR-RDICTS', rdicts)
+    // rdicts = dicts.filter(dict=> dict.dname == 'drv')
+    // log('_BR-RDICTS', rdicts.length)
     let prefcon
     if (dag.prefsegs) {
         let conns = dag.prefsegs.filter(seg=> seg.conn)
@@ -253,11 +253,12 @@ async function cleanBreaks(dag, pcwf) {
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
-        let rhdicts = headdicts.map(dict=> dict.rdict)
-        // log('_HEAD-RDICTS', rhdicts)
+        // let dvrdicts = headdicts.filter(dict=> dict.dname == 'dvr')
+        let rdicts = headdicts.map(dict=> dict.rdict)
+        // log('_HEAD-RDICTS', rdicts)
         headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
-        rhdicts = headdicts.map(dict=> dict.rdict)
-        // log('_HEAD-RDICTS_2', rhdicts)
+        rdicts = headdicts.map(dict=> dict.rdict)
+        // log('_HEAD-RDICTS_2', rdicts)
         if (headdicts.length) br.headdicts = headdicts
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
@@ -282,7 +283,6 @@ function vowDictMapping(conn, dict) {
         else if (!dict.aug && ['υ', 'xxx'].includes(conn))  mapping = true // βαρύτονος
         // else if (!dict.aug && conn) mapping = true // βαρύτονος - или сделать includes, как в verb?
     } else if (dict.verb) {
-        if (!dict.reg) return // === DVR
         if (!dict.aug) dict.aug = ''
         // log('_MAPPING', dict.rdict, 1, conn, 2, dict.aug)
         if (!dict.aug && !conn)  mapping = true
@@ -344,8 +344,13 @@ async function findDicts(breaks) {
     let headkeys = _.uniq(breaks.map(br=> br.head))
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
     let keys = _.compact(headkeys.concat(tailkeys))
+    // keys = ['δεικν']
+    // log('_DDD KEYS', keys)
     let dicts = await getDicts(keys)
+    let dvrdicts = dicts.filter(dict=> dict.dname == 'dvr' && dict.stem == 'δεικν')
+    // log('_DDD', dvrdicts)
     dag.dictids = _.uniq(dicts.map(ddict=> ddict.stem))
+    // log('_DDD', dag.dictids)
     return dicts
 }
 
