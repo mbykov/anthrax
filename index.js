@@ -178,16 +178,20 @@ function filterProbeVerb(dict, pfls) {
 
 function filterProbeName(dict, pfls) {
     // log('_D-name=====', dict.rdict, dict.stem, dict.type)
+    if (!dict.gens) {
+        log('_NO GENS', dict)
+    }
+
     let cfls = []
     for(let flex of pfls) {
         let ok = false
         // log('_F=================', flex)
         if (dict.name && flex.name && dict.type == flex.type && dict.gens.includes(flex.gen)) ok = true
         // if (dict.name && flex.name) ok = true
-        // if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
+        if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
         // ok = true
         if (ok) cfls.push(flex)
-        if (ok) log('_F=================', flex)
+        // if (ok) log('_F_OK=================', flex)
     }
     // log('_D', dict, 'cfls', cfls.length)
     return cfls
@@ -256,6 +260,7 @@ async function cleanBreaks(dag, pcwf) {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
         // let dvrdicts = headdicts.filter(dict=> dict.dname == 'dvr')
+
         let rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS', rdicts)
         headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
@@ -263,8 +268,12 @@ async function cleanBreaks(dag, pcwf) {
         // log('_HEAD-RDICTS_2', rdicts)
         if (headdicts.length) br.headdicts = headdicts
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
+
+        taildicts = taildicts.filter(dict=> dict.stem.length > 2) // очень много лишних, маловероятных схем, ex: γαλ-α-ξ-ίου
+
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
         if (taildicts.length) {
+            headdicts = headdicts.filter(dict=> dict.stem.length > 2)
             headdicts = headdicts.filter(dict=> {
                 if (dict.name) return true
                 else if (dict.verb && dict.reg) return true
