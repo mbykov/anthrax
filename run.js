@@ -2,7 +2,7 @@
 
 import _  from 'lodash'
 import { anthrax } from './index.js'
-import { prettyName } from './lib/utils.js'
+import { prettyName, prettyVerb } from './lib/utils.js'
 import Debug from 'debug'
 const d = Debug('dicts')
 
@@ -12,7 +12,7 @@ let prettyfls = process.argv.slice(3)[0] //  'ἀργυρῷ'
 const log = console.log
 // let fls = process.argv[3]
 
-log('_FLS', prettyfls)
+// log('_FLS', prettyfls)
 
 async function run() {
     let chains = await anthrax(wordform)
@@ -33,6 +33,7 @@ function prettyFLS(chain) {
     let fls = chain.find(seg=> seg.fls).fls
     let morphs = ''
     if (mseg.name) morphs = prettyName(fls)
+    else if (mseg.verb) morphs = prettyVerb(fls)
     return morphs
 }
 

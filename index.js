@@ -101,7 +101,7 @@ async function anthraxChains(wf) {
         chains = await eachBreak(dag, breaks)
     }
 
-    log('_XXXX', chains.length)
+    // log('_XXXX', chains.length)
 
     // whole compound
     if (dag.prefsegs) {
@@ -150,7 +150,7 @@ async function eachBreak(dag, breaks) {
             // log('_PROBE', dict, probe.rdict)
             let cfls = []
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
-            else cfls = filterProbe(probe, pfls)
+            else cfls = filterProbeName(probe, pfls)
             if (!cfls.length) continue
             // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
             let cogns = cognates.filter(cdict=> cdict.dict == dict)
@@ -176,18 +176,18 @@ function filterProbeVerb(dict, pfls) {
     return cfls
 }
 
-function filterProbe(dict, pfls) {
+function filterProbeName(dict, pfls) {
     // log('_D-name=====', dict.rdict, dict.stem, dict.type)
     let cfls = []
     for(let flex of pfls) {
         let ok = false
+        // log('_F=================', flex)
         if (dict.name && flex.name && dict.type == flex.type && dict.gens.includes(flex.gen)) ok = true
         // if (dict.name && flex.name) ok = true
-        if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
-        // if (!flex.key) ok = false
+        // if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
         // ok = true
         if (ok) cfls.push(flex)
-        // if (ok) log('_F=================', flex)
+        if (ok) log('_F=================', flex)
     }
     // log('_D', dict, 'cfls', cfls.length)
     return cfls
