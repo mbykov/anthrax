@@ -56,7 +56,9 @@ export function adjTests(rows, limit) {
         } else if (descr == 'adv') {
             // tests[dict] = rtests
         } else if (descr == 'caution') {
-            tests.pop()
+            // log('_CAUTION', rtests)
+            // throw new Error()
+            rtests.pop()
         } else {
             let str = row.split(':')[1]
             if (!str) continue

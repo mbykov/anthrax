@@ -150,6 +150,7 @@ async function eachBreak(dag, breaks) {
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbeName(probe, pfls)
             if (!cfls.length) continue
+            if (!probe.trns) probe.trns = ['non reg verb']
             // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
             let cogns = cognates.filter(cdict=> cdict.dict == dict)
             let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cogns)
