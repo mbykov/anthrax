@@ -24,6 +24,12 @@ pref: ἀν- • (ana-)
     back, backwards
 #   = αν
 
+pref: ἄνπερ
+      if
+      = ἐάνπερ
+      = ἤνπερ
+      = ἐάν
+
 # pref: ἀντι- • (anti-)
 pref: ἀντ- • (anti-)
     anti-, against
@@ -214,8 +220,8 @@ pref: ὀκτ- • (okta-)
     eight
 
 # pref: ὀλιγο
-pref: ὀλιγ-
-      not many
+#pref: ὀλιγ-
+#      not many
 
 # ============================================= P =======================
 

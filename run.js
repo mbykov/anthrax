@@ -19,6 +19,8 @@ async function run() {
     log('_run_chains_:', chains)
     for (let chain of chains) {
         let segs = chain.map(seg=> seg.seg).join('-')
+        let main = chain.find(seg=> seg.mainseg)
+        log('_cdicts:', main.cdicts)
         log('_scheme:', segs)
         let pretty = prettyFLS(chain)
         log('_morphs:', pretty)

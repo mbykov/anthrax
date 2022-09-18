@@ -66,8 +66,6 @@ async function anthraxChains(wf) {
     // dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
-    // ========================== TODO: везде cognates проверить, и интерфейс обновить
-
     // ἀδικέω - odd δικάζω
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
     let prefsegs = await makePrefSegs(dag)
@@ -133,7 +131,7 @@ async function eachBreak(dag, breaks) {
 
         // if (br.tail != 'ποι') continue
         // log('\n_==AUG BR==', 'head:', br.head, 'br.conn:', br.conn, 'tail:', br.tail, 'fls:', br.fls._id, '_mainseg:', mainseg, cognates.length)
-        p('_PDICT FILTER', cognates.map(dict=> dict.rdict))
+        // p('_PDICT_FILTER_cogns', cognates.map(dict=> dict.rdict))
 
         cognates = cognates.filter(dict=> {
             // if (dict.dname == 'dvr') return false
@@ -162,16 +160,17 @@ async function eachBreak(dag, breaks) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    // log('_filter Probe Verb=====', dict.rdict, dict.stem, dict.type, dict.dname)
+    // log('_filter Probe Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
     let cfls = []
     for(let flex of pfls) {
         let ok = true
         // log('_F=================', flex.type, '_D', dict.type)
         if (!flex.verb) ok = false
-        if (dict.type !== flex.type) ok = false
+        // if (dict.type !== flex.type) ok = false
         if (dict.keys && !dict.keys.includes(flex.key)) ok = false
+        // ok = true
         if (ok) cfls.push(flex)
-        // if (ok) log('_FV=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
+        // if (ok) log('_FVerb=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
     }
     return cfls
 }
@@ -264,16 +263,20 @@ async function cleanBreaks(dag, pcwf) {
         let rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS', rdicts)
         headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
+        headdicts = headdicts.filter(dict=> !dict.pos) // спец.формы
+
         rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS_2', rdicts)
         if (headdicts.length) br.headdicts = headdicts
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
 
         taildicts = taildicts.filter(dict=> dict.stem.length > 2) // очень много лишних, маловероятных схем, ex: γαλ-α-ξ-ίου
+        taildicts = taildicts.filter(dict=> !dict.pos) // спец.формы
 
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
         if (taildicts.length) {
             headdicts = headdicts.filter(dict=> dict.stem.length > 2)
+            taildicts = taildicts.filter(dict=> !dict.pos) // спец.формы
             headdicts = headdicts.filter(dict=> {
                 if (dict.name) return true
                 else if (dict.verb && dict.reg) return true
@@ -365,7 +368,7 @@ async function findDicts(breaks) {
     // keys = ['δεικν']
     // log('_DDD KEYS', keys)
     let dicts = await getDicts(keys)
-    let dvrdicts = dicts.filter(dict=> dict.dname == 'dvr' && dict.stem == 'δεικν')
+    // let dvrdicts = dicts.filter(dict=> dict.dname == 'dvr' && dict.stem == 'δεικν')
     // log('_DDD', dvrdicts)
     dag.dictids = _.uniq(dicts.map(ddict=> ddict.stem))
     // log('_DDD', dag.dictids)
