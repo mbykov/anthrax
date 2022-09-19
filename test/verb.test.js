@@ -28,7 +28,7 @@ let cache =  new Map();
 rows = rows.slice(0, 1500)
 let tests = makeVerbTests(rows)
 
-tests = tests.slice(0, 20)
+tests = tests.slice(0, 1500)
 log('TESTS', tests.length)
 // tests = []
 
@@ -40,7 +40,7 @@ for (let test of tests) {
     // else if (wf.inf) cache[wf.form].push(wf.tense)
 }
 
-log('_CACHE', cache['ἀγαθοεργέω'])
+log('_CACHE', cache['ἀγαθοεργεῖτον'])
 log('_CACHE', _.keys(cache).length)
 
 

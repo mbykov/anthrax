@@ -10,7 +10,7 @@ const numpers = "sg.1 sg.2 sg.3 du.2 du.3 pl.1 pl.2 pl.3".split(' ')
 export function makeVerbTests(rows, only) {
     let pars = parseText(rows, only)
 
-    pars = pars.slice(0, 2)
+    // pars = pars.slice(0, 2)
     // log('_P', pars[0].data)
     // return []
     let tests = parsePars (pars, only)
@@ -25,7 +25,7 @@ function parsePars (pars, only)  {
         tenses = _.uniq(tenses)
         let voices = tenses.map(descr => { return descr.split('.')[0] })
         voices = _.uniq(voices)
-        log('_V', voices)
+        // log('_V', voices)
 
         par.verbs.forEach(line => {
             // log('_L', line)
