@@ -1,6 +1,18 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
+* 19 сент 2022
+  == осталось 2 пункта
+  - [ ] participles
+  - [ ] irregs
+  - и проверить, т.е. тесты
+  - verbs
+  - infs
+  - parts
+  == и выложить
+  == и документы
+
+
 * BUGS
   - διαιτάω
   - ἐνδύω

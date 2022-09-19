@@ -38,7 +38,7 @@ let limit = 0
 let ntests = nameTests(nrows, limit)
 log('_NTESTS', ntests.length)
 // let atests = adjTests(arows, limit)
-log('_ATESTS', atests.length)
+// log('_ATESTS', atests.length)
 
 // let tests = ntests.concat(atests)
 let tests = ntests

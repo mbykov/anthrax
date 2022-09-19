@@ -154,33 +154,18 @@ async function eachBreak(dag, breaks) {
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
             // let probe = grdicts.find(dict=> dict.dname == 'dvr') || grdicts[0]
 
-            // =================== KEYS === выбираю по концу стема подходящий keys
+            // =================== FREE KEYS ===
             // log('_PROBE', dict, probe.dname, probe.stem, probe.type)
-
-            let keys = []
-            if (probe.verb) {
-                keys = vtypes[probe.type] || ['no verb']
-            } else if (probe.name) {
-                // for (let ntype in ntypes) {
-                //     if (probe.type != ntype) continue
-                //     for (let end in ntypes[ntype]) {
-                //         if (!probe.stem.endsWith(end)) continue
-                //     }
-                // }
-                let nkt = ntypes[probe.type]
-                if (!nkt) nkt = {}
-                let stem1 = probe.stem.slice(-1)
-                let stem2 = probe.stem.slice(-2)
-                let stem3 = probe.stem.slice(-3)
-                keys = nkt[stem3] ? nkt[stem3] : nkt[stem2] ? nkt[stem2] : nkt[stem1] ? nkt[stem1] :  []
-            } else {
-                log('_SOME TYPE??')
-                throw new Error()
-            }
-            // if (probe.keys) log('_wkt keys', probe.rdict, probe.keys.length)
-            // log('_keys', probe.rdict, keys.length)
-
             if (!probe.keys) {
+                let keys = []
+                if (probe.verb) {
+                    keys = vtypes[probe.type] || ['no verb']
+                } else if (probe.name) {
+                    // name без keys
+                } else {
+                    log('_SOME TYPE??')
+                    throw new Error()
+                }
                 probe.keys = keys
             }
 
@@ -210,7 +195,7 @@ function filterProbeVerb(dict, pfls) {
         let ok = true
         // log('_F=================', flex.type, '_D', dict.type)
         if (!flex.verb) ok = false
-        // if (dict.type !== flex.type) ok = false
+        if (dict.type !== flex.type) ok = false // это нужно, ибо много правильных: ἀθηνιάω
         if (!dict.keys.includes(flex.key)) ok = false
         // ok = true
         if (ok) cfls.push(flex)
@@ -222,18 +207,16 @@ function filterProbeVerb(dict, pfls) {
 
 function filterProbeName(dict, pfls) {
     // log('_D-name=====', dict.rdict, dict.stem, dict.type)
-    if (!dict.gens) {
-        log('_NO GENS', dict)
-        throw new Error()
-    }
-
     let cfls = []
     for(let flex of pfls) {
-        let ok = false
+        let ok = true
+        if (!flex.name) ok = false
         // log('_F=================', flex)
-        if (dict.name && flex.name && dict.type == flex.type && dict.gens.includes(flex.gen)) ok = true
-        // if (dict.name && flex.name) ok = true
-        if (dict.keys && flex.key && dict.keys[flex.gend] !== flex.key) ok = false
+        if (dict.type != flex.type) ok = false
+        if (!dict.gens.includes(flex.gen)) ok = false
+
+        // if (dict.keys[flex.gend] != flex.key) ok = false // пока name можно без keys
+
         // ok = true
         if (ok) cfls.push(flex)
         // if (ok) log('_F_OK=================', flex)
