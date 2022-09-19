@@ -8,6 +8,9 @@ import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
+import { vtypes } from '../Dicts/WKT/wkt/wkt-keys/verb-types.js'
+import { ntypes } from '../Dicts/WKT/wkt/wkt-keys/name-types.js'
+
 const d = Debug('app')
 const p = Debug('pref')
 const h = Debug('whole')
@@ -141,11 +144,49 @@ async function eachBreak(dag, breaks) {
 
         let dictgroups = _.groupBy(cognates, 'dict')
 
+        // ==== группировать не по dict, а по стему? чтобы затем найти wkt - м.б. несколько
+        // если есть, оставить эти rdicts
+        // а не подбирать keys для dvr
+
         for (let dict in dictgroups) {
             let grdicts = dictgroups[dict]
             // log('_grDicts', dict, grdicts.length)
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
-            // log('_PROBE', dict, probe.rdict)
+            // let probe = grdicts.find(dict=> dict.dname == 'dvr') || grdicts[0]
+
+            // =================== KEYS === выбираю по концу стема подходящий keys
+            // log('_PROBE', dict, probe.dname, probe.stem, probe.type)
+
+            let keys = []
+            if (probe.verb) {
+                keys = vtypes[probe.type] || ['no verb']
+            } else if (probe.name) {
+                // for (let ntype in ntypes) {
+                //     if (probe.type != ntype) continue
+                //     for (let end in ntypes[ntype]) {
+                //         if (!probe.stem.endsWith(end)) continue
+                //     }
+                // }
+                let nkt = ntypes[probe.type]
+                if (!nkt) nkt = {}
+                let stem1 = probe.stem.slice(-1)
+                let stem2 = probe.stem.slice(-2)
+                let stem3 = probe.stem.slice(-3)
+                keys = nkt[stem3] ? nkt[stem3] : nkt[stem2] ? nkt[stem2] : nkt[stem1] ? nkt[stem1] :  []
+            } else {
+                log('_SOME TYPE??')
+                throw new Error()
+            }
+            // if (probe.keys) log('_wkt keys', probe.rdict, probe.keys.length)
+            // log('_keys', probe.rdict, keys.length)
+
+            if (!probe.keys) {
+                probe.keys = keys
+            }
+
+            // if (!probe.keys) log('_probe', probe.rdict, probe.dname, probe.stem, 'type:', probe.type)
+
+
             let cfls = []
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbeName(probe, pfls)
@@ -157,21 +198,24 @@ async function eachBreak(dag, breaks) {
             chains.push(chain)
         }
     }
+    // return []
     return chains
 }
 
 function filterProbeVerb(dict, pfls) {
     // log('_filter Probe Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    if (!dict.keys) return []
     let cfls = []
     for(let flex of pfls) {
         let ok = true
         // log('_F=================', flex.type, '_D', dict.type)
         if (!flex.verb) ok = false
         // if (dict.type !== flex.type) ok = false
-        if (dict.keys && !dict.keys.includes(flex.key)) ok = false
+        if (!dict.keys.includes(flex.key)) ok = false
         // ok = true
         if (ok) cfls.push(flex)
         // if (ok) log('_FVerb=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
+        // if (ok) log('_FVerb=================', flex)
     }
     return cfls
 }
@@ -180,6 +224,7 @@ function filterProbeName(dict, pfls) {
     // log('_D-name=====', dict.rdict, dict.stem, dict.type)
     if (!dict.gens) {
         log('_NO GENS', dict)
+        throw new Error()
     }
 
     let cfls = []
