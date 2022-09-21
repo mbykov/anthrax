@@ -8,8 +8,8 @@ import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
-import { vtypes } from '../Dicts/WKT/wkt/wkt-keys/verb-types.js'
-import { ntypes } from '../Dicts/WKT/wkt/wkt-keys/name-types.js'
+import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
+// import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
 
 const d = Debug('app')
 const p = Debug('pref')
@@ -159,7 +159,7 @@ async function eachBreak(dag, breaks) {
             if (!probe.keys) {
                 let keys = []
                 if (probe.verb) {
-                    keys = vtypes[probe.type] || ['no verb']
+                    keys = vkeys[probe.type] || ['no verb']
                 } else if (probe.name) {
                     // name без keys
                 } else {

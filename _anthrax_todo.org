@@ -1,6 +1,39 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
+* FLS = format
+
+- { name: true,
+  type: 'ία',
+  term: 'ία',
+  numcase: 'sg.nom',
+  gend: 'fem',
+  key: '{"sg.nom":"ία","du.nom":"ία","pl.nom":"ίαι","sg.gen":"ίας","du.gen":"ίαιν","pl.gen":"ιῶν","sg.dat":"ίᾳ","du.dat":"ίαιν","pl.dat":"ίαις","sg.acc":"ίαν","du.acc":"ία","pl.acc":"ίας","sg.voc":"ία","du.voc":"ία","pl.voc":"ίαι"}',
+  gen: 'ίας'
+}
+
+-  {
+  name: true,
+  adj: true,
+  type: 'ος',
+  term: 'ος',
+  numcase: 'sg.nom',
+  gend: 'masc',
+  key: '{"sg.nom":"ος","du.nom":"ω","pl.nom":"οι","sg.gen":"ου","du.gen":"οιιν","pl.gen":"ων","sg.dat":"ῳ","du.dat":"οιιν","pl.dat":"οις","sg.acc":"ον","du.acc":"ω","pl.acc":"ους","sg.voc":"ε","du.voc":"ω","pl.voc":"οι"}',
+  gen: 'ου'
+}
+
+-  {
+  verb: true,
+  type: 'έω',
+  term: 'έω',
+  tense: 'act.pres.ind',
+  numper: 'sg.1',
+  key: '{"tense":"act.pres.ind","terms":{"sg.1":"έω","sg.2":"εῖς","sg.3":"εῖ","du.2":"εῖτον","du.3":"εῖτον","pl.1":"έομεν","pl.2":"εῖτε","pl.3":"έουσιν"}}'
+}
+
+
+
 * 19 сент 2022
   == осталось 3 пункта
   - [ ] общие terms
