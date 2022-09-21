@@ -9,6 +9,7 @@ import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remo
 import Debug from 'debug'
 
 import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
+import { xkeys } from '../Dicts/WKT/wkt/wkt-keys/xkeys-verb.js'
 // import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
 
 const d = Debug('app')
@@ -106,7 +107,7 @@ async function anthraxChains(wf) {
 
     // whole compound
     if (dag.prefsegs) {
-        // log('_X_DDD', dag.prefsegs.length, '_CH', chains.length)
+        // log('_X_', dag.prefsegs.length, '_CH', chains.length)
         let whcomps = []
         for await (let chain of chains) {
             chain.unshift(...dag.prefsegs)
@@ -155,19 +156,19 @@ async function eachBreak(dag, breaks) {
             // let probe = grdicts.find(dict=> dict.dname == 'dvr') || grdicts[0]
 
             // =================== FREE KEYS ===
-            // log('_PROBE', dict, probe.dname, probe.stem, probe.type)
             if (!probe.keys) {
-                let keys = []
+                let typekeys = []
                 if (probe.verb) {
-                    keys = vkeys[probe.type] || ['no verb']
+                    typekeys = vkeys[probe.type] || ['no verb']
                 } else if (probe.name) {
                     // name без keys
                 } else {
                     log('_SOME TYPE??')
                     throw new Error()
                 }
-                probe.keys = keys
+                probe.keys = typekeys
             }
+            log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.keys.length)
 
             // if (!probe.keys) log('_probe', probe.rdict, probe.dname, probe.stem, 'type:', probe.type)
 
@@ -188,15 +189,38 @@ async function eachBreak(dag, breaks) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    // log('_filter Probe Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    // log('_D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    if (!dict.keys) return []
+    let stem3 = dict.stem.slice(-3)
+    let cfls = []
+    for (let flex of pfls) {
+        if (!flex.verb) continue
+        let xtense = xkeys[flex.key]
+        if (!xtense) continue
+        let xtype = xtense[flex.tense]
+        // log('_XTYPE', xtype)
+        if (!xtype) continue
+        let xstems = xtype[flex.type]
+        if (!xstems) continue
+        log('_xstems', stem3, xstems)
+        if (xstems.includes(stem3)) cfls.push(flex)
+        // if (ok) log('_FVerb=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
+        // if (ok) log('_FVerb=================', flex)
+    }
+    return cfls
+}
+
+function filterProbeVerb_vkeys(dict, pfls) {
+    // log('_D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
     if (!dict.keys) return []
     let cfls = []
-    for(let flex of pfls) {
+    for (let flex of pfls) {
         let ok = true
-        // log('_F=================', flex.type, '_D', dict.type)
-        if (!flex.verb) ok = false
-        if (dict.type !== flex.type) ok = false // это нужно, ибо много правильных: ἀθηνιάω
-        if (!dict.keys.includes(flex.key)) ok = false
+        if (!flex.verb) continue
+        if (dict.type !== flex.type) continue // это нужно, ибо много правильных: ἀθηνιάω
+        log('_F=================', flex.type, flex.tense)
+        if (!dict.keys[flex.tense]) continue
+        if (!dict.keys[flex.tense].includes(flex.key)) ok = false
         // ok = true
         if (ok) cfls.push(flex)
         // if (ok) log('_FVerb=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
@@ -206,9 +230,9 @@ function filterProbeVerb(dict, pfls) {
 }
 
 function filterProbeName(dict, pfls) {
-    // log('_D-name=====', dict.rdict, dict.stem, dict.type)
+    // log('_D-Name=====', dict.rdict, dict.stem, dict.type)
     let cfls = []
-    for(let flex of pfls) {
+    for (let flex of pfls) {
         let ok = true
         if (!flex.name) ok = false
         // log('_F=================', flex)
