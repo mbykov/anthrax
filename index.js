@@ -170,9 +170,6 @@ async function eachBreak(dag, breaks) {
             }
             log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.keys.length)
 
-            // if (!probe.keys) log('_probe', probe.rdict, probe.dname, probe.stem, 'type:', probe.type)
-
-
             let cfls = []
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbeName(probe, pfls)
@@ -191,21 +188,21 @@ async function eachBreak(dag, breaks) {
 function filterProbeVerb(dict, pfls) {
     // log('_D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
     if (!dict.keys) return []
-    let stem3 = dict.stem.slice(-3)
+    let stem3 = dict.stem.slice(-7)
     let cfls = []
+    let xtense, xtype, xstems
     for (let flex of pfls) {
         if (!flex.verb) continue
-        let xtense = xkeys[flex.key]
+        if (flex.tense != 'act.pres.ind') continue
+        xtense = xkeys[flex.key]
         if (!xtense) continue
-        let xtype = xtense[flex.tense]
-        // log('_XTYPE', xtype)
+        // log('_Xtense', xtense)
+        xtype = xtense[flex.tense]
         if (!xtype) continue
-        let xstems = xtype[flex.type]
+        xstems = xtype[dict.type]
         if (!xstems) continue
-        log('_xstems', stem3, xstems)
+        // if (flex.tense == 'act.pres.ind') log('_XSTEMS', dict.rdict, flex.tense, stem3, xstems)
         if (xstems.includes(stem3)) cfls.push(flex)
-        // if (ok) log('_FVerb=================', dict.rdict, dict.stem, 1, dict.type, dict.augs, dict.dname, 2, flex.type, flex.term)
-        // if (ok) log('_FVerb=================', flex)
     }
     return cfls
 }
@@ -246,6 +243,7 @@ function filterProbeName(dict, pfls) {
         // if (ok) log('_F_OK=================', flex)
     }
     // log('_D', dict, 'cfls', cfls.length)
+    // return []
     return cfls
 }
 
