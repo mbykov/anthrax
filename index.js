@@ -11,6 +11,7 @@ import Debug from 'debug'
 // import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
 import { xkeys } from '../Dicts/WKT/wkt/wkt-keys/xkeys-verb.js'
 import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
+import { pKeys } from '../Dicts/WKT/wkt/wkt-keys/keys-part.js'
 
 const d = Debug('app')
 const p = Debug('pref')
@@ -62,12 +63,12 @@ async function anthraxChains(wf) {
     if (!flakes.length) return
     dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
+    d('_flakes_tails', tails)
 
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
     d('_flexids', dag.flexids)
     dag.pcwf = plain(dag.cwf)
-    // dag.tail = dag.pcwf
     d('_pcwf', dag.pcwf)
 
     // ἀδικέω - odd δικάζω
@@ -123,7 +124,7 @@ async function eachBreak(dag, breaks) {
     let chains = []
     let regdicts = await getRegVerbs(breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    p('_breaks-ids', breaksids)
+    d('_breaks-ids', breaksids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
@@ -144,36 +145,18 @@ async function eachBreak(dag, breaks) {
         // log('_cognates', cognates)
 
         let dictgroups = _.groupBy(cognates, 'dict')
-
         // ==== группировать не по dict, а по стему? чтобы затем найти wkt - м.б. несколько
-        // если есть, оставить эти rdicts
-        // а не подбирать keys для dvr
 
         for (let dict in dictgroups) {
             let grdicts = dictgroups[dict]
             // log('_grDicts', dict, grdicts.length)
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
-            // let probe = grdicts.find(dict=> dict.dname == 'dvr') || grdicts[0]
 
-            // =================== FREE KEYS ===
-            // if (!probe.keys) {
-            // if (true) {
-            //     let typekeys = []
-            //     if (probe.verb) {
-            //         typekeys = vkeys[probe.type] || ['no verb']
-            //     } else if (probe.name) {
-            //         // name без keys
-            //     } else {
-            //         log('_SOME TYPE??')
-            //         throw new Error()
-            //     }
-            //     probe.keys = typekeys
-            // }
-            // if (!probe.keys) probe.keys = []
-            log('_PROBE', dict, probe.dname, probe.stem, probe.type)
+            // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
 
             let cfls = []
-            if (probe.verb) cfls = filterProbeVerb(probe, pfls)
+            if (probe.verb) cfls = filterProbePart(probe, pfls)
+            else if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbeName(probe, pfls)
             if (!cfls.length) continue
             if (!probe.trns) probe.trns = ['non reg verb']
@@ -187,8 +170,23 @@ async function eachBreak(dag, breaks) {
     return chains
 }
 
+function filterProbePart(dict, pfls) {
+    log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    let cfls = []
+    let xtense, xtype, xstems
+    for (let flex of pfls) {
+        if (!flex.part) continue
+        let partkeys = pKeys[flex.type]?.[flex.tense]?.[flex.gend]
+        // log('_PF', flex.term)
+        if (!partkeys.includes(flex.terms)) continue
+        cfls.push(flex)
+        // log('_P-KEYS', partkeys)
+    }
+    return cfls
+}
+
 function filterProbeVerb(dict, pfls) {
-    // log('_D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    // log('_filter-D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
     let stem = dict.stem.slice(-7)
     let cfls = []
     let xtense, xtype, xstems
@@ -209,19 +207,34 @@ function filterProbeVerb(dict, pfls) {
 }
 
 function filterProbeName(dict, pfls) {
-    log('_D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    if (dict.adj) return []
+    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.keys)
+    // log('_filter-D-Name =====', dict)
+    // if (dict.adj) return []
+    let keys = (dict.keys) ? dict.keys : nkeys
     let stem = dict.stem.slice(-3)
     let cfls = []
-    let xgend, xtype, xstems
+    let xterm, xnumcase, xgend, xstems
     for (let flex of pfls) {
         if (!flex.name) continue
         // log('_f', flex.numcase)
-        xgend = nkeys[flex.key]
-        // log('_g', xgend)
+        if (dict.gends && !dict.gends.includes(flex.gend)) continue
+        if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
+        xterm = nkeys[flex.key]
+        if (!xterm) continue
+        // log('_xterm', xterm)
+        xnumcase = xterm[flex.term]
+        // log('_xnumcase', _.keys(xnumcase))
+        if (!xnumcase) continue
+        xgend = xnumcase[flex.numcase]
         if (!xgend) continue
         // log('_xgend', xgend)
-        xstems = xgend[flex.gend]
-        if (xstems.includes(stem)) cfls.push(flex)
+        xstems = xgend[flex.gend].sort()
+        if (!xstems) continue
+        // log('_xstems', stem, xstems)
+        if (!xstems.includes(stem)) continue
+        // log('_f', flex)
+        cfls.push(flex)
     }
     return cfls
 }
@@ -315,8 +328,7 @@ async function cleanBreaks(dag, pcwf) {
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
     let rdicts = dicts.map(dict=> dict.rdict)
-    // rdicts = dicts.filter(dict=> dict.dname == 'drv')
-    // log('_BR-RDICTS', rdicts.length)
+
     let prefcon
     if (dag.prefsegs) {
         let conns = dag.prefsegs.filter(seg=> seg.conn)
@@ -329,10 +341,8 @@ async function cleanBreaks(dag, pcwf) {
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
-        // let dvrdicts = headdicts.filter(dict=> dict.dname == 'dvr')
-
         let rdicts = headdicts.map(dict=> dict.rdict)
-        // log('_HEAD-RDICTS', rdicts)
+        // log('_HEAD-RDICTS', br.head, rdicts)
         headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
         headdicts = headdicts.filter(dict=> !dict.pos) // спец.формы
 
@@ -437,12 +447,10 @@ async function findDicts(breaks) {
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
     let keys = _.compact(headkeys.concat(tailkeys))
     // keys = ['δεικν']
-    // log('_DDD KEYS', keys)
+    // log('_findDicts', keys)
     let dicts = await getDicts(keys)
-    // let dvrdicts = dicts.filter(dict=> dict.dname == 'dvr' && dict.stem == 'δεικν')
-    // log('_DDD', dvrdicts)
     dag.dictids = _.uniq(dicts.map(ddict=> ddict.stem))
-    // log('_DDD', dag.dictids)
+    d('_dag.dictids', dag.dictids)
     return dicts
 }
 
