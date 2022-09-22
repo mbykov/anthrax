@@ -8,9 +8,9 @@ import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
-import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
+// import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
 import { xkeys } from '../Dicts/WKT/wkt/wkt-keys/xkeys-verb.js'
-// import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
+import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
 
 const d = Debug('app')
 const p = Debug('pref')
@@ -156,19 +156,21 @@ async function eachBreak(dag, breaks) {
             // let probe = grdicts.find(dict=> dict.dname == 'dvr') || grdicts[0]
 
             // =================== FREE KEYS ===
-            if (!probe.keys) {
-                let typekeys = []
-                if (probe.verb) {
-                    typekeys = vkeys[probe.type] || ['no verb']
-                } else if (probe.name) {
-                    // name без keys
-                } else {
-                    log('_SOME TYPE??')
-                    throw new Error()
-                }
-                probe.keys = typekeys
-            }
-            log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.keys.length)
+            // if (!probe.keys) {
+            // if (true) {
+            //     let typekeys = []
+            //     if (probe.verb) {
+            //         typekeys = vkeys[probe.type] || ['no verb']
+            //     } else if (probe.name) {
+            //         // name без keys
+            //     } else {
+            //         log('_SOME TYPE??')
+            //         throw new Error()
+            //     }
+            //     probe.keys = typekeys
+            // }
+            // if (!probe.keys) probe.keys = []
+            log('_PROBE', dict, probe.dname, probe.stem, probe.type)
 
             let cfls = []
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
@@ -187,13 +189,12 @@ async function eachBreak(dag, breaks) {
 
 function filterProbeVerb(dict, pfls) {
     // log('_D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
-    if (!dict.keys) return []
-    let stem3 = dict.stem.slice(-7)
+    let stem = dict.stem.slice(-7)
     let cfls = []
     let xtense, xtype, xstems
     for (let flex of pfls) {
         if (!flex.verb) continue
-        if (flex.tense != 'act.pres.ind') continue
+        // if (flex.tense != 'act.pres.ind') continue
         xtense = xkeys[flex.key]
         if (!xtense) continue
         // log('_Xtense', xtense)
@@ -202,8 +203,47 @@ function filterProbeVerb(dict, pfls) {
         xstems = xtype[dict.type]
         if (!xstems) continue
         // if (flex.tense == 'act.pres.ind') log('_XSTEMS', dict.rdict, flex.tense, stem3, xstems)
-        if (xstems.includes(stem3)) cfls.push(flex)
+        if (xstems.includes(stem)) cfls.push(flex)
     }
+    return cfls
+}
+
+function filterProbeName(dict, pfls) {
+    log('_D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    let stem = dict.stem.slice(-3)
+    let cfls = []
+    let xgend, xtype, xstems
+    for (let flex of pfls) {
+        if (!flex.name) continue
+        // log('_f', flex.numcase)
+        xgend = nkeys[flex.key]
+        // log('_g', xgend)
+        if (!xgend) continue
+        // log('_xgend', xgend)
+        xstems = xgend[flex.gend]
+        if (xstems.includes(stem)) cfls.push(flex)
+    }
+    return cfls
+}
+
+function filterProbeName_(dict, pfls) {
+    // log('_D-Name=====', dict.rdict, dict.stem, dict.type)
+    let cfls = []
+    for (let flex of pfls) {
+        let ok = true
+        if (!flex.name) ok = false
+        // log('_F=================', flex)
+        if (dict.type != flex.type) ok = false
+        if (!dict.gens.includes(flex.gen)) ok = false
+
+        // if (dict.keys[flex.gend] != flex.key) ok = false // пока name можно без keys
+
+        // ok = true
+        if (ok) cfls.push(flex)
+        // if (ok) log('_F_OK=================', flex)
+    }
+    // log('_D', dict, 'cfls', cfls.length)
+    // return []
     return cfls
 }
 
@@ -226,26 +266,6 @@ function filterProbeVerb_vkeys(dict, pfls) {
     return cfls
 }
 
-function filterProbeName(dict, pfls) {
-    // log('_D-Name=====', dict.rdict, dict.stem, dict.type)
-    let cfls = []
-    for (let flex of pfls) {
-        let ok = true
-        if (!flex.name) ok = false
-        // log('_F=================', flex)
-        if (dict.type != flex.type) ok = false
-        if (!dict.gens.includes(flex.gen)) ok = false
-
-        // if (dict.keys[flex.gend] != flex.key) ok = false // пока name можно без keys
-
-        // ok = true
-        if (ok) cfls.push(flex)
-        // if (ok) log('_F_OK=================', flex)
-    }
-    // log('_D', dict, 'cfls', cfls.length)
-    // return []
-    return cfls
-}
 
 function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognates) {
     let chain = []

@@ -1,6 +1,13 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
+* = формат ключей
+  - создать keysdb
+  - формат записи keys: _id=uuid, или md5, terms, type, tense, stems
+  - dict.key_ids, flex.key_id
+  - доставать из keysdb по запросу
+  - отложить на потом?
+
 * FLS = format
 
 - { name: true,
