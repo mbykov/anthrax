@@ -10,7 +10,8 @@ import Debug from 'debug'
 
 // import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
 import { xkeys } from '../Dicts/WKT/wkt/wkt-keys/xkeys-verb.js'
-import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
+// import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
+import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/mkeys-name.js'
 import { pKeys } from '../Dicts/WKT/wkt/wkt-keys/keys-part.js'
 
 const d = Debug('app')
@@ -171,7 +172,7 @@ async function eachBreak(dag, breaks) {
 }
 
 function filterProbePart(dict, pfls) {
-    log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    // log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
     let cfls = []
     let xtense, xtype, xstems
     for (let flex of pfls) {
@@ -207,6 +208,30 @@ function filterProbeVerb(dict, pfls) {
 }
 
 function filterProbeName(dict, pfls) {
+    if (dict.adj) return []
+    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.keys)
+    // log('_filter-D-Name =====', dict)
+    // if (dict.adj) return []
+    let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
+    dictkey = JSON.stringify(dictkey)
+    let cfls = []
+    for (let flex of pfls) {
+        if (dict.gends && !dict.gends.includes(flex.gend)) continue
+        if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
+
+        let fks = nkeys[dictkey]
+        let flexkey = {term: flex.term, numcase: flex.numcase}
+        flexkey = JSON.stringify(flexkey)
+        let terms = fks[flexkey]
+        if (!terms) continue
+        // log('_TTTTT', terms)
+        if (terms.includes(flex.key)) cfls.push(flex)
+        // log('_FF', flex.numcase)
+    }
+    return cfls
+}
+
+function filterProbeName_xKeys(dict, pfls) {
     if (dict.adj) return []
     // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.keys)
     // log('_filter-D-Name =====', dict)
