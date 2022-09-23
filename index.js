@@ -150,12 +150,12 @@ async function eachBreak(dag, breaks) {
             let grdicts = dictgroups[dict]
             // log('_grDicts', dict, grdicts.length)
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
-
-            // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
+            log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
+            // log('_P-KEYS', probe.keys)
 
             let cfls = []
             if (probe.verb) cfls = filterProbePart(probe, pfls)
-            else if (probe.verb) cfls = filterProbeVerb(probe, pfls)
+            if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbeName(probe, pfls)
             if (!cfls.length) continue
             if (!probe.trns) probe.trns = ['non reg verb']
@@ -185,6 +185,24 @@ function filterProbePart(dict, pfls) {
 }
 
 function filterProbeVerb(dict, pfls) {
+    log('_filter-D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    let dictkey = { type: dict.type, reg: dict.reg }
+    dictkey = JSON.stringify(dictkey)
+    let keys = dict.keys ? dict.keys : vkeys[dictkey]
+    let cfls = []
+    for (let flex of pfls) {
+        if (dict.type != flex.type) continue
+        let flexkey = {type: flex.type, tense: flex.tense, numper: flex.numper}
+        flexkey = JSON.stringify(flexkey)
+        let terms = keys[flex.tense]
+        if (!terms) continue
+        // if (terms.includes(flex.key)) log('_F', flex)
+        if (terms.includes(flex.key)) cfls.push(flex)
+    }
+    return cfls
+}
+
+function filterProbeVerb_xKeys(dict, pfls) {
     // log('_filter-D-Verb =====', dict.rdict, dict.stem, dict.type, dict.dname)
     let stem = dict.stem.slice(-7)
     let cfls = []
@@ -211,19 +229,20 @@ function filterProbeName(dict, pfls) {
     let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
     dictkey = JSON.stringify(dictkey)
     // log('_D-key', dictkey)
+    let keys = nkeys[dictkey]
+    if (!keys && dict.adj) keys = akeys[dictkey]
+    if (!keys) return []
+
     let cfls = []
     for (let flex of pfls) {
+        if (dict.type != flex.type) continue
         if (dict.gends && !dict.gends.includes(flex.gend)) continue
         if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
 
-        let flexkeys = nkeys[dictkey]
-        if (!flexkeys && dict.adj) flexkeys = akeys[dictkey]
-        if (!flexkeys) continue
-        let flexkey = {term: flex.term, numcase: flex.numcase}
+        let flexkey = {term: flex.term, type: flex.type, numcase: flex.numcase}
         flexkey = JSON.stringify(flexkey)
         let terms = flexkeys[flexkey]
         if (!terms) continue
-        // log('_TTTTT', terms)
         if (terms.includes(flex.key)) cfls.push(flex)
         // log('_FF', flex.numcase)
     }

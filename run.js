@@ -36,8 +36,11 @@ async function run(full) {
     }
 
     for (let chain of chains) {
+        log('_chain:', chain)
         let segs = chain.map(seg=> seg.seg).join('-')
         log('_scheme:', segs)
+        // let fls = chain.map(seg=> seg.fls)
+        // log('_fls:', fls)
         let pretty = prettyFLS(chain)
         log('_morphs:', pretty)
         if (full) {
