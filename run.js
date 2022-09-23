@@ -7,25 +7,38 @@ import Debug from 'debug'
 const d = Debug('dicts')
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-let prettyfls = process.argv.slice(3)[0] //  'ἀργυρῷ'
+let full = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
 const log = console.log
 
 if (!wordform) log('no wordform')
-else run()
+else run(full)
 
-async function run() {
+
+
+async function run(full) {
     let chains = await anthrax(wordform)
-    log('_run_chains_:', chains)
-    for (let chain of chains) {
-        // log('_INDECL_:', chain[0].cdicts)
+    // log('_run_chains_:', chains)
+    let indecl = chains[0].find(seg=> seg.indecl)
+    if (indecl) {
+        // log('_run_indecl_:', indecl)
+        prettyIndecl(indecl)
+        // let cdicts =
+        if (full) {
+            log('_cdicts:', indecl.cdicts)
+        }
+        return
+    }
 
+    for (let chain of chains) {
         let segs = chain.map(seg=> seg.seg).join('-')
-        // let main = chain.find(seg=> seg.mainseg)
-        // log('_cdicts:', main.cdicts)
         log('_scheme:', segs)
         let pretty = prettyFLS(chain)
         log('_morphs:', pretty)
+        if (full) {
+            let main = chain.find(seg=> seg.mainseg)
+            log('_cdicts:', main.cdicts)
+        }
     }
 }
 
@@ -36,4 +49,15 @@ function prettyFLS(chain) {
     if (mseg.name) morphs = prettyName(fls)
     else if (mseg.verb) morphs = prettyVerb(fls)
     return morphs
+}
+
+function prettyIndecl(indecl) {
+    for (let cdict of indecl.cdicts) {
+        let fls = cdict.fls
+        let morphs = ''
+        if (cdict.fls) morphs = prettyName(fls)
+        if (cdict.name) morphs = prettyName(fls)
+        else if (cdict.verb) morphs = prettyVerb(fls)
+        log('_indecl:', cdict.rdict, morphs)
+    }
 }

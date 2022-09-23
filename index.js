@@ -8,10 +8,9 @@ import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
-// import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
 import { xkeys } from '../Dicts/WKT/wkt/wkt-keys/xkeys-verb.js'
-// import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
-import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/mkeys-name.js'
+import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
+import { akeys } from '../Dicts/WKT/wkt/wkt-keys/keys-adj.js'
 import { pKeys } from '../Dicts/WKT/wkt/wkt-keys/keys-part.js'
 
 const d = Debug('app')
@@ -41,7 +40,6 @@ export async function anthrax(wf) {
     // log('_TD', termcdicts)
     let termcdicts = await getTermsNew(cwf)
     // log('_TD NEW', termcdictsnew)
-    // let tchains = termcdicts.map(cdict=> [{seg: cdict.term, cdict, indecl: true}])
     if (termcdicts.length) {
         let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
         chains.push(termchain)
@@ -208,21 +206,22 @@ function filterProbeVerb(dict, pfls) {
 }
 
 function filterProbeName(dict, pfls) {
-    if (dict.adj) return []
-    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.keys)
+    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
     // log('_filter-D-Name =====', dict)
-    // if (dict.adj) return []
     let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
     dictkey = JSON.stringify(dictkey)
+    // log('_D-key', dictkey)
     let cfls = []
     for (let flex of pfls) {
         if (dict.gends && !dict.gends.includes(flex.gend)) continue
         if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
 
-        let fks = nkeys[dictkey]
+        let flexkeys = nkeys[dictkey]
+        if (!flexkeys && dict.adj) flexkeys = akeys[dictkey]
+        if (!flexkeys) continue
         let flexkey = {term: flex.term, numcase: flex.numcase}
         flexkey = JSON.stringify(flexkey)
-        let terms = fks[flexkey]
+        let terms = flexkeys[flexkey]
         if (!terms) continue
         // log('_TTTTT', terms)
         if (terms.includes(flex.key)) cfls.push(flex)
@@ -232,10 +231,8 @@ function filterProbeName(dict, pfls) {
 }
 
 function filterProbeName_xKeys(dict, pfls) {
-    if (dict.adj) return []
     // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.keys)
     // log('_filter-D-Name =====', dict)
-    // if (dict.adj) return []
     let keys = (dict.keys) ? dict.keys : nkeys
     let stem = dict.stem.slice(-3)
     let cfls = []
