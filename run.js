@@ -19,6 +19,11 @@ else run(full)
 async function run(full) {
     let chains = await anthrax(wordform)
     // log('_run_chains_:', chains)
+    if (!chains.length) {
+        log('no result')
+        return
+    }
+
     let indecl = chains[0].find(seg=> seg.indecl)
     if (indecl) {
         // log('_run_indecl_:', indecl)
