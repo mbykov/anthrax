@@ -41,6 +41,8 @@ async function run(full) {
         log('_scheme:', segs)
         // let fls = chain.map(seg=> seg.fls)
         // log('_fls:', fls)
+        // let mainseg = chain.find(seg=> seg.mainseg)
+        // log('_M:', mainseg.cdicts[0].keys)
         let pretty = prettyFLS(chain)
         log('_morphs:', pretty)
         if (full) {

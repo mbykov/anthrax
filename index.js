@@ -8,7 +8,7 @@ import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
-import { xkeys } from '../Dicts/WKT/wkt/wkt-keys/xkeys-verb.js'
+import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
 import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
 import { akeys } from '../Dicts/WKT/wkt/wkt-keys/keys-adj.js'
 import { pKeys } from '../Dicts/WKT/wkt/wkt-keys/keys-part.js'
@@ -138,7 +138,7 @@ async function eachBreak(dag, breaks) {
         // p('_PDICT_FILTER_cogns', cognates.map(dict=> dict.rdict))
 
         cognates = cognates.filter(dict=> {
-            // if (dict.dname == 'dvr') return false
+            // if (dict.dname == 'wkt') return false
             return true
         })
         // log('_cognates', cognates)
@@ -150,17 +150,20 @@ async function eachBreak(dag, breaks) {
             let grdicts = dictgroups[dict]
             // log('_grDicts', dict, grdicts.length)
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
+
             log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
             // log('_P-KEYS', probe.keys)
 
             let cfls = []
+            // pfls = pfls.filter(flex=> flex.type == probe.type)
+
             if (probe.verb) cfls = filterProbePart(probe, pfls)
             if (probe.verb) cfls = filterProbeVerb(probe, pfls)
             else cfls = filterProbeName(probe, pfls)
             if (!cfls.length) continue
             if (!probe.trns) probe.trns = ['non reg verb']
             // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
-            let cogns = cognates.filter(cdict=> cdict.dict == dict)
+            let cogns = cognates //.filter(cdict=> cdict.dict == dict)
             let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cogns)
             chains.push(chain)
         }
@@ -190,13 +193,13 @@ function filterProbeVerb(dict, pfls) {
     dictkey = JSON.stringify(dictkey)
     let keys = dict.keys ? dict.keys : vkeys[dictkey]
     let cfls = []
+
     for (let flex of pfls) {
         if (dict.type != flex.type) continue
-        let flexkey = {type: flex.type, tense: flex.tense, numper: flex.numper}
-        flexkey = JSON.stringify(flexkey)
+        // let flexkey = {type: flex.type, tense: flex.tense, numper: flex.numper}
+        // flexkey = JSON.stringify(flexkey)
         let terms = keys[flex.tense]
         if (!terms) continue
-        // if (terms.includes(flex.key)) log('_F', flex)
         if (terms.includes(flex.key)) cfls.push(flex)
     }
     return cfls
