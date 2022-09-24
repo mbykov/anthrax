@@ -192,6 +192,7 @@ function filterProbeVerb(dict, pfls) {
     let dictkey = { type: dict.type, reg: dict.reg }
     dictkey = JSON.stringify(dictkey)
     let keys = dict.keys ? dict.keys : vkeys[dictkey]
+    if (!keys) keys = []
     let cfls = []
 
     for (let flex of pfls) {
@@ -244,7 +245,7 @@ function filterProbeName(dict, pfls) {
 
         let flexkey = {term: flex.term, type: flex.type, numcase: flex.numcase}
         flexkey = JSON.stringify(flexkey)
-        let terms = flexkeys[flexkey]
+        let terms = keys[flexkey]
         if (!terms) continue
         if (terms.includes(flex.key)) cfls.push(flex)
         // log('_FF', flex.numcase)
