@@ -194,6 +194,7 @@ function filterProbeVerb(dict, pfls) {
     let keys = dict.keys ? dict.keys : vkeys[dictkey]
     if (!keys) keys = []
     let cfls = []
+    if (!dict.trns) dict.trns = [] // неправильная форма глагола
 
     for (let flex of pfls) {
         if (dict.type != flex.type) continue
