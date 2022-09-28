@@ -228,11 +228,6 @@ function filterProbeVerb_xKeys(dict, pfls) {
     return cfls
 }
 
-// если dict_any, то нужен цикл по всем dict.gens
-// или собирать dictkey из type, each_gens, dict.gends и накапливать keys
-// а на самом деле нужно считать частоту gens, и оставлять только лучший вариант
-// нет, вручную создать typical-gens
-
 function filterProbeName(dict, pfls) {
     // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
     // log('_filter-D-Name =====', dict)
