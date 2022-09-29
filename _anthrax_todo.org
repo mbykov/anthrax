@@ -1,6 +1,9 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
+
+
+
 * = формат ключей
   - создать keysdb
   - формат записи keys: _id=uuid, или md5, terms, type, tense, stems
