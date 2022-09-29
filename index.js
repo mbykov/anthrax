@@ -287,7 +287,6 @@ async function cleanBreaks(dag, pcwf) {
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
     let rdicts = dicts.map(dict=> dict.rdict)
-    log('_XXXX', dicts[0])
 
     let prefcon
     if (dag.prefsegs) {
@@ -308,8 +307,7 @@ async function cleanBreaks(dag, pcwf) {
         // headdicts = headdicts.filter(dict=> !dict.pos) // спец.формы
 
         rdicts = headdicts.map(dict=> dict.rdict)
-        log('_HEAD-RDICTS_2', rdicts)
-        if (br.head == 'γοραζ') log('_XXXX_2', br.head, headdicts.length)
+        // log('_HEAD-RDICTS_2', rdicts)
         if (headdicts.length) br.headdicts = headdicts
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
 
