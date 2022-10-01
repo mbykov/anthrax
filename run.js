@@ -18,13 +18,16 @@ else run(full)
 
 async function run(full) {
     let chains = await anthrax(wordform)
-    // log('_run_chains_:', chains)
+    log('_run_chains_:', chains)
+
     if (!chains.length) {
         log('no result')
         return
     }
 
     let indecl = chains[0].find(seg=> seg.indecl)
+    log('_INDECL_:', indecl)
+
     if (indecl) {
         // log('_run_indecl_:', indecl)
         prettyIndecl(indecl)
@@ -68,6 +71,6 @@ function prettyIndecl(indecl) {
         if (cdict.fls) morphs = prettyName(fls)
         if (cdict.name) morphs = prettyName(fls)
         else if (cdict.verb) morphs = prettyVerb(fls)
-        log('_indecl:', cdict.rdict, morphs)
+        log('_indecl:', cdict.term, morphs)
     }
 }
