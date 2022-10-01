@@ -62,7 +62,7 @@ async function anthraxChains(wf) {
     if (!flakes.length) return
     dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
-    d('_flakes_tails', tails)
+    // d('_flakes_tails', tails)
 
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
@@ -140,11 +140,9 @@ async function eachBreak(dag, breaks) {
 
         for (let dict in dictgroups) {
             let grdicts = dictgroups[dict]
-            // log('_grDicts', dict, grdicts.length)
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
 
-            log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
-            // log('_P-KEYS', probe.keys)
+            // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
 
             let cfls = []
             // pfls = pfls.filter(flex=> flex.type == probe.type)
@@ -180,15 +178,9 @@ function filterProbePart(dict, pfls) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
-    // log('_filter-D-Pfls =====', pfls.length)
+    // log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
     if (!dict.keys) dict.reg = true
-    // let dictkey = { type: dict.type, reg: dict.reg }
-    // dictkey = JSON.stringify(dictkey)
-    if (dict.keys) log('_DK', dict.dict, dict.keys.length)
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
-    // if (!keys) keys = []
-    // log('_KEYS-keys', _.keys(keys))
     let cfls = []
 
     for (let flex of pfls) {
@@ -196,20 +188,12 @@ function filterProbeVerb(dict, pfls) {
         if (dict.type != flex.dtype) continue
         let fkeys = dkeys[flex.type]?.[flex.tense]
         if (!fkeys) continue
-        // log('_FKEYS', flex.type, fkeys[0], fkeys.length)
-        // let flexkey = [flex.tense, flex.key].join('-')
         if (!fkeys.includes(flex.terms)) continue
-        // log('_F', flex.reg)
-        let terms = JSON.parse(flex.terms)
-        if (terms[flex.numper] != flex.term) continue
-
-        // log('_FKEYS', terms)
-        // log('_F', flex)
-
+        // let terms = JSON.parse(flex.terms)
+        // if (terms[flex.numper] != flex.term) continue
         cfls.push(flex)
-        // cfls.push(flex)
     }
-    log('_CFLS', cfls.length)
+    // log('_CFLS', cfls.length)
     return cfls
 }
 
