@@ -178,7 +178,7 @@ function filterProbePart(dict, pfls) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
+    // log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
@@ -190,8 +190,8 @@ function filterProbeVerb(dict, pfls) {
         if (dict.type != flex.dtype) continue
         let fkeys = dkeys[flex.type]?.[flex.tense]
         if (!fkeys) continue
-        log('_F', dict.rdict, fkeys)
-        log('_Fx', dict.rdict, flex)
+        // log('_F', dict.rdict, fkeys)
+        // log('_Fx', dict.rdict, flex)
         if (!fkeys.includes(flex.terms)) continue
         // let terms = JSON.parse(flex.terms)
         // if (terms[flex.numper] != flex.term) continue
@@ -338,7 +338,7 @@ function vowDictMapping(conn, dict) {
         // log('_MAPPING-aug', dict.rdict, dict)
         // log('_MAPPING', dict.rdict, 1, conn, 2, dict.aug, 3, dict.aug == conn)
         if (!dict.aug && !conn)  mapping = true
-        else if (!dict.aug && ['ο', 'α'].includes(conn))  mapping = true // ἀγαθοποιέω
+        else if (!dict.aug && ['ο', 'α', 'ἐ'].includes(conn))  mapping = true // ἀγαθοποιέω
         else if (strip(dict.aug) == strip(conn))  mapping = true
         // mapping = true
     }
