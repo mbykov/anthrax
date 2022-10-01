@@ -178,16 +178,20 @@ function filterProbePart(dict, pfls) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    // log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
+    log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
 
+    // log('_D', dict.rdict, dict.keys)
+
     for (let flex of pfls) {
-        if (dict.reg != flex.reg) continue
+        if (!!dict.reg != !!flex.reg) continue
         if (dict.type != flex.dtype) continue
         let fkeys = dkeys[flex.type]?.[flex.tense]
         if (!fkeys) continue
+        log('_F', dict.rdict, fkeys)
+        log('_Fx', dict.rdict, flex)
         if (!fkeys.includes(flex.terms)) continue
         // let terms = JSON.parse(flex.terms)
         // if (terms[flex.numper] != flex.term) continue
