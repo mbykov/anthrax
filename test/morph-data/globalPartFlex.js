@@ -1,3 +1,4 @@
+// test
 export const globalPartFlex = [
         {
                 "rverb": "ἀγαθοεργέω",
