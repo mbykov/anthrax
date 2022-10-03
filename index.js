@@ -8,10 +8,10 @@ import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
-import { vkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-verb.js'
-import { nkeys } from '../Dicts/WKT/wkt/wkt-keys/keys-name.js'
-import { akeys } from '../Dicts/WKT/wkt/wkt-keys/keys-adj.js'
-import { pKeys } from '../Dicts/WKT/wkt/wkt-keys/keys-part.js'
+import { vkeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-verb.js'
+import { nkeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-name.js'
+import { akeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-adj.js'
+import { pKeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-part.js'
 
 const d = Debug('app')
 const p = Debug('pref')
