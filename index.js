@@ -163,7 +163,7 @@ async function eachBreak(dag, breaks) {
 }
 
 function filterProbePart(dict, pfls) {
-    log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    // log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
     if (!dict.verb) return
     let cfls = []
     let dkeys = dict.keys // ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
@@ -174,9 +174,9 @@ function filterProbePart(dict, pfls) {
         // if (dict.type != flex.dtype) continue
         // let partkeys = pKeys[flex.type]?.[flex.tense]?.[flex.gend]
         let fkeys = dkeys[flex.type]?.[flex.tense]
-        log('_Fkeys', flex.type, flex.tense, fkeys)
+        // log('_Fkeys', flex.type, flex.tense, fkeys)
         if (!fkeys) continue
-        log('_PF', flex.key)
+        // log('_PF', flex.key)
         if (!dkeys.includes(flex.terms)) continue
         cfls.push(flex)
         // log('_P-KEYS', partkeys)
@@ -210,8 +210,7 @@ function filterProbeVerb(dict, pfls) {
 }
 
 function filterProbeName(dict, pfls) {
-    return []
-    log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
+    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
     let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
     dictkey = JSON.stringify(dictkey)
     // log('_D-key', dictkey)
