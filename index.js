@@ -145,11 +145,13 @@ async function eachBreak(dag, breaks) {
             // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
 
             let cfls = []
-            // pfls = pfls.filter(flex=> flex.type == probe.type)
+            let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
+            log('_PFLS', probe.rdict, pfls.length)
 
-            if (probe.verb) cfls = filterProbePart(probe, pfls)
-            if (probe.verb) cfls = filterProbeVerb(probe, pfls)
+            if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
+            if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
             else cfls = filterProbeName(probe, pfls)
+            // cfls = _.compact(cfls)
             if (!cfls.length) continue
             if (!probe.trns) probe.trns = ['non regular verb']
             // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
@@ -164,15 +166,17 @@ async function eachBreak(dag, breaks) {
 
 function filterProbePart(dict, pfls) {
     // log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
-    if (!dict.verb) return
+    if (!dict.verb || !dict.reg) return []
     let cfls = []
-    let dkeys = dict.keys // ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
-    log('_Part keys', dict.rdict, dkeys)
+    let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
+    log('_Part keys', dict.rdict) // , dkeys
     for (let flex of pfls) {
+        // if (!flex) log('_________________NO FLEX', dict.rdict)
         if (!flex.part) continue
-        // if (!!dict.reg != !!flex.reg) continue
-        // if (dict.type != flex.dtype) continue
-        // let partkeys = pKeys[flex.type]?.[flex.tense]?.[flex.gend]
+        // if (dict.type != flex.type) continue
+        log('_PF', flex.term)
+        cfls.push(flex)
+
         let fkeys = dkeys[flex.type]?.[flex.tense]
         // log('_Fkeys', flex.type, flex.tense, fkeys)
         if (!fkeys) continue
@@ -181,12 +185,13 @@ function filterProbePart(dict, pfls) {
         cfls.push(flex)
         // log('_P-KEYS', partkeys)
     }
+    log('_P-CFLS', cfls.length)
     return cfls
 }
 
 function filterProbeVerb(dict, pfls) {
     // log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
-    if (!dict.verb) return
+    if (!dict.verb) return []
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
