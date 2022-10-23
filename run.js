@@ -2,7 +2,7 @@
 
 import _  from 'lodash'
 import { anthrax } from './index.js'
-import { prettyName, prettyVerb } from './lib/utils.js'
+// import { prettyName, prettyVerb } from './lib/utils.js'
 import Debug from 'debug'
 const d = Debug('dicts')
 
@@ -13,8 +13,6 @@ const log = console.log
 
 if (!wordform) log('no wordform')
 else run(full)
-
-
 
 async function run(full) {
     let chains = await anthrax(wordform)
@@ -39,7 +37,7 @@ async function run(full) {
     }
 
     for (let chain of chains) {
-        log('_chain:', chain)
+        // log('_chain:', chain)
         let segs = chain.map(seg=> seg.seg).join('-')
         log('_scheme:', segs)
         let fls = chain.find(seg=> seg.fls)
@@ -73,4 +71,23 @@ function prettyIndecl(indecl) {
         else if (cdict.verb) morphs = prettyVerb(fls)
         log('_indecl:', cdict.term, morphs)
     }
+}
+
+function prettyName(fls) {
+    let morphs = fls.map(flex=> {
+        return  [flex.gend, flex.numcase].join('.')
+    })
+    return _.uniq(morphs).sort()
+}
+
+function prettyVerb(fls) {
+    let morphs = fls.map(flex=> {
+        let str
+        // if (flex.part) str =[ [flex.tense, flex.numper].join('.'),  [flex.gend, 'sg.nom'].join('.') ].join(', ')
+        if (flex.part) str = [flex.tense,  [flex.gend, flex.numcase].join('.') ].join(', ')
+        else if (flex.inf) str = flex.tense
+        else str = [flex.tense, flex.numper].join(', ').trim()
+        return str
+    })
+    return _.uniq(morphs).sort()
 }

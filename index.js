@@ -145,7 +145,7 @@ async function eachBreak(dag, breaks) {
             // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
 
             let cfls = []
-            let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
+            // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
             log('_PFLS', probe.rdict, pfls.length)
 
             if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
@@ -169,12 +169,13 @@ function filterProbePart(dict, pfls) {
     if (!dict.verb || !dict.reg) return []
     let cfls = []
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
-    log('_Part keys', dict.rdict) // , dkeys
+    // log('_Part keys', dict.rdict) // , dkeys
     for (let flex of pfls) {
         // if (!flex) log('_________________NO FLEX', dict.rdict)
         if (!flex.part) continue
+
         // if (dict.type != flex.type) continue
-        log('_PF', flex.term)
+        // log('_PF', flex.term)
         cfls.push(flex)
 
         let fkeys = dkeys[flex.type]?.[flex.tense]
@@ -185,7 +186,7 @@ function filterProbePart(dict, pfls) {
         cfls.push(flex)
         // log('_P-KEYS', partkeys)
     }
-    log('_P-CFLS', cfls.length)
+    // log('_P-CFLS', cfls.length)
     return cfls
 }
 
@@ -200,7 +201,8 @@ function filterProbeVerb(dict, pfls) {
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
-        if (dict.type != flex.dtype) continue
+        if (dict.dtype != flex.dtype) continue
+        log('_F', dict.stem, dict.type, flex.dtype)
         let fkeys = dkeys[flex.type]?.[flex.tense]
         if (!fkeys) continue
         // log('_F', dict.rdict, fkeys)
