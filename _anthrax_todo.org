@@ -1,6 +1,24 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
+* = algorithm
+  - prefs - wf = prosanabaino - [pros-tail, prosana-tail, null-wf]
+  - В prefsegs выделенное значение [null-wf] breaks-to-chains по полной wf
+  - prefseg = {term, docs, conn?}. потом pref-docs нужно будет брать из db-terms: wkt+lsj+etc
+  - Цикл по prefsegs, затем breaks-to-chains по tail. chains = prefseg+br-chains.
+  - сначала breaks wf, и все docs запомнить, чтобы не лазить в базу каждый tail-breaks
+ - в результате: chains = [{pref/aug}, {first-component}?, {main-component}, {fls}] - между ними {conn}
+
+* οἷός τ᾽ εἰμι и ἔχω ἐν νῷ
+ - ἐν νῷ ἔχω (+infin) - I have in mind, I intend
+ - οἷός τ᾽ εἰμι inf - to be able inf
+
+* 1 ноября - subkeys везде одинаково
+  - name - nom-gens
+  - adj - masc-fem-neut / mf-n
+  - verb - stype для стема, как есть. Тут много fls, поэтому terms.unclude
+  - part - как в adj
+  -
 
 * 21 окт
   - [ ] все глаголы

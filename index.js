@@ -13,6 +13,9 @@ import { nkeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-name.js'
 import { akeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-adj.js'
 import { pKeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-part.js'
 
+import { preflist } from '../prefslist/dst/preflist.js' //
+import { prefdocs } from '../prefslist/dst/prefdocs.js' //
+
 const d = Debug('app')
 const p = Debug('pref')
 const h = Debug('whole')
@@ -56,6 +59,7 @@ export async function anthrax(wf) {
 
 async function anthraxChains(wf) {
     dag = new Map();
+    dag.rawwf = wf
     dag.cwf = comb(wf)
     let flakes = scrape(dag.cwf).reverse()
 
@@ -73,6 +77,13 @@ async function anthraxChains(wf) {
     // ἀδικέω - odd δικάζω
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
     let prefsegs = await makePrefSegs(dag)
+    // log('_PREF_SEGS', prefsegs)
+    for (let prefseg of prefsegs) {
+        log('_p', prefseg)
+    }
+
+    return []
+
     dag.prefsegs = prefsegs
     // dag.prefsegs = ''
 
@@ -116,6 +127,69 @@ async function anthraxChains(wf) {
     }
     return chains
 }
+
+// compound - προσαναβαίνω; ἀντιπαραγράφω; ἀποδείκνυμι; ἀναβλέπω
+async function makePrefSegs(dag)  {
+    let prefraw = parsePrefix(dag.pcwf)
+    if (!prefraw) return
+    let prefs = prefraw.split('-')
+    let segs = []
+    let oprefs = []
+    prefs.forEach(rawpref=> {
+        let o = {rawpref, pref: rawpref, conn: ''}
+        let conn = ''
+        if (rawpref == 'δι') o.conn = ''
+        else if (o.pref.endsWith('ι')) {
+            o.conn = 'ι'
+            o.pref = o.pref.replace(/ι$/, '')
+        }
+        let prefdoc = prefdocs.find(prefdoc=> strip(prefdoc.dict) == strip(o.pref))
+        if (!prefdoc) {
+            log('_NO PREF_DOC', pref, dag.rawwf)
+            throw new Error()
+        }
+        o.docs = [prefdoc]
+
+        let last = _.last(oprefs)
+        if (last) {
+            o.pref = last.rawpref + o.pref
+            o.rawpref = o.pref
+            o.docs = last.docs.concat(o.docs)
+        }
+        oprefs.push(o)
+        // log('_XXX_SEG', o)
+        let rerawpref = new RegExp('^' + o.rawpref)
+        let tail = dag.pcwf.replace(rerawpref, '')
+        // log('_TAIL', o.rawpref, dag.pcwf, tail)
+        let shorttail = removeVowelBeg(tail)
+        let retail = new RegExp(shorttail + '$')
+        let tailconn = tail.replace(retail, '')
+        let seg = {term: o.pref, conn: o.conn, tail: shorttail, docs: o.docs}
+        if (tailconn) seg.conn = tailconn
+        segs.push(seg)
+    })
+    return segs
+}
+
+function removeVowelEnd(pref) {
+    if (pref == '') return {pref, conn: ''}
+    else return {pref, conn: ''}
+}
+
+function removeVowelBeg(wf) {
+    let beg = wf[0]
+    while (beg) {
+        if (vowels.includes(beg)) {
+            wf = wf.slice(1)
+            beg = wf[0]
+        } else {
+            beg = false
+        }
+    }
+    return wf
+}
+
+
 
 async function eachBreak(dag, breaks) {
     let chains = []
@@ -191,30 +265,29 @@ function filterProbePart(dict, pfls) {
 }
 
 function filterProbeVerb(dict, pfls) {
-    // log('_filter-D-Verb =====', dict.dict, dict.stem, dict.type, dict.dname) // , dict.keys
     if (!dict.verb) return []
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-
     // log('_D', dict.rdict, dict.keys)
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
         if (dict.type != flex.type) continue
-        log('_F', dict.stem, dict.type, flex.type)
+        // log('_F', dict.stem, dict.type, flex.type)
+
         let fkeys = dkeys[flex.vtype]?.[flex.tense]
         if (!fkeys) continue
-        // log('_F', dict.rdict, fkeys)
-        // log('_Fx', dict.rdict, flex)
         if (!fkeys.includes(flex.terms)) continue
-        // let terms = JSON.parse(flex.terms)
-        // if (terms[flex.numper] != flex.term) continue
+
         cfls.push(flex)
     }
     // log('_CFLS', cfls.length)
     return cfls
 }
+
+// TODO: === прилагательные. subkeys - os-a-on, и все остальные, найти в wkt/makeAdj
+// а здесь - adj filter probe, потому что свой dictkey
 
 function filterProbeName(dict, pfls) {
     // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
@@ -222,7 +295,8 @@ function filterProbeName(dict, pfls) {
     dictkey = JSON.stringify(dictkey)
     // log('_D-key', dictkey)
     let dkeys = dict.keys ? dict.keys : nkeys[dictkey] ? akeys[dictkey] : []
-    // log('_D-keys', dkeys)
+    dkeys = akeys[dictkey]
+    log('_D-keys', dkeys)
 
     let cfls = []
     for (let flex of pfls) {
@@ -230,9 +304,12 @@ function filterProbeName(dict, pfls) {
         if (dict.gends && !dict.gends.includes(flex.gend)) continue
         if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
 
+        // cfls.push(flex)
+        // continue
+
         let flexkey = {term: flex.term, type: flex.type, numcase: flex.numcase}
         flexkey = JSON.stringify(flexkey)
-        let terms = dkeys[flex.gend]
+        let terms = dkeys[flexkey]
         if (!terms) continue
         // log('_FF', flex.gend, terms)
         if (terms.includes(flex.key)) cfls.push(flex)
@@ -370,6 +447,7 @@ function findConnection(pstr) {
   return conn
 }
 
+
 // only two parts, but the second can be divided into connector and a tail itself
 // last part may begin with accent
 function makeBreaks(pcwf, flexes) {
@@ -419,8 +497,17 @@ async function findDicts(breaks) {
     return dicts
 }
 
-// compound - προσαναβαίνω; ἀντιπαραγράφω; ἀποδείκνυμι
-async function makePrefSegs(dag) {
+function parsePrefix(wf) {
+    let prefstr = '', re
+    for (let pref of preflist) {
+        re = new RegExp('^' + pref.replace(/-/g, ''))
+        if (!re.test(wf)) continue
+        if (prefstr.length < pref.length) prefstr = pref
+    }
+    return prefstr
+}
+
+async function makePrefSegs_(dag) {
     let prefsegs = []
     let headkeys = _.uniq(dag.flakes.map(flake=> plain(flake.head)))
     let cprefs = await getPrefs(headkeys)
