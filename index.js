@@ -66,7 +66,7 @@ async function anthraxChains(wf) {
     if (!flakes.length) return
     dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
-    // d('_flakes_tails', tails)
+    log('_flakes_tails', tails)
 
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
@@ -76,19 +76,50 @@ async function anthraxChains(wf) {
 
     // ἀδικέω - odd δικάζω
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
-    let prefsegs = await makePrefSegs(dag)
+    let prefsegs = await makePrefSegs(dag) || []
+    // prefsegs.unshift({tail: dag.cwf})
     // log('_PREF_SEGS', prefsegs)
-    for (let prefseg of prefsegs) {
-        log('_p', prefseg)
-    }
-
-    return []
-
-    dag.prefsegs = prefsegs
-    // dag.prefsegs = ''
+    log('_DAG.pcwf', dag.pcwf)
 
     let chains = []
     let breaks = []
+    prefsegs.forEach(async (prefseg, idx)=> {
+        log('_prefseg_', prefseg)
+        let ptail = plain(prefseg.tail)
+        breaks = await cleanBreaks(dag, ptail)
+        log('_ptail:', ptail, breaks)
+        let prefchains = await eachBreak(dag, breaks)
+        chains.push(...prefchains)
+        log('_PrefCH:', prefchains)
+        log('_Chains:', chains)
+    })
+
+    log('_dag.pcwf', dag.pcwf)
+
+    if (!chains.length) {
+        dag.prefsegs = ''
+        breaks = []
+        let aug = parseAug(dag.pcwf)
+        if (aug) {
+            dag.aug = aug
+            let re = new RegExp('^' + dag.aug)
+            dag.pcwf = dag.pcwf.replace(re, '')
+            log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
+            let augseg = {seg: dag.aug, aug: true}
+            dag.prefsegs = [augseg]
+        }
+        breaks = await cleanBreaks(dag, dag.pcwf)
+        log('_Breaks:', breaks)
+        chains = await eachBreak(dag, breaks)
+        log('_Chains:', chains)
+    }
+
+
+    return chains
+
+    dag.prefsegs = prefsegs
+    // dag.prefsegs = ''
+    // let breaks = []
     if (dag.prefsegs) {
         breaks = await cleanBreaks(dag, dag.pref_pcwf)
         p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf, dag.pref_pcwf)
@@ -159,7 +190,8 @@ async function makePrefSegs(dag)  {
         oprefs.push(o)
         // log('_XXX_SEG', o)
         let rerawpref = new RegExp('^' + o.rawpref)
-        let tail = dag.pcwf.replace(rerawpref, '')
+        let tail = dag.cwf.replace(rerawpref, '')
+        if (tail == dag.cwf) tail = dag.pcwf.replace(rerawpref, '')
         // log('_TAIL', o.rawpref, dag.pcwf, tail)
         let shorttail = removeVowelBeg(tail)
         let retail = new RegExp(shorttail + '$')
@@ -188,8 +220,6 @@ function removeVowelBeg(wf) {
     }
     return wf
 }
-
-
 
 async function eachBreak(dag, breaks) {
     let chains = []
@@ -269,16 +299,20 @@ function filterProbeVerb(dict, pfls) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    // log('_D', dict.rdict, dict.keys)
+    log('_D', dict.rdict, dict.reg, dict.type)
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
         if (dict.type != flex.type) continue
-        // log('_F', dict.stem, dict.type, flex.type)
+        // log('_F', dict.stem, dict.type, flex.reg)
 
-        let fkeys = dkeys[flex.vtype]?.[flex.tense]
+        // let fkeys = dkeys[flex.vtype]?.[flex.tense]
+        // if (!fkeys) continue
+        // if (!fkeys.includes(flex.terms)) continue
+        let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
-        if (!fkeys.includes(flex.terms)) continue
+        if (!fkeys.includes(flex.key)) continue
+        log('_F_OK', dict.stem, dict.type, flex.reg)
 
         cfls.push(flex)
     }
@@ -365,6 +399,7 @@ async function cleanBreaks(dag, pcwf) {
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
     let rdicts = dicts.map(dict=> dict.rdict)
+    // log('_BR.rdicts', rdicts)
 
     let prefcon
     if (dag.prefsegs) {
@@ -373,12 +408,12 @@ async function cleanBreaks(dag, pcwf) {
     }
 
     let vow = (prefcon) ? prefcon.seg : dag.aug ? dag.aug : ''
-    // log('_VOW', vow)
+    log('_VOW', vow)
 
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
-        if (br.head == 'γοραζ') log('_XXXX', br.head, headdicts.length)
+        // if (br.head == 'γοραζ') log('_XXXX', br.head, headdicts.length)
         let rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS', br.head, rdicts)
         headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
@@ -416,6 +451,7 @@ async function cleanBreaks(dag, pcwf) {
 }
 
 function vowDictMapping(conn, dict) {
+    // log('_vowDictMapping,conn, dict.aug', conn, dict.rdict, dict.verb, dict.aug, conn == dict.aug)
     let mapping = false
     if (dict.name) {
         if (dict.aug == conn) mapping = true
