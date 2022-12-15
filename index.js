@@ -19,6 +19,7 @@ import { prefdocs } from '../prefslist/dst/prefdocs.js' //
 const d = Debug('app')
 const p = Debug('pref')
 const h = Debug('whole')
+const f = Debug('filter')
 
 let dag = {}
 
@@ -66,7 +67,7 @@ async function anthraxChains(wf) {
     if (!flakes.length) return
     dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
-    log('_flakes_tails', tails)
+    // log('_flakes_tails', tails)
 
     dag.flexes = await getFlexes(tails)
     dag.flexids = dag.flexes.map(flex=> flex._id)
@@ -79,26 +80,23 @@ async function anthraxChains(wf) {
     let prefsegs = await makePrefSegs(dag) || []
     // prefsegs.unshift({tail: dag.cwf})
     // log('_PREF_SEGS', prefsegs)
-    log('_DAG.pcwf', dag.pcwf)
 
     let chains = []
     let breaks = []
     prefsegs.forEach(async (prefseg, idx)=> {
-        log('_prefseg_', prefseg)
+        // log('_prefseg_', prefseg)
         let ptail = plain(prefseg.tail)
         breaks = await cleanBreaks(dag, ptail)
-        log('_ptail:', ptail, breaks)
+        // log('_ptail:', ptail, breaks)
         let prefchains = await eachBreak(dag, breaks)
         chains.push(...prefchains)
-        log('_PrefCH:', prefchains)
-        log('_Chains:', chains)
+        // log('_PrefCH:', prefchains)
+        // log('_Chains:', chains)
     })
-
-    log('_dag.pcwf', dag.pcwf)
 
     if (!chains.length) {
         dag.prefsegs = ''
-        breaks = []
+        // breaks = []
         let aug = parseAug(dag.pcwf)
         if (aug) {
             dag.aug = aug
@@ -108,10 +106,11 @@ async function anthraxChains(wf) {
             let augseg = {seg: dag.aug, aug: true}
             dag.prefsegs = [augseg]
         }
-        breaks = await cleanBreaks(dag, dag.pcwf)
-        log('_Breaks:', breaks)
-        chains = await eachBreak(dag, breaks)
-        log('_Chains:', chains)
+        let breaks = await cleanBreaks(dag, dag.pcwf)
+        // f('_Simple_breaks:', breaks)
+        let simplechains = await eachBreak(dag, breaks)
+        // f('_Simple_chains:', simplechains)
+        chains.push(...simplechains)
     }
 
 
@@ -176,7 +175,7 @@ async function makePrefSegs(dag)  {
         }
         let prefdoc = prefdocs.find(prefdoc=> strip(prefdoc.dict) == strip(o.pref))
         if (!prefdoc) {
-            log('_NO PREF_DOC', pref, dag.rawwf)
+            log('_NO PREF_DOC', rawpref, dag.rawwf)
             throw new Error()
         }
         o.docs = [prefdoc]
@@ -225,11 +224,12 @@ async function eachBreak(dag, breaks) {
     let chains = []
     let regdicts = await getRegVerbs(breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    d('_breaks-ids', breaksids)
+    f('_breaks-ids', breaksids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
-        let headdictslist = headdicts.map(dict=> dict.rdict)
+        let head_rdicts_list = headdicts.map(dict=> dict.rdict)
+        f('_head_rdicts_list', head_rdicts_list)
         let taildicts = br.taildicts
         let cognates = (br.tail) ? taildicts : headdicts            // cognates - совсем грязные
         let mainseg = (br.tail) ? (br.tail) : (br.head)
@@ -246,11 +246,11 @@ async function eachBreak(dag, breaks) {
             let grdicts = dictgroups[dict]
             let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
 
-            // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.verb)
+            f('_PROBE', dict, probe.dname, probe.stem, probe.type, 'verb:', probe.verb)
 
             let cfls = []
             let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-            log('_PFLS', probe.rdict, pfls.length)
+            f('_PFLS', probe.rdict, pfls.length)
 
             if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
             if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
@@ -299,7 +299,7 @@ function filterProbeVerb(dict, pfls) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    log('_D', dict.rdict, dict.reg, dict.type)
+    // log('_D-verb', dict.rdict, dict.reg, dict.type)
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
@@ -312,7 +312,7 @@ function filterProbeVerb(dict, pfls) {
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
-        log('_F_OK', dict.stem, dict.type, flex.reg)
+        // log('_F_OK', dict.stem, dict.type, flex.reg)
 
         cfls.push(flex)
     }
@@ -330,7 +330,7 @@ function filterProbeName(dict, pfls) {
     // log('_D-key', dictkey)
     let dkeys = dict.keys ? dict.keys : nkeys[dictkey] ? akeys[dictkey] : []
     dkeys = akeys[dictkey]
-    log('_D-keys', dkeys)
+    // log('_D-name', dkeys)
 
     let cfls = []
     for (let flex of pfls) {
@@ -399,7 +399,7 @@ async function cleanBreaks(dag, pcwf) {
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
     let rdicts = dicts.map(dict=> dict.rdict)
-    // log('_BR.rdicts', rdicts)
+    f('_break all rdicts:', rdicts)
 
     let prefcon
     if (dag.prefsegs) {
@@ -408,7 +408,7 @@ async function cleanBreaks(dag, pcwf) {
     }
 
     let vow = (prefcon) ? prefcon.seg : dag.aug ? dag.aug : ''
-    log('_VOW', vow)
+    f('_VOW-connector:', vow)
 
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
@@ -422,6 +422,7 @@ async function cleanBreaks(dag, pcwf) {
         rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS_2', rdicts)
         if (headdicts.length) br.headdicts = headdicts
+
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
 
         taildicts = taildicts.filter(dict=> dict.stem.length > 2) // очень много лишних, маловероятных схем, ex: γαλ-α-ξ-ίου
@@ -472,7 +473,7 @@ function vowDictMapping(conn, dict) {
     return mapping
 }
 
-function findConnection(pstr) {
+function findConnector(pstr) {
   let vow = pstr[0]
   let conn = ''
   while(vowels.includes(vow)) {
@@ -501,7 +502,7 @@ function makeBreaks(pcwf, flexes) {
             // todo: наверное, на след шагу в conn чтобы сразу добавить гласную
             // но в простейшем ἀγαθοποιέω окончание έω, а head заканчивается на гласную, отбросить гласную здесь нельзя
             tail = phead.slice(pos)
-            conn = findConnection(tail)
+            conn = findConnector(tail)
             if (conn) {
                 let re = new RegExp('^' + conn)
                 tail = tail.replace(re, '')
@@ -574,7 +575,7 @@ async function makePrefSegs_(dag) {
     // last connector btw prefs & stem
     let re = new RegExp('^' + max.term)
     pcwf = dag.pcwf.replace(re, '')
-    let conn = findConnection(pcwf)
+    let conn = findConnector(pcwf)
     if (conn) {
         re = new RegExp('^' + conn)
         pcwf = pcwf.replace(re, '')

@@ -1,6 +1,7 @@
 #+STARTUP: overview
 #+STARTUP: hidestars
 
+
 * = algorithm
   - prefs - wf = prosanabaino - [pros-tail, prosana-tail, null-wf]
   - В prefsegs выделенное значение [null-wf] breaks-to-chains по полной wf

@@ -24,7 +24,7 @@ async function run(full) {
     }
 
     let indecl = chains[0].find(seg=> seg.indecl)
-    log('_INDECL_:', indecl)
+    // log('_INDECL_:', indecl)
 
     if (indecl) {
         // log('_run_indecl_:', indecl)
@@ -41,7 +41,7 @@ async function run(full) {
         let segs = chain.map(seg=> seg.seg).join('-')
         log('_scheme:', segs)
         let fls = chain.find(seg=> seg.fls)
-        log('_fls:', fls)
+        log('_fls:', fls.length)
         // let mainseg = chain.find(seg=> seg.mainseg)
         // log('_M:', mainseg.cdicts[0].keys)
         let pretty = prettyFLS(chain)
