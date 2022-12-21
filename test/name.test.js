@@ -7,10 +7,14 @@ import fse from 'fs-extra'
 import path from 'path'
 import { dirname } from 'path';
 import {oxia, comb, plain, strip} from 'orthos'
-import { nameTests } from './lib/makeNameTests.js'
-import { adjTests } from './lib/makeAdjTests.js'
+// import { nameTests } from './lib/makeNameTests.js'
+// import { adjTests } from './lib/makeAdjTests.js'
 
-import { prettyName } from '../lib/utils.js'
+let only = process.argv.slice(10)[0] //  'ἀργυρῷ'
+
+
+// import { prettyName } from '../lib/utils.js'
+import { getFile } from './lib/utils.js'
 
 import { anthrax } from '../index.js'
 
@@ -24,66 +28,103 @@ let skip = true
 /* let dict, formstr, restrict */
 /* let numbers = ['sg', 'du', 'pl'] */
 
-const ntext = fse.readFileSync('./test/morph-data/wkt_name.txt','utf8')
-const nrows = ntext.split('\n')
+// const ntext = fse.readFileSync('./test/morph-data/wkt_name.txt','utf8')
+// const nrows = ntext.split('\n')
 
-const atext = fse.readFileSync('./test/morph-data/wkt_adj.txt','utf8')
-let arows = atext.split('\n')
+// const atext = fse.readFileSync('./test/morph-data/wkt_adj.txt','utf8')
+// let arows = atext.split('\n')
 
+log('_ONLY', only)
 let cache =  new Map();
 /* let res = {} */
-
 let limit = 0
-
-let ntests = nameTests(nrows, limit)
-log('_NTESTS', ntests.length)
+// let ntests = nameTests(nrows, limit)
+// log('_NTESTS', ntests.length)
 // let atests = adjTests(arows, limit)
 // log('_ATESTS', atests.length)
 
-// let tests = ntests.concat(atests)
-let tests = ntests
+import { nouns } from '../../fetcher/lib/nouns_list.js'
+let names = nouns.map(name=> comb(name))
+log('_NAMES', names.length)
 
-// tests = tests.slice(0,2)
-log('_TESTS', tests.length)
-/* tests = [] */
+names = names.slice(0, 2)
 
-// let wfs = []
-for (let wf of tests) {
-    if (!wf.dict) log('__NO DICT', wf)
-    let wfkey = wf.form
-    wfkey = [wf.dict, wf.form].join('-')
-    if (!cache[wfkey]) cache[wfkey] = []
-    cache[wfkey].push(wf.descr)
+let tests = []
+
+// let files = getFiles(only)
+// log('_FNS', files[0])
+for (let name of nouns) {
+    if (only && only != name) continue
+    log('_NAME', name)
+
+    let file = getFile(name)
+    for (let dialect of file.forms) {
+        // log('_F', dialect)
+        for (let form of dialect.forms) {
+            if (!cache[form.wf]) cache[form.wf] = []
+            cache[form.wf].push(form)
+            tests.push(form.wf)
+      }
+    }
 }
 
-for (let wfkey in cache) {
-    cache[wfkey] = _.uniq(cache[wfkey])
-}
+tests = _.uniq(tests)
+
+// log('_CACHE', cache)
+// log('_TESTS', tests)
+
 
 /* log('_CACHE', cache['ἀλαζών-ἀλαζόνε']) */
 
+tests = tests.slice(0,1)
+
+describe('test names:', () => {
+    for (let wf of tests) {
+        // log('_WF', wf, cache[wf])
+        let expected = cache[wf].map(form=> [form.num, form.case].join('.')).sort()
+        log('_EXP', wf, expected)
+        testWF(wf, expected)
+    }
+})
+
 async function testWF(wf, exp) {
-    it(`wf: ${wf.rdict} - ${wf.form} - ${wf.descr}`, async () => {
-        let chains = await anthrax(wf.form)
+    it(`wf:  ${wf}`, async () => {
+        let chains = await anthrax(wf)
         // log('_EXP', wf.key, exp)
-        let chain = chains.find(chain=> chain.find(seg=> seg.mainseg).name)
+        let chain = chains.find(chain=> chain.find(seg=> seg.mainseg).name) // а если несколько names?
         /* log('_WF', wf) */
         // log('_CHAIN', chains.length, chain)
         let fls = chain.find(seg=> seg.fls).fls
-        let morphs = prettyName(fls)
+        log('_FLS', fls)
+        // let morphs = fls.
+        // let morphs = prettyName(fls)
         assert.deepEqual(morphs, exp)
     })
 }
 
-describe('test names:', () => {
-    for (let wf of tests) {
-        let wfkey = wf.form
-        wfkey = [wf.dict, wf.form].join('-')
-        let expected = cache[wfkey].sort()
-        wf.key = wfkey
-        testWF(wf, expected)
-    }
-})
+
+// async function testWF(wf, exp) {
+//     it(`wf: ${wf.rdict} - ${wf.form} - ${wf.descr}`, async () => {
+//         let chains = await anthrax(wf.form)
+//         // log('_EXP', wf.key, exp)
+//         let chain = chains.find(chain=> chain.find(seg=> seg.mainseg).name)
+//         /* log('_WF', wf) */
+//         // log('_CHAIN', chains.length, chain)
+//         let fls = chain.find(seg=> seg.fls).fls
+//         let morphs = prettyName(fls)
+//         assert.deepEqual(morphs, exp)
+//     })
+// }
+
+// describe('test names:', () => {
+//     for (let wf of tests) {
+//         let wfkey = wf.form
+//         wfkey = [wf.dict, wf.form].join('-')
+//         let expected = cache[wfkey].sort()
+//         wf.key = wfkey
+//         testWF(wf, expected)
+//     }
+// })
 
 
 function compactNamesFls_(dicts) {

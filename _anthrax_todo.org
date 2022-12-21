@@ -3,6 +3,7 @@
 
 
 * 21 декабря, после fetch-wkt, то есть включая dialects
+ - [X] anthrax - noun
  - [ ] noun tests
  - [ ]
  -
