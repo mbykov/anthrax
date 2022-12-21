@@ -45,7 +45,7 @@ export async function anthrax(wf) {
     // let termcdicts = await getTerms(cwf)
     // log('_TD', termcdicts)
     let termcdicts = await getTermsNew(cwf)
-    log('_TERMS', termcdicts)
+    // log('_TERMS', termcdicts)
     if (termcdicts.length) {
         let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
         chains.push(termchain)
@@ -104,7 +104,7 @@ async function anthraxChains(wf) {
             dag.aug = aug
             let re = new RegExp('^' + dag.aug)
             dag.pcwf = dag.pcwf.replace(re, '')
-            log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
+            // log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
             let augseg = {seg: dag.aug, aug: true}
             dag.prefsegs = [augseg]
         }
@@ -341,7 +341,7 @@ function filterProbeName(dict, pfls) {
                 if (dialect != flex.dialect) continue
                 if (decl != flex.decl) continue
                 if (!ddkey.gends.includes(flex.gend)) continue
-                if (!ddkey.key == flex.key) continue
+                if (ddkey.key != flex.key) continue
                 // log('_F', flex)
                 cfls.push(flex)
             }
@@ -467,7 +467,7 @@ async function cleanBreaks(dag, pcwf) {
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
         // if (br.head == 'γοραζ') log('_XXXX', br.head, headdicts.length)
         let rdicts = headdicts.map(dict=> dict.rdict)
-        log('_HEAD-RDICTS', br.head, rdicts)
+        // log('_HEAD-RDICTS', br.head, rdicts)
         // теперь aug в диалектах
         // headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
 

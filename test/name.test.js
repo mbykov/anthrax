@@ -13,7 +13,7 @@ import {oxia, comb, plain, strip} from 'orthos'
 let only = process.argv.slice(10)[0] //  'ἀργυρῷ'
 
 
-// import { prettyName } from '../lib/utils.js'
+import { prettyName } from '../lib/utils.js'
 import { getFile } from './lib/utils.js'
 
 import { anthrax } from '../index.js'
@@ -47,7 +47,8 @@ import { nouns } from '../../fetcher/lib/nouns_list.js'
 let names = nouns.map(name=> comb(name))
 log('_NAMES', names.length)
 
-names = names.slice(0, 2)
+names = names.slice(1, 20)
+log('_NAMES', names)
 
 let tests = []
 
@@ -55,34 +56,52 @@ let tests = []
 // log('_FNS', files[0])
 for (let name of nouns) {
     if (only && only != name) continue
-    log('_NAME', name)
+    // log('_NAME', name)
+    let file
+    try {
+        file = getFile(name)
+    } catch(err) {
+        continue
+    }
 
-    let file = getFile(name)
     for (let dialect of file.forms) {
-        // log('_F', dialect)
+        // log('_D', dialect)
         for (let form of dialect.forms) {
-            if (!cache[form.wf]) cache[form.wf] = []
-            cache[form.wf].push(form)
             tests.push(form.wf)
+            if (!cache[form.wf]) cache[form.wf] = []
+            for (let gens of dialect.gends) {
+                let test = _.clone(form)
+                test.gend = gens
+                cache[form.wf].push(test)
+            }
       }
     }
 }
 
 tests = _.uniq(tests)
 
+for (let wf in cache) {
+    if (!tests.includes(wf)) continue
+    let jsons = cache[wf].map(form=> JSON.stringify(form))
+    jsons = _.uniq(jsons)
+    // if (wf == 'ἀγαθίς') log('==============', wf, jsons)
+    cache[wf] = jsons.map(json=> JSON.parse(json))
+    // if (wf == 'ἀγαθίς') log('==============', wf, cache[wf])
+}
+
 // log('_CACHE', cache)
 // log('_TESTS', tests)
 
 
-/* log('_CACHE', cache['ἀλαζών-ἀλαζόνε']) */
+log('_CACHE', cache['ἀγαλλίασις'])
 
-tests = tests.slice(0,1)
+// tests = tests.slice(0,1)
 
 describe('test names:', () => {
     for (let wf of tests) {
         // log('_WF', wf, cache[wf])
-        let expected = cache[wf].map(form=> [form.num, form.case].join('.')).sort()
-        log('_EXP', wf, expected)
+        let expected = cache[wf].map(form=> [form.gend, form.num, form.case].join('.')).sort()
+        // log('_EXP', wf, expected)
         testWF(wf, expected)
     }
 })
@@ -95,9 +114,9 @@ async function testWF(wf, exp) {
         /* log('_WF', wf) */
         // log('_CHAIN', chains.length, chain)
         let fls = chain.find(seg=> seg.fls).fls
-        log('_FLS', fls)
+        // log('_FLS', fls)
         // let morphs = fls.
-        // let morphs = prettyName(fls)
+        let morphs = prettyName(fls)
         assert.deepEqual(morphs, exp)
     })
 }
