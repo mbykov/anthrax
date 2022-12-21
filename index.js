@@ -23,6 +23,8 @@ const f = Debug('filter')
 
 let dag = {}
 
+let notdialectnames = ['name', 'verb', 'rdict', 'dict', 'type', 'stem', 'gends', 'trns', 'gens',  'dname']
+
 // terms: πρίν
 // ψευδο - убрать из префиксов!
 // ἐπεξήγησις
@@ -324,7 +326,57 @@ function filterProbeVerb(dict, pfls) {
 // а здесь - adj filter probe, потому что свой dictkey
 
 function filterProbeName(dict, pfls) {
-    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
+    f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
+    let dialectnames = _.keys(dict).filter(dname=> !notdialectnames.includes(dname))
+    f('_dialectnames', dialectnames)
+
+    let cfls = []
+    for (let dialect of dialectnames) {
+        let dkey = dict[dialect]
+        for (let decl in dkey) {
+            let ddkey = dkey[decl]
+            for (let flex of pfls) {
+                if (!flex.name) continue
+                if (dict.type != flex.type) continue
+                if (dialect != flex.dialect) continue
+                if (decl != flex.decl) continue
+                if (!ddkey.gends.includes(flex.gend)) continue
+                if (!ddkey.key == flex.key) continue
+                // log('_F', flex)
+                cfls.push(flex)
+            }
+        }
+    }
+    return cfls
+
+    let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
+    dictkey = JSON.stringify(dictkey)
+    // log('_D-key', dictkey)
+    let dkeys = dict.keys ? dict.keys : nkeys[dictkey] ? akeys[dictkey] : []
+    dkeys = akeys[dictkey]
+    // log('_D-name', dkeys)
+
+    for (let flex of pfls) {
+        if (dict.type != flex.type) continue
+        if (dict.gends && !dict.gends.includes(flex.gend)) continue
+        if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
+
+        // cfls.push(flex)
+        // continue
+
+        let flexkey = {term: flex.term, type: flex.type, numcase: flex.numcase}
+        flexkey = JSON.stringify(flexkey)
+        let terms = dkeys[flexkey]
+        if (!terms) continue
+        // log('_FF', flex.gend, terms)
+        if (terms.includes(flex.key)) cfls.push(flex)
+    }
+    cfls = []
+    return cfls
+}
+
+function filterProbeName_(dict, pfls) {
+    f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
     let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
     dictkey = JSON.stringify(dictkey)
     // log('_D-key', dictkey)
@@ -399,7 +451,7 @@ async function cleanBreaks(dag, pcwf) {
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
     let rdicts = dicts.map(dict=> dict.rdict)
-    f('_break all rdicts:', rdicts)
+    f('_break all rdicts:', rdicts.slice(0, 5), rdicts.length)
 
     let prefcon
     if (dag.prefsegs) {
@@ -415,9 +467,9 @@ async function cleanBreaks(dag, pcwf) {
         let headdicts = dicts.filter(dict=> dict.stem == br.head)
         // if (br.head == 'γοραζ') log('_XXXX', br.head, headdicts.length)
         let rdicts = headdicts.map(dict=> dict.rdict)
-        // log('_HEAD-RDICTS', br.head, rdicts)
-        headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
-        // headdicts = headdicts.filter(dict=> !dict.pos) // спец.формы
+        log('_HEAD-RDICTS', br.head, rdicts)
+        // теперь aug в диалектах
+        // headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
 
         rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS_2', rdicts)
@@ -447,7 +499,6 @@ async function cleanBreaks(dag, pcwf) {
         if (br.headdicts?.length && br.taildicts?.length) ok = true
         return ok
     })
-
     return breaks
 }
 

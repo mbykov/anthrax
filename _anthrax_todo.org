@@ -2,6 +2,14 @@
 #+STARTUP: hidestars
 
 
+* 21 декабря, после fetch-wkt, то есть включая dialects
+ - [ ] noun tests
+ - [ ]
+ -
+
+* name & noun
+ в fetcher-е - noun, потому что так в wkt. А в anthrax - name
+
 * = algorithm
   - prefs - wf = prosanabaino - [pros-tail, prosana-tail, null-wf]
   - В prefsegs выделенное значение [null-wf] breaks-to-chains по полной wf
