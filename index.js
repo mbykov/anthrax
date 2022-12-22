@@ -327,26 +327,30 @@ function filterProbeVerb(dict, pfls) {
 
 function filterProbeName(dict, pfls) {
     f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
-    let dialectnames = _.keys(dict).filter(dname=> !notdialectnames.includes(dname))
-    f('_dialectnames', dialectnames)
+    // let dialectnames = _.keys(dict).filter(dname=> !notdialectnames.includes(dname))
+    // f('_dialectnames', dialectnames)
+    if (!dict.keys) {
+        // log('_NO DICT.KEYS', dict)
+        // это пока что dvr и прочие словари
+        return []
+    }
 
     let cfls = []
-    for (let dialect of dialectnames) {
-        let dkey = dict[dialect]
-        for (let decl in dkey) {
-            let ddkey = dkey[decl]
-            for (let flex of pfls) {
-                if (!flex.name) continue
-                if (dict.type != flex.type) continue
-                if (dialect != flex.dialect) continue
-                if (decl != flex.decl) continue
-                if (!ddkey.gends.includes(flex.gend)) continue
-                if (ddkey.key != flex.key) continue
-                // log('_F', flex)
-                cfls.push(flex)
-            }
-        }
+    for (let flex of pfls) {
+        if (!flex.name) continue
+        if (dict.type != flex.type) continue
+        let key = dict.keys.find(dkey=>
+            dkey.dialect == flex.dialect  &&
+                dkey.declension == flex.declension &&
+                dkey.stype == flex.stype &&
+                dkey.gends.includes(flex.gend) &&
+                dkey.key == flex.key
+        )
+        if (!key) continue
+        f('_filter-F', flex)
+        cfls.push(flex)
     }
+
     return cfls
 
     let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }

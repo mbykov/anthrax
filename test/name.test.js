@@ -44,7 +44,7 @@ let limit = 0
 // log('_ATESTS', atests.length)
 
 import { nouns } from '../../fetcher/lib/nouns_list.js'
-let names = nouns.map(name=> comb(name))
+let names = nouns //.map(name=> comb(name))
 log('_NAMES', names.length)
 
 names = names.slice(1, 20)
@@ -54,7 +54,7 @@ let tests = []
 
 // let files = getFiles(only)
 // log('_FNS', files[0])
-for (let name of nouns) {
+for (let name of names) {
     if (only && only != name) continue
     // log('_NAME', name)
     let file
