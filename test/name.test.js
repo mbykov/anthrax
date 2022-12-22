@@ -21,42 +21,28 @@ import { anthrax } from '../index.js'
 import Debug from 'debug'
 const d = Debug('test')
 
-/* let wordform = 'ἄβακος' */
-/* anthrax(wordform) */
-
-let skip = true
-/* let dict, formstr, restrict */
-/* let numbers = ['sg', 'du', 'pl'] */
-
-// const ntext = fse.readFileSync('./test/morph-data/wkt_name.txt','utf8')
-// const nrows = ntext.split('\n')
-
-// const atext = fse.readFileSync('./test/morph-data/wkt_adj.txt','utf8')
-// let arows = atext.split('\n')
-
 log('_ONLY', only)
 let cache =  new Map();
 /* let res = {} */
-let limit = 0
-// let ntests = nameTests(nrows, limit)
-// log('_NTESTS', ntests.length)
-// let atests = adjTests(arows, limit)
-// log('_ATESTS', atests.length)
 
 import { nouns } from '../../fetcher/lib/nouns_list.js'
 let names = nouns //.map(name=> comb(name))
 log('_NAMES', names.length)
 
-names = names.slice(1, 20)
-log('_NAMES', names)
+names = names // .slice(0, 20)
+// log('_NAMES', names)
 
 let tests = []
 
+names = ['ἄγκυρα']
+
+let skip = true
 // let files = getFiles(only)
 // log('_FNS', files[0])
 for (let name of names) {
-    if (only && only != name) continue
-    // log('_NAME', name)
+    if (only == name) skip = false
+    // log('_NAME', only, name, only == name)
+    if (skip) continue
     let file
     try {
         file = getFile(name)
@@ -65,7 +51,7 @@ for (let name of names) {
     }
 
     for (let dialect of file.forms) {
-        // log('_D', dialect)
+        log('_D', dialect)
         for (let form of dialect.forms) {
             tests.push(form.wf)
             if (!cache[form.wf]) cache[form.wf] = []
@@ -86,9 +72,11 @@ for (let wf in cache) {
     jsons = _.uniq(jsons)
     // if (wf == 'ἀγαθίς') log('==============', wf, jsons)
     cache[wf] = jsons.map(json=> JSON.parse(json))
-    // if (wf == 'ἀγαθίς') log('==============', wf, cache[wf])
 }
 
+let conly = comb(only)
+log('_CACHE', cache[conly])
+// log('_CACHE', cache['ἄγκυρα'])
 // log('_CACHE', cache)
 // log('_TESTS', tests)
 
