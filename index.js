@@ -4,7 +4,7 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { scrape, vowels, parseAug, aug2vow, aspirations } from './lib/utils.js'
+import { scrape, vowels, getStress, parseAug, aug2vow, aspirations } from './lib/utils.js'
 import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
 import Debug from 'debug'
 
@@ -64,8 +64,12 @@ async function anthraxChains(wf) {
     dag = new Map();
     dag.rawwf = wf
     dag.cwf = comb(wf)
-    let flakes = scrape(dag.cwf).reverse()
+    let {stress, stressidx} = getStress(dag.cwf)
+    dag.stress = stress
+    dag.stressidx = stressidx
+    // log('_DAG', dag)
 
+    let flakes = scrape(dag.cwf).reverse()
     if (!flakes.length) return
     dag.flakes = flakes
     let tails = flakes.map(flake=> flake.tail)
@@ -93,70 +97,26 @@ async function anthraxChains(wf) {
         let prefchains = await eachBreak(dag, breaks)
         chains.push(...prefchains)
         // log('_PrefCH:', prefchains)
-        // log('_Chains:', chains)
     })
 
-    if (!chains.length) {
-        dag.prefsegs = ''
-        // breaks = []
-        let aug = parseAug(dag.pcwf)
-        if (aug) {
-            dag.aug = aug
-            let re = new RegExp('^' + dag.aug)
-            dag.pcwf = dag.pcwf.replace(re, '')
-            // log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
-            let augseg = {seg: dag.aug, aug: true}
-            dag.prefsegs = [augseg]
-        }
-        let breaks = await cleanBreaks(dag, dag.pcwf)
-        // f('_Simple_breaks:', breaks)
-        let simplechains = await eachBreak(dag, breaks)
-        // f('_Simple_chains:', simplechains)
-        chains.push(...simplechains)
+    // if (!chains.length) {
+    dag.prefsegs = ''
+    let aug = parseAug(dag.pcwf)
+    if (aug) {
+        dag.aug = aug
+        let re = new RegExp('^' + dag.aug)
+        dag.pcwf = dag.pcwf.replace(re, '')
+        // log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
+        let augseg = {seg: dag.aug, aug: true}
+        dag.augseg = augseg
+        // dag.prefsegs = [augseg]
     }
-
-
-    return chains
-
-    dag.prefsegs = prefsegs
-    // dag.prefsegs = ''
-    // let breaks = []
-    if (dag.prefsegs) {
-        breaks = await cleanBreaks(dag, dag.pref_pcwf)
-        p('_prefsegs', dag.prefsegs, 'pcwf', dag.pcwf, dag.pref_pcwf)
-        let prefchains = await eachBreak(dag, breaks)
-        chains.push(...prefchains)
-    }
-    // log('_CH', chains.length)
-    // log('_DAG', dag)
-
-    if (!breaks.length || !chains.length) {
-        dag.prefsegs = ''
-        breaks = []
-        let aug = parseAug(dag.pcwf)
-        if (aug) {
-            dag.aug = aug
-            let re = new RegExp('^' + dag.aug)
-            dag.pcwf = dag.pcwf.replace(re, '')
-            let augseg = {seg: dag.aug, aug: true}
-            dag.prefsegs = [augseg]
-        }
-        breaks = await cleanBreaks(dag, dag.pcwf)
-        // log('_B', breaks.length)
-        chains = await eachBreak(dag, breaks)
-    }
-
-    // whole compound
-    if (dag.prefsegs) {
-        // log('_X_', dag.prefsegs.length, '_CH', chains.length)
-        let whcomps = []
-        for await (let chain of chains) {
-            chain.unshift(...dag.prefsegs)
-            whcomps = await wholeCompounds(chain)
-            // log('_X_WH', whcomps.length)
-        }
-        chains.unshift(...whcomps)
-    }
+    breaks = await cleanBreaks(dag, dag.pcwf)
+    // f('_Simple_breaks:', breaks)
+    let augchains = await eachBreak(dag, breaks)
+    f('_aug_chains:', augchains)
+    chains.push(...augchains)
+    // }
     return chains
 }
 
@@ -246,12 +206,18 @@ async function eachBreak(dag, breaks) {
 
         for (let dict in dictgroups) {
             let grdicts = dictgroups[dict]
-            let probe = grdicts.find(dict=> dict.dname == 'wkt') || grdicts[0]
+            let probe = grdicts.find(dict=> dict.dname == 'wkt')  // || grdicts[0]
 
-            f('_PROBE', dict, probe.dname, probe.stem, probe.type, 'verb:', probe.verb)
+            // if (dict.dname != 'wkt') continue
+            // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.syllables, probe.aug)
 
             let cfls = []
-            let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
+            // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
+            let pfls = br.fls.docs.filter(flex=> flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+            pfls = pfls.filter(flex=> flex.syllables == probe.syllables)
+            pfls = pfls.filter(flex=> flex.aug == dag.aug)
+            pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
+            // log('_PFLS', pfls)
             f('_PFLS', probe.rdict, pfls.length)
 
             if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
@@ -263,6 +229,7 @@ async function eachBreak(dag, breaks) {
             // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
             let cogns = cognates //.filter(cdict=> cdict.dict == dict)
             let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cogns)
+            if (dag.augseg) chain.unshift(dag.augseg) // AUG
             chains.push(chain)
         }
     }
@@ -347,62 +314,8 @@ function filterProbeName(dict, pfls) {
                 dkey.key == flex.key
         )
         if (!key) continue
-        f('_filter-F', flex)
+        f('_filter-F', dict.rdict, dict.syllables, flex)
         cfls.push(flex)
-    }
-
-    return cfls
-
-    let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
-    dictkey = JSON.stringify(dictkey)
-    // log('_D-key', dictkey)
-    let dkeys = dict.keys ? dict.keys : nkeys[dictkey] ? akeys[dictkey] : []
-    dkeys = akeys[dictkey]
-    // log('_D-name', dkeys)
-
-    for (let flex of pfls) {
-        if (dict.type != flex.type) continue
-        if (dict.gends && !dict.gends.includes(flex.gend)) continue
-        if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
-
-        // cfls.push(flex)
-        // continue
-
-        let flexkey = {term: flex.term, type: flex.type, numcase: flex.numcase}
-        flexkey = JSON.stringify(flexkey)
-        let terms = dkeys[flexkey]
-        if (!terms) continue
-        // log('_FF', flex.gend, terms)
-        if (terms.includes(flex.key)) cfls.push(flex)
-    }
-    cfls = []
-    return cfls
-}
-
-function filterProbeName_(dict, pfls) {
-    f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
-    let dictkey = { type: dict.type, gens: dict.gens, gends: dict.gends }
-    dictkey = JSON.stringify(dictkey)
-    // log('_D-key', dictkey)
-    let dkeys = dict.keys ? dict.keys : nkeys[dictkey] ? akeys[dictkey] : []
-    dkeys = akeys[dictkey]
-    // log('_D-name', dkeys)
-
-    let cfls = []
-    for (let flex of pfls) {
-        if (dict.type != flex.type) continue
-        if (dict.gends && !dict.gends.includes(flex.gend)) continue
-        if (dict.gens && !dict.gens.includes(flex.gen)) continue // dvr может иметь gen
-
-        // cfls.push(flex)
-        // continue
-
-        let flexkey = {term: flex.term, type: flex.type, numcase: flex.numcase}
-        flexkey = JSON.stringify(flexkey)
-        let terms = dkeys[flexkey]
-        if (!terms) continue
-        // log('_FF', flex.gend, terms)
-        if (terms.includes(flex.key)) cfls.push(flex)
     }
     return cfls
 }
@@ -413,7 +326,7 @@ function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognate
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
-    let rcogns = cognates.map(dict=> dict.rdict).join(',')
+    let rcogns = _.uniq(cognates.map(dict=> dict.rdict)).join(',')
     let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, cognates, rcogns, mainseg: true}
     if (probe.verb) tailseg.verb = true
     else if (probe.name) tailseg.name = true
@@ -539,7 +452,6 @@ function findConnector(pstr) {
   return conn
 }
 
-
 // only two parts, but the second can be divided into connector and a tail itself
 // last part may begin with accent
 function makeBreaks(pcwf, flexes) {
@@ -597,106 +509,4 @@ function parsePrefix(wf) {
         if (prefstr.length < pref.length) prefstr = pref
     }
     return prefstr
-}
-
-async function makePrefSegs_(dag) {
-    let prefsegs = []
-    let headkeys = _.uniq(dag.flakes.map(flake=> plain(flake.head)))
-    let cprefs = await getPrefs(headkeys)
-    // log('_find_cprefs_=', cprefs)
-    if (!cprefs.length) return
-    let max = _.maxBy(cprefs, function(pref) { return pref.term.length; })
-
-    let pcwf = dag.pcwf
-    if (!max.prefs) {
-        prefsegs = [{seg: max.term, pref: max}]
-    } else {
-        let prefs = await getPrefs(max.prefs)
-        for (let pref of prefs) {
-            let re = new RegExp(pref.term)
-            pcwf = pcwf.replace(re, "-$&-")
-        }
-        pcwf = pcwf.replace(/--/g, '-')
-        let parts = pcwf.split('-').slice(1, -1)
-        let seg
-        for (let part of parts) {
-            let pref = prefs.find(pref=> pref.term == part)
-            if (pref) seg = {seg: pref.term, pref}
-            else seg = {seg: part, conn: true}
-            if (seg.seg) prefsegs.push(seg)
-        }
-    }
-
-    // last connector btw prefs & stem
-    let re = new RegExp('^' + max.term)
-    pcwf = dag.pcwf.replace(re, '')
-    let conn = findConnector(pcwf)
-    if (conn) {
-        re = new RegExp('^' + conn)
-        pcwf = pcwf.replace(re, '')
-        let connseg = {seg: conn, conn: true} // , aug: true
-        prefsegs.push(connseg)
-    }
-    dag.pref_pcwf = pcwf
-    return prefsegs
-}
-
-async function wholeCompounds(chain) {
-    let whstems = []
-    let fromIndex = 0
-    let pref_id = 0
-    while (pref_id > -1) {
-        pref_id = _.findIndex(chain, function(seg) { return seg.pref; }, fromIndex);
-        fromIndex += pref_id
-        if (fromIndex == 0) fromIndex = 1
-        let rsegs = chain.slice(pref_id)
-        let whstem = rsegs.map(seg=> {
-            if (seg.pref || seg.conn || seg.mainseg) return seg.seg
-        })
-        whstem = _.compact(whstem).join('')
-        h('_whstem___before', whstem)
-        let aug = parseAug(whstem)
-        h('_aug', aug)
-        if (aug) whstem = whstem.replace(aug, '')
-        whstems.push(whstem)
-    }
-    whstems = _.compact(whstems)
-    h('_whstems', whstems)
-    let cognates = await getDicts(whstems)
-    let rcogns = cognates.map(dict=> dict.rdict)
-    h('_cognates', rcogns)
-
-    let whchains = []
-    let flseg = chain.find(seg=> seg.fls)
-    let mainseg = chain.find(seg=> seg.mainseg)
-    let probe = mainseg.cdicts[0]
-
-    let dictgroups = _.groupBy(cognates, 'dict')
-    // h('_WH DG', dictgroups)
-    chain.forEach((seg, idx)=> {
-        if (!seg.pref) return
-        let pref = seg.pref
-        for (let dict in dictgroups) {
-            h('_wh dict', dict, pref.term)
-            let cdicts = dictgroups[dict]
-            let cdict = dictgroups[dict][0]
-            if (cdict.type != probe.type) continue
-            // let strdict = strip(cdict.dict)
-            if (cdict.dict.startsWith(pref.term)) {
-                // h('_START WITH', cdict.rdict, pref.term)
-                let whchain = [{seg: cdict.stem, cdicts, rdict: cdict.rdict, mainseg: true, cognates, rcogns }, flseg]
-                let pdict = plain(cdict.dict)
-                let aug = parseAug(pdict)
-                if (aug) {
-                    let augseg = {seg: aug, conn: true}
-                    whchain.unshift(augseg)
-                }
-                let beforesegs = chain.slice(0, idx)
-                if (beforesegs.length) whchain.unshift(...beforesegs)
-                whchains.push(whchain)
-            }
-        }
-    })
-
-    return whchains
 }

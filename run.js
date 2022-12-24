@@ -44,6 +44,10 @@ async function run(full) {
         log('_fls_xx:', flseg.fls.length)
         // let mainseg = chain.find(seg=> seg.mainseg)
         // log('_M:', mainseg.cdicts[0].keys)
+        for (let flex of flseg.fls) {
+            // log('_FLEX', flex.aug, flex.rdict)
+        }
+
         let pretty = prettyFLS(chain)
         log('_morphs:', pretty)
         if (full) {

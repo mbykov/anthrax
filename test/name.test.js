@@ -30,17 +30,18 @@ let names = nouns //.map(name=> comb(name))
 log('_NAMES', names.length)
 
 names = names // .slice(0, 20)
+// names = ['ἄγκυρα']
 // log('_NAMES', names)
 
 let tests = []
 
-names = ['ἄγκυρα']
 
-let skip = true
+let skip = false
+if (only) skip = true
 // let files = getFiles(only)
 // log('_FNS', files[0])
 for (let name of names) {
-    if (only == name) skip = false
+    if (only && only == name) skip = false
     // log('_NAME', only, name, only == name)
     if (skip) continue
     let file
@@ -51,9 +52,10 @@ for (let name of names) {
     }
 
     for (let dialect of file.forms) {
-        log('_D', dialect)
+        // log('_D', dialect)
         for (let form of dialect.forms) {
             tests.push(form.wf)
+            // let pwf = plain(form.wf) // нельзя, объединяются разные формы с острым и облеченным ударением, Ἀβδηρίτης
             if (!cache[form.wf]) cache[form.wf] = []
             for (let gens of dialect.gends) {
                 let test = _.clone(form)
@@ -74,20 +76,17 @@ for (let wf in cache) {
     cache[wf] = jsons.map(json=> JSON.parse(json))
 }
 
-let conly = comb(only)
-log('_CACHE', cache[conly])
-// log('_CACHE', cache['ἄγκυρα'])
-// log('_CACHE', cache)
-// log('_TESTS', tests)
-
-
-log('_CACHE', cache['ἀγαλλίασις'])
-
-// tests = tests.slice(0,1)
+if (only) {
+    let conly = comb(only)
+    // let ponly = plain(conly)
+    log('_CACHE', only, cache[conly])
+    log('_CACHE-AGON', only, cache['ἀγῶν'])
+}
 
 describe('test names:', () => {
     for (let wf of tests) {
         // log('_WF', wf, cache[wf])
+        // let pwf = plain(wf)
         let expected = cache[wf].map(form=> [form.gend, form.num, form.case].join('.')).sort()
         // log('_EXP', wf, expected)
         testWF(wf, expected)
@@ -96,15 +95,19 @@ describe('test names:', () => {
 
 async function testWF(wf, exp) {
     it(`wf:  ${wf}`, async () => {
+        let morphs = []
         let chains = await anthrax(wf)
         // log('_EXP', wf.key, exp)
-        let chain = chains.find(chain=> chain.find(seg=> seg.mainseg).name) // а если несколько names?
+        chains = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
         /* log('_WF', wf) */
-        // log('_CHAIN', chains.length, chain)
-        let fls = chain.find(seg=> seg.fls).fls
-        // log('_FLS', fls)
-        // let morphs = fls.
-        let morphs = prettyName(fls)
+        for (let chain of chains) {
+            // log('_CHAIN', chains.length, chain)
+            let fls = chain.find(seg=> seg.fls).fls
+            // log('_FLS', fls)
+            let cmorphs = prettyName(fls)
+            morphs.push(...cmorphs)
+        }
+        morphs = _.uniq(morphs).sort()
         assert.deepEqual(morphs, exp)
     })
 }
