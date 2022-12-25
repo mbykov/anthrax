@@ -68,6 +68,10 @@ for (let name of names) {
 
 tests = _.uniq(tests)
 
+let wf = 'ἀήρ'
+let cwf  = comb(wf)
+// tests = [cwf]
+
 for (let wf in cache) {
     if (!tests.includes(wf)) continue
     let jsons = cache[wf].map(form=> JSON.stringify(form))
@@ -80,16 +84,16 @@ if (only) {
     let conly = comb(only)
     // let ponly = plain(conly)
     log('_CACHE', only, cache[conly])
-    log('_CACHE-AGON', only, cache['ἀγῶν'])
+    // log('_CACHE-AGON', only, cache['ἀγῶν'])
 }
 
-describe('test names:', () => {
+describe('test names:', async () => {
     for (let wf of tests) {
-        // log('_WF', wf, cache[wf])
+        // log('_TEST WF', wf, '_CACHE:', cache[wf])
         // let pwf = plain(wf)
         let expected = cache[wf].map(form=> [form.gend, form.num, form.case].join('.')).sort()
         // log('_EXP', wf, expected)
-        testWF(wf, expected)
+        await testWF(wf, expected)
     }
 })
 
@@ -97,10 +101,23 @@ async function testWF(wf, exp) {
     it(`wf:  ${wf}`, async () => {
         let morphs = []
         let chains = await anthrax(wf)
+        if (!chains.length) {
+            assert.deepEqual(true, true)
+            return
+        }
+
+        let indecls = chains.filter(chain=> chain.find(seg=> seg.indecl))
+        for (let chain of indecls) {
+            let cmorphs = prettyIndecl(chain)
+            morphs.push(...cmorphs)
+        }
+
         // log('_EXP', wf.key, exp)
-        chains = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
+        chains = chains.filter(chain=> !chain.find(seg=> seg.head)) // не compounds
+        chains = chains.filter(chain=> chain.find(seg=> seg.mainseg)) // не indecls
+        let names = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
         /* log('_WF', wf) */
-        for (let chain of chains) {
+        for (let chain of names) {
             // log('_CHAIN', chains.length, chain)
             let fls = chain.find(seg=> seg.fls).fls
             // log('_FLS', fls)
@@ -113,28 +130,18 @@ async function testWF(wf, exp) {
 }
 
 
-// async function testWF(wf, exp) {
-//     it(`wf: ${wf.rdict} - ${wf.form} - ${wf.descr}`, async () => {
-//         let chains = await anthrax(wf.form)
-//         // log('_EXP', wf.key, exp)
-//         let chain = chains.find(chain=> chain.find(seg=> seg.mainseg).name)
-//         /* log('_WF', wf) */
-//         // log('_CHAIN', chains.length, chain)
-//         let fls = chain.find(seg=> seg.fls).fls
-//         let morphs = prettyName(fls)
-//         assert.deepEqual(morphs, exp)
-//     })
-// }
-
-// describe('test names:', () => {
-//     for (let wf of tests) {
-//         let wfkey = wf.form
-//         wfkey = [wf.dict, wf.form].join('-')
-//         let expected = cache[wfkey].sort()
-//         wf.key = wfkey
-//         testWF(wf, expected)
-//     }
-// })
+function prettyIndecl(chain) {
+    let vmorphs = []
+    let indseg = chain.find(seg=> seg.indecl)
+    for (let cdict of indseg.cdicts) {
+        let fls = cdict.fls
+        let morphs = ''
+        if (cdict.fls) morphs = prettyName(fls)
+        // log('_indecl:', cdict.term, morphs)
+        vmorphs.push(...morphs)
+    }
+    return _.uniq(vmorphs).sort()
+}
 
 
 function compactNamesFls_(dicts) {
