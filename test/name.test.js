@@ -54,13 +54,14 @@ for (let name of names) {
     for (let dialect of file.forms) {
         // log('_D', dialect)
         for (let form of dialect.forms) {
-            tests.push(form.wf)
+            let wf = form.wf.toLowerCase()
+            tests.push(wf)
             // let pwf = plain(form.wf) // нельзя, объединяются разные формы с острым и облеченным ударением, Ἀβδηρίτης
-            if (!cache[form.wf]) cache[form.wf] = []
+            if (!cache[wf]) cache[wf] = []
             for (let gens of dialect.gends) {
                 let test = _.clone(form)
                 test.gend = gens
-                cache[form.wf].push(test)
+                cache[wf].push(test)
             }
       }
     }

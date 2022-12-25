@@ -102,6 +102,7 @@ async function anthraxChains(wf) {
     // if (!chains.length) {
     dag.prefsegs = ''
     let aug = parseAug(dag.pcwf)
+    // log('_AUG', wf, dag.aug)
     if (aug) {
         dag.aug = aug
         let re = new RegExp('^' + dag.aug)
@@ -206,7 +207,10 @@ async function eachBreak(dag, breaks) {
 
         for (let dict in dictgroups) {
             let grdicts = dictgroups[dict]
+            // grdicts = grdicts.filter(dict=> dict.aug == dag.aug)
+            grdicts = grdicts.filter(dict=> dict.keys.find(key=> key.aug == dag.aug))
             let probe = grdicts.find(dict=> dict.dname == 'wkt')  // || grdicts[0]
+            if (!probe) continue
 
             // if (dict.dname != 'wkt') continue
             // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.syllables, probe.aug)
@@ -215,7 +219,7 @@ async function eachBreak(dag, breaks) {
             // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
             let pfls = br.fls.docs.filter(flex=> flex.stress == dag.stress && flex.stressidx == dag.stressidx)
             pfls = pfls.filter(flex=> flex.syllables == probe.syllables)
-            pfls = pfls.filter(flex=> flex.aug == dag.aug)
+            // pfls = pfls.filter(flex=> flex.aug == dag.aug)
             pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
             // log('_PFLS', pfls)
             f('_PFLS', probe.rdict, pfls.length)
