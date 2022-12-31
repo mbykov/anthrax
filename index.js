@@ -23,7 +23,7 @@ const f = Debug('filter')
 
 let dag = {}
 
-let notdialectnames = ['name', 'verb', 'rdict', 'dict', 'type', 'stem', 'gends', 'trns', 'gens',  'dname']
+// let notdialectnames = ['name', 'verb', 'rdict', 'dict', 'type', 'stem', 'gends', 'trns', 'gens',  'dname']
 
 // terms: πρίν
 // ψευδο - убрать из префиксов!
@@ -212,33 +212,64 @@ async function eachBreak(dag, breaks) {
             let probe = grdicts.find(dict=> dict.dname == 'wkt')  // || grdicts[0]
             if (!probe) continue
 
-            // if (dict.dname != 'wkt') continue
-            // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.syllables, probe.aug)
+            let probes = grdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ???
+            // let probeChains = eachProbechain(dag, probes, br, mainseg, grdicts, headdicts, regdicts, cognates)
+            let probeChains = eachProbechain(dag, probes, br, grdicts)
 
-            let cfls = []
-            // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-            let pfls = br.fls.docs.filter(flex=> flex.stress == dag.stress && flex.stressidx == dag.stressidx)
-            pfls = pfls.filter(flex=> flex.syllables == probe.syllables)
-            // pfls = pfls.filter(flex=> flex.aug == dag.aug)
-            pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
-            // log('_PFLS', pfls)
-            f('_PFLS', probe.rdict, pfls.length)
+            // let cfls = []
+            // // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.syllables, probe.aug)
+            // // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
+            // let pfls = br.fls.docs.filter(flex=> flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+            // pfls = pfls.filter(flex=> flex.syllables == probe.syllables)
+            // pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
+            // // log('_PFLS', pfls)
+            // // pfls = br.fls.docs
+            // f('_PFLS', probe.rdict, pfls.length)
 
-            if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
-            if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
-            else cfls = filterProbeName(probe, pfls)
-            // cfls = _.compact(cfls)
-            if (!cfls.length) continue
-            if (!probe.trns) probe.trns = ['non regular verb']
-            // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
-            let cogns = cognates //.filter(cdict=> cdict.dict == dict)
-            let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cogns)
-            if (dag.augseg) chain.unshift(dag.augseg) // AUG
-            chains.push(chain)
+            // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
+            // if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
+            // else cfls = filterProbeName(probe, pfls)
+            // // cfls = _.compact(cfls)
+            // if (!cfls.length) continue
+            // if (!probe.trns) probe.trns = ['non regular verb']
+            // // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
+            // let cogns = cognates //.filter(cdict=> cdict.dict == dict)
+            // // let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cogns)
+            // let chain = makeChain(br, probe, grdicts, cfls)
+            // if (dag.augseg) chain.unshift(dag.augseg) // AUG
+            // // chains.push(chain)
+
+            chains.push(...probeChains)
         }
     }
     // return []
     return chains
+}
+
+function eachProbechain(dag, probes, br, grdicts) {
+    let probeChains = []
+    for (let probe of probes) {
+        let cfls = []
+        // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.syllables, probe.aug)
+        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        pfls = pfls.filter(flex=> flex.syllables == probe.syllables)
+        pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
+        // log('_PFLS', pfls)
+        // pfls = br.fls.docs
+        f('_PFLS', probe.rdict, pfls.length)
+
+        if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
+        if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
+        else cfls = filterProbeName(probe, pfls)
+        // cfls = _.compact(cfls)
+        if (!cfls.length) continue
+        if (!probe.trns) probe.trns = ['non regular verb']
+        // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
+        let chain = makeChain(br, probe, grdicts, cfls)
+        if (dag.augseg) chain.unshift(dag.augseg) // AUG
+        probeChains.push(chain)
+    }
+    return probeChains
 }
 
 function filterProbePart(dict, pfls) {
@@ -314,8 +345,8 @@ function filterProbeName(dict, pfls) {
             dkey.dialect == flex.dialect  &&
                 dkey.declension == flex.declension &&
                 dkey.stype == flex.stype &&
-                dkey.gends.includes(flex.gend) &&
-                dkey.key == flex.key
+                // dkey.gends.includes(flex.gend) &&
+                dkey[flex.gend] == flex.key
         )
         if (!key) continue
         f('_filter-F', dict.rdict, dict.syllables, flex)
@@ -324,9 +355,16 @@ function filterProbeName(dict, pfls) {
     return cfls
 }
 
-function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognates) {
+// function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognates) {
+function makeChain(br, probe, cdicts, fls) {
+    let headdicts = br.headdicts
+    let head_rdicts_list = headdicts.map(dict=> dict.rdict)
+    f('_head_rdicts_list', head_rdicts_list)
+    let taildicts = br.taildicts
+    let cognates = (br.tail) ? taildicts : headdicts            // cognates - совсем грязные
+    let mainseg = (br.tail) ? (br.tail) : (br.head)
+
     let chain = []
-    // chain.push(br)
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
