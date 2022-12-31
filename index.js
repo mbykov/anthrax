@@ -368,8 +368,10 @@ function makeChain(br, probe, cdicts, fls) {
     let flsseg = {seg: br.fls._id, fls}
     chain.push(flsseg)
 
+    if (mainseg.length < 2) cognates = []
     let rcogns = _.uniq(cognates.map(dict=> dict.rdict)).join(',')
-    let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, cognates, rcogns, mainseg: true}
+    // let tailseg = {seg: mainseg, cdicts, rdict: probe.rdict, cognates, rcogns, mainseg: true}
+    let tailseg = {seg: mainseg, cdicts: [probe], rdict: probe.rdict, cognates, rcogns, mainseg: true}
     if (probe.verb) tailseg.verb = true
     else if (probe.name) tailseg.name = true
     // если нужен regdict для одного из cdicts, перенести trns

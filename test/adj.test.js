@@ -80,7 +80,7 @@ if (only) {
     let conly = comb(only)
     // let ponly = plain(conly)
     log('_CACHE', only, cache[conly])
-    log('_CACHE-FW', only, cache['ἀοιδόν'])
+    log('_CACHE-FW', only, cache['ἄποδα'])
 }
 
 describe('test names:', async () => {
@@ -88,6 +88,7 @@ describe('test names:', async () => {
         // log('_TEST WF', wf, '_CACHE:', cache[wf])
         // let pwf = plain(wf)
         let expected = cache[wf].map(form=> [form.gend, form.num, form.case].join('.')).sort()
+        expected = _.uniq(expected)
         // log('_EXP', wf, expected)
         await testWF(wf, expected)
     }
@@ -112,10 +113,15 @@ async function testWF(wf, exp) {
         chains = chains.filter(chain=> !chain.find(seg=> seg.head)) // не compounds
         chains = chains.filter(chain=> chain.find(seg=> seg.mainseg)) //
         let names = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
+        names = chains.filter(chain=> chain.find(seg=> seg.mainseg && seg.name && seg.cdicts.find(cdict=> !cdict.gends)))
         /* log('_WF', wf) */
         for (let chain of names) {
-            // log('_CHAIN', chains.length, chain)
+            // log('_MAIN_CHAIN', chain)
             let main = chain.find(seg=> seg.mainseg)
+            if (!main) {
+                assert.deepEqual(true, true)
+                continue
+            }
             let cdicts = main.cdicts.filter(cdict=> cdict.name && !cdict.gends) //
             // log('_CDICTS', wf, cdicts.map(cdict=> cdict.rdict))
             if (!cdicts.length) {
@@ -127,9 +133,9 @@ async function testWF(wf, exp) {
             // log('_FLS', fls)
             let cmorphs = prettyName(fls)
             morphs.push(...cmorphs)
-            morphs = _.uniq(morphs).sort()
-            assert.deepEqual(morphs, exp)
         }
+        morphs = _.uniq(morphs).sort()
+        assert.deepEqual(morphs, exp)
     })
 }
 
