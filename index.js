@@ -45,7 +45,7 @@ export async function anthrax(wf) {
     // let termcdicts = await getTerms(cwf)
     // log('_TD', termcdicts)
     let termcdicts = await getTermsNew(cwf)
-    // log('_TERMS', termcdicts)
+    log('_TERMS', termcdicts)
     if (termcdicts.length) {
         let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
         chains.push(termchain)
@@ -126,6 +126,7 @@ async function makePrefSegs(dag)  {
     let prefraw = parsePrefix(dag.pcwf)
     if (!prefraw) return
     let prefs = prefraw.split('-')
+    if (prefs.join('') == dag.pcwf) return []
     let segs = []
     let oprefs = []
     prefs.forEach(rawpref=> {

@@ -80,7 +80,7 @@ if (only) {
     let conly = comb(only)
     // let ponly = plain(conly)
     log('_CACHE', only, cache[conly])
-    log('_CACHE-FW', only, cache['ἄποδα'])
+    log('_CACHE-FW', only, cache['ἀγαθή'])
 }
 
 describe('test names:', async () => {
