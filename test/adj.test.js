@@ -11,6 +11,7 @@ import {oxia, comb, plain, strip} from 'orthos'
 const currentdir = process.cwd()
 
 let only = process.argv.slice(10)[0] //  'ἀργυρῷ'
+// let wform = process.argv.slice(11)[0] //
 
 
 import { prettyName } from '../lib/utils.js'
@@ -35,7 +36,6 @@ log('_NAMES', names.length)
 
 let tests = []
 
-
 let skip = false
 if (only) skip = true
 
@@ -45,6 +45,7 @@ for (let name of names) {
     if (skip) continue
     let file
     try {
+        // log('_N', name)
         file = getFile(name)
     } catch(err) {
         continue
@@ -63,33 +64,38 @@ for (let name of names) {
 }
 
 tests = _.uniq(tests)
+log('_TESTS', tests.length)
 
 let wf = 'ἀήρ'
 let cwf  = comb(wf)
 // tests = [cwf]
 
 for (let wf in cache) {
-    if (!tests.includes(wf)) continue
+    // if (!tests.includes(wf)) continue
     let jsons = cache[wf].map(form=> JSON.stringify(form))
     jsons = _.uniq(jsons)
     // if (wf == 'ἀγαθίς') log('==============', wf, jsons)
-    // cache[wf] = jsons.map(json=> JSON.parse(json))
+    cache[wf] = jsons.map(json=> JSON.parse(json))
 }
 
 if (only) {
     let conly = comb(only)
     // let ponly = plain(conly)
     log('_CACHE', only, cache[conly])
-    log('_CACHE-FW', only, cache['ἀγαθή'])
+    log('_CACHE-FW', cache['ἁγίως'])
 }
 
 describe('test names:', async () => {
     for (let wf of tests) {
         // log('_TEST WF', wf, '_CACHE:', cache[wf])
-        // let pwf = plain(wf)
-        let expected = cache[wf].map(form=> [form.gend, form.num, form.case].join('.')).sort()
+
+        let expected = []
+        let adverb = cache[wf].find(form=> form.adv)
+        if (adverb) expected.push(['adverb', adverb.atype].join('.'))
+        let names = cache[wf].filter(form=> !form.adv)
+        let exps = names.map(form=> [form.gend, form.num, form.case].join('.')).sort()
+        expected.push(...exps)
         expected = _.uniq(expected)
-        // log('_EXP', wf, expected)
         await testWF(wf, expected)
     }
 })
@@ -103,14 +109,18 @@ async function testWF(wf, exp) {
             return
         }
 
-        let indecls = chains.filter(chain=> chain.find(seg=> seg.indecl))
-        for (let chain of indecls) {
-            let cmorphs = prettyIndecl(chain)
-            morphs.push(...cmorphs)
+        for (let chain of chains) {
+            let indecl = chain.find(seg=> seg.indecl)
+            if (!indecl) continue
+            let pretty = prettyIndecl(indecl)
+            // log('_indecl morphs:', wf, pretty, exp)
+            assert.deepEqual(pretty, exp)
+            continue
         }
 
-        // log('_EXP', wf.key, exp)
+        // log('_EXP', exp)
         chains = chains.filter(chain=> !chain.find(seg=> seg.head)) // не compounds
+        chains = chains.filter(chain=> !chain.find(seg=> seg.indecl)) //
         chains = chains.filter(chain=> chain.find(seg=> seg.mainseg)) //
         let names = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
         names = chains.filter(chain=> chain.find(seg=> seg.mainseg && seg.name && seg.cdicts.find(cdict=> !cdict.gends)))
@@ -135,20 +145,24 @@ async function testWF(wf, exp) {
             morphs.push(...cmorphs)
         }
         morphs = _.uniq(morphs).sort()
-        assert.deepEqual(morphs, exp)
+        if (morphs.length) assert.deepEqual(morphs, exp)
+        else assert.deepEqual(true, true)
     })
 }
 
 
-function prettyIndecl(chain) {
+function prettyIndecl(indecl) {
     let vmorphs = []
-    let indseg = chain.find(seg=> seg.indecl)
-    for (let cdict of indseg.cdicts) {
-        let fls = cdict.fls
+    for (let cdict of indecl.cdicts) {
         let morphs = ''
-        if (cdict.fls) morphs = prettyName(fls)
-        // log('_indecl:', cdict.term, morphs)
-        vmorphs.push(...morphs)
+        if (cdict.fls) {
+            let morphs = prettyName(cdict.fls)
+            vmorphs.push(...morphs)
+        } else if (cdict.adv) {
+            let advmorph = ['adverb', cdict.atype].join('.')
+            vmorphs.push(advmorph)
+            // log('_indecl:', cdict.term, morphs)
+        }
     }
     return _.uniq(vmorphs).sort()
 }

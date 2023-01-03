@@ -2,7 +2,7 @@
 
 import _  from 'lodash'
 import { anthrax } from './index.js'
-// import { prettyName, prettyVerb } from './lib/utils.js'
+import { prettyName, prettyIndecl, prettyVerb } from './lib/utils.js'
 import Debug from 'debug'
 const d = Debug('dicts')
 
@@ -28,8 +28,8 @@ async function run(full) {
 
     if (indecl) {
         // log('_run_indecl_:', indecl)
-        prettyIndecl(indecl)
-        // let cdicts =
+        let pretty = prettyIndecl(indecl)
+        log('_indecl morphs:', pretty)
         if (full) {
             log('_cdicts:', indecl.cdicts)
         }
@@ -66,25 +66,30 @@ function prettyFLS(chain) {
     return morphs
 }
 
-function prettyIndecl(indecl) {
+function prettyIndecl_(indecl) {
+    let vmorphs = []
     for (let cdict of indecl.cdicts) {
-        let fls = cdict.fls
         let morphs = ''
-        if (cdict.fls) morphs = prettyName(fls)
-        if (cdict.name) morphs = prettyName(fls)
-        else if (cdict.verb) morphs = prettyVerb(fls)
-        log('_indecl:', cdict.term, morphs)
+        if (cdict.fls) {
+            let morphs = prettyName(cdict.fls)
+            vmorphs.push(...morphs)
+        } else if (cdict.adv) {
+            let advmorph = ['adverb', cdict.atype].join('.')
+            vmorphs.push(advmorph)
+            // log('_indecl:', cdict.term, morphs)
+        }
     }
+    return _.uniq(vmorphs).sort()
 }
 
-function prettyName(fls) {
+function prettyName_(fls) {
     let morphs = fls.map(flex=> {
         return  [flex.gend, flex.numcase].join('.')
     })
     return _.uniq(morphs).sort()
 }
 
-function prettyVerb(fls) {
+function prettyVerb_(fls) {
     let morphs = fls.map(flex=> {
         let str
         // if (flex.part) str =[ [flex.tense, flex.numper].join('.'),  [flex.gend, 'sg.nom'].join('.') ].join(', ')

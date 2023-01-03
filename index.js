@@ -45,7 +45,7 @@ export async function anthrax(wf) {
     // let termcdicts = await getTerms(cwf)
     // log('_TD', termcdicts)
     let termcdicts = await getTermsNew(cwf)
-    log('_TERMS', termcdicts)
+    // log('_TERMS', termcdicts)
     if (termcdicts.length) {
         let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
         chains.push(termchain)
@@ -345,10 +345,11 @@ function filterProbeName(dict, pfls) {
         let key = dict.keys.find(dkey=>
             dkey.dialect == flex.dialect  &&
                 dkey.declension == flex.declension &&
-                dkey.stype == flex.stype &&
-                // dkey.gends.includes(flex.gend) &&
-                dkey[flex.gend] == flex.key
+                dkey.stype == flex.stype
+                // dkey[flex.gend] == flex.key
         )
+        if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
+        else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
         if (!key) continue
         f('_filter-F', dict.rdict, dict.syllables, flex)
         cfls.push(flex)
