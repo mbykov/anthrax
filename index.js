@@ -82,9 +82,9 @@ async function anthraxChains(wf) {
     d('_pcwf', dag.pcwf)
 
     // ἀδικέω - odd δικάζω
+    // проверить ἀνθράκινα, д.б. два результата
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
     let prefsegs = await makePrefSegs(dag) || []
-    // prefsegs.unshift({tail: dag.cwf})
     // log('_PREF_SEGS', prefsegs)
 
     let chains = []
@@ -93,10 +93,16 @@ async function anthraxChains(wf) {
         // log('_prefseg_', prefseg)
         let ptail = plain(prefseg.tail)
         breaks = await cleanBreaks(dag, ptail)
+        // в цикле по префиксам не может быть cdicts с префиксами, они вычисляются в augs:
+        // log('_DAG:', dag)
+        // log('_prefseg:', prefseg)
         // log('_ptail:', ptail, breaks)
         let prefchains = await eachBreak(dag, breaks)
+        // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
+        delete prefseg.tail
+        prefchains.forEach(chain=> chain.unshift(prefseg))
         chains.push(...prefchains)
-        // log('_PrefCH:', prefchains)
+        // log('_Pref Chains:', prefchains)
     })
 
     // if (!chains.length) {
@@ -115,7 +121,10 @@ async function anthraxChains(wf) {
     breaks = await cleanBreaks(dag, dag.pcwf)
     // f('_Simple_breaks:', breaks)
     let augchains = await eachBreak(dag, breaks)
-    f('_aug_chains:', augchains)
+    p('_aug_chains:', augchains)
+    if (dag.augseg) {
+        augchains.forEach(chain=> chain.unshift(dag.augseg))
+    }
     chains.push(...augchains)
     // }
     return chains
@@ -159,7 +168,7 @@ async function makePrefSegs(dag)  {
         let shorttail = removeVowelBeg(tail)
         let retail = new RegExp(shorttail + '$')
         let tailconn = tail.replace(retail, '')
-        let seg = {term: o.pref, conn: o.conn, tail: shorttail, docs: o.docs}
+        let seg = {seg: o.pref, conn: o.conn, tail: shorttail, docs: o.docs, pref: true}
         if (tailconn) seg.conn = tailconn
         segs.push(seg)
     })
@@ -186,7 +195,7 @@ function removeVowelBeg(wf) {
 
 async function eachBreak(dag, breaks) {
     let chains = []
-    let regdicts = await getRegVerbs(breaks)
+    // let regdicts = await getRegVerbs(breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
     f('_breaks-ids', breaksids)
 
@@ -195,7 +204,7 @@ async function eachBreak(dag, breaks) {
         let head_rdicts_list = headdicts.map(dict=> dict.rdict)
         f('_head_rdicts_list', head_rdicts_list)
         let taildicts = br.taildicts
-        let cognates = (br.tail) ? taildicts : headdicts            // cognates - совсем грязные
+        let cognates = (br.tail) ? taildicts : headdicts  // cognates - совсем грязные
         let mainseg = (br.tail) ? (br.tail) : (br.head)
         let pfls = br.fls.docs
 
@@ -209,37 +218,13 @@ async function eachBreak(dag, breaks) {
         for (let dict in dictgroups) {
             let grdicts = dictgroups[dict]
             // grdicts = grdicts.filter(dict=> dict.aug == dag.aug)
-            grdicts = grdicts.filter(dict=> dict.keys.find(key=> key.aug == dag.aug))
-            let probe = grdicts.find(dict=> dict.dname == 'wkt')  // || grdicts[0]
-            if (!probe) continue
+            // grdicts = grdicts.filter(dict=> dict.keys.find(key=> key.aug == dag.aug))
+            // let probe = grdicts.find(dict=> dict.dname == 'wkt')  // || grdicts[0]
+            // if (!probe) continue
 
             let probes = grdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ???
             // let probeChains = eachProbechain(dag, probes, br, mainseg, grdicts, headdicts, regdicts, cognates)
             let probeChains = eachProbechain(dag, probes, br, grdicts)
-
-            // let cfls = []
-            // // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.syllables, probe.aug)
-            // // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-            // let pfls = br.fls.docs.filter(flex=> flex.stress == dag.stress && flex.stressidx == dag.stressidx)
-            // pfls = pfls.filter(flex=> flex.syllables == probe.syllables)
-            // pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
-            // // log('_PFLS', pfls)
-            // // pfls = br.fls.docs
-            // f('_PFLS', probe.rdict, pfls.length)
-
-            // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
-            // if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
-            // else cfls = filterProbeName(probe, pfls)
-            // // cfls = _.compact(cfls)
-            // if (!cfls.length) continue
-            // if (!probe.trns) probe.trns = ['non regular verb']
-            // // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
-            // let cogns = cognates //.filter(cdict=> cdict.dict == dict)
-            // // let chain = makeChain(br, probe, grdicts, cfls, mainseg, headdicts, regdicts, cogns)
-            // let chain = makeChain(br, probe, grdicts, cfls)
-            // if (dag.augseg) chain.unshift(dag.augseg) // AUG
-            // // chains.push(chain)
-
             chains.push(...probeChains)
         }
     }
@@ -251,12 +236,11 @@ function eachProbechain(dag, probes, br, grdicts) {
     let probeChains = []
     for (let probe of probes) {
         let cfls = []
-        // log('_PROBE', dict, probe.dname, probe.stem, probe.type, probe.syllables, probe.aug)
         let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
         pfls = pfls.filter(flex=> flex.syllables == probe.syllables)
         pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
         // log('_PFLS', pfls)
-        // pfls = br.fls.docs
+        pfls = br.fls.docs
         f('_PFLS', probe.rdict, pfls.length)
 
         if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
@@ -267,7 +251,8 @@ function eachProbechain(dag, probes, br, grdicts) {
         if (!probe.trns) probe.trns = ['non regular verb']
         // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
         let chain = makeChain(br, probe, grdicts, cfls)
-        if (dag.augseg) chain.unshift(dag.augseg) // AUG
+        // if (dag.augseg) chain.unshift(dag.augseg) // AUG
+        // else if (dag.prefseg) chain.unshift(dag.prefseg)
         probeChains.push(chain)
     }
     return probeChains
@@ -304,16 +289,13 @@ function filterProbeVerb(dict, pfls) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    // log('_D-verb', dict.rdict, dict.reg, dict.type)
+    // log('_D-verb', dict.rdict, dict.reg, dict.type, pfls.length)
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
         if (dict.type != flex.type) continue
         // log('_F', dict.stem, dict.type, flex.reg)
 
-        // let fkeys = dkeys[flex.vtype]?.[flex.tense]
-        // if (!fkeys) continue
-        // if (!fkeys.includes(flex.terms)) continue
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
@@ -413,8 +395,9 @@ async function cleanBreaks(dag, pcwf) {
     let breaks = makeBreaks(pcwf, dag.flexes)
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
+    dicts = dicts.filter(dict=> !dict.prefix)
     let rdicts = dicts.map(dict=> dict.rdict)
-    f('_break all rdicts:', rdicts.slice(0, 5), rdicts.length)
+    log('_break all rdicts:', rdicts, rdicts.length)
 
     let prefcon
     if (dag.prefsegs) {

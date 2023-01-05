@@ -1,6 +1,9 @@
-#+STARTUP: overview
 #+STARTUP: hidestars
+#+STARTUP: overview
 
+* = замечания и примеры
+ - αἶρα - пример, почему нужно добавить не только stress-idx, но и сам stress
+ -
 
 * 21 декабря, после fetch-wkt, то есть включая dialects
  - [X] anthrax - noun
@@ -355,12 +358,6 @@ _res: [
   - в словаре Wkt проверяются ключи. Если есть wkt-dict, то в остальных словарях искать только этот же dict
   - показать все варианты полных цепочек
 
-* = descr v.2 ??
-  - вопрос: или встроить pouch? или morph-server-fetch? Или pouch, клонируемый из morph-server?
-  - для fanki-web достаточно сервера. Для десктопов нужен pouch
-  -
-
-
 * = BIG ARCH =
   - обработка enclitics
   - поиск term = indeclinable
@@ -368,6 +365,12 @@ _res: [
   - simple-compound
   - no simple - simple-compound в цикле с кешем DAG
   -
+
+* = descr v.2 ??
+  - вопрос: или встроить pouch? или morph-server-fetch? Или pouch, клонируемый из morph-server?
+  - для fanki-web достаточно сервера. Для десктопов нужен pouch
+  -
+
 
 * = descr = сначала flex
   - работать нужно отбрасывая flex, начиная с самого длинного flex - см. δυναμέναις - уходит в цикл, хотя есть простой вариант part.

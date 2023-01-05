@@ -120,6 +120,7 @@ async function testWF(wf, exp) {
 
         // log('_EXP', exp)
         chains = chains.filter(chain=> !chain.find(seg=> seg.head)) // не compounds
+        chains = chains.filter(chain=> !chain.find(seg=> seg.pref)) //
         chains = chains.filter(chain=> !chain.find(seg=> seg.indecl)) //
         chains = chains.filter(chain=> chain.find(seg=> seg.mainseg)) //
         let names = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)

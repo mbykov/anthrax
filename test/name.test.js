@@ -85,7 +85,7 @@ if (only) {
     let conly = comb(only)
     // let ponly = plain(conly)
     log('_CACHE', only, cache[conly])
-    // log('_CACHE-AGON', only, cache['ἀγῶν'])
+    log('_CACHE-AGON', only, cache['αἴρα'])
 }
 
 describe('test names:', async () => {
@@ -115,8 +115,10 @@ async function testWF(wf, exp) {
 
         // log('_EXP', wf.key, exp)
         chains = chains.filter(chain=> !chain.find(seg=> seg.head)) // не compounds
-        chains = chains.filter(chain=> chain.find(seg=> seg.mainseg)) // не indecls
+        chains = chains.filter(chain=> !chain.find(seg=> seg.pref)) //
+        chains = chains.filter(chain=> !chain.find(seg=> seg.indecl)) //
         let names = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
+        names = chains.filter(chain=> chain.find(seg=> seg.mainseg && seg.name && seg.cdicts.find(cdict=> cdict.gends))) // non-adective
         /* log('_WF', wf) */
         for (let chain of names) {
             // log('_CHAIN', chains.length, chain)
