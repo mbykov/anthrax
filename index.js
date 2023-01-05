@@ -100,8 +100,19 @@ async function anthraxChains(wf) {
         let prefchains = await eachBreak(dag, breaks)
         // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
         delete prefseg.tail
-        prefchains.forEach(chain=> chain.unshift(prefseg))
-        chains.push(...prefchains)
+        let bothchains = [] // внутренний или внешний префикс
+        prefchains.forEach(chain=> {
+            let mainseg = chain.find(seg=> seg.mainseg)
+            if (!mainseg) return
+            let cdict = mainseg.cdicts[0]
+            if (cdict.prefix && cdict.prefix == prefseg.seg) {
+                chains.push(chain)
+            } if (!cdict.prefix) {
+                chain.unshift(prefseg)
+                chains.push(chain)
+            }
+        })
+        // chains.push(...prefchains)
         // log('_Pref Chains:', prefchains)
     })
 
@@ -113,7 +124,7 @@ async function anthraxChains(wf) {
         dag.aug = aug
         let re = new RegExp('^' + dag.aug)
         dag.pcwf = dag.pcwf.replace(re, '')
-        // log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
+        log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
         let augseg = {seg: dag.aug, aug: true}
         dag.augseg = augseg
         // dag.prefsegs = [augseg]
@@ -395,7 +406,7 @@ async function cleanBreaks(dag, pcwf) {
     let breaks = makeBreaks(pcwf, dag.flexes)
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
-    dicts = dicts.filter(dict=> !dict.prefix)
+    // dicts = dicts.filter(dict=> !dict.prefix)
     let rdicts = dicts.map(dict=> dict.rdict)
     log('_break all rdicts:', rdicts, rdicts.length)
 
