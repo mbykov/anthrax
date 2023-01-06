@@ -124,7 +124,7 @@ async function anthraxChains(wf) {
         dag.aug = aug
         let re = new RegExp('^' + dag.aug)
         dag.pcwf = dag.pcwf.replace(re, '')
-        log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
+        // log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
         let augseg = {seg: dag.aug, aug: true}
         dag.augseg = augseg
         // dag.prefsegs = [augseg]
@@ -267,7 +267,7 @@ function eachProbechain(dag, probes, br, grdicts) {
         pfls = br.fls.docs
         f('_PFLS', probe.rdict, pfls.length)
 
-        if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
+        // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
         else cfls = filterProbeName(probe, pfls)
         // cfls = _.compact(cfls)
