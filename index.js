@@ -133,10 +133,23 @@ async function anthraxChains(wf) {
     // f('_Simple_breaks:', breaks)
     let augchains = await eachBreak(dag, breaks)
     p('_aug_chains:', augchains)
+    augchains.forEach(chain=> {
+        let mainseg = chain.find(seg=> seg.mainseg)
+        if (!mainseg) return
+        let cdict = mainseg.cdicts[0]
+        if (cdict.prefix) return
+        if (cdict.aug && cdict.aug == dag.aug) {
+            chain.unshift(dag.augseg)
+            chains.push(chain)
+        } if (!cdict.aug && !dag.aug) {
+            chains.push(chain)
+        }
+    })
+
     if (dag.augseg) {
-        augchains.forEach(chain=> chain.unshift(dag.augseg))
+        // augchains.forEach(chain=> chain.unshift(dag.augseg))
     }
-    chains.push(...augchains)
+    // chains.push(...augchains)
     // }
     return chains
 }
@@ -408,7 +421,7 @@ async function cleanBreaks(dag, pcwf) {
     let dicts = await findDicts(breaks)
     // dicts = dicts.filter(dict=> !dict.prefix)
     let rdicts = dicts.map(dict=> dict.rdict)
-    log('_break all rdicts:', rdicts, rdicts.length)
+    // log('_break all rdicts:', rdicts, rdicts.length)
 
     let prefcon
     if (dag.prefsegs) {

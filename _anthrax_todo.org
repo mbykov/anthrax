@@ -1,6 +1,9 @@
 #+STARTUP: hidestars
 #+STARTUP: overview
 
+* BUGS NOW
+ - γῇ - лишние значения
+
 * = замечания и примеры
  - αἶρα - пример, почему нужно добавить не только stress-idx, но и сам stress
  -
