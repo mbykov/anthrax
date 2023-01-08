@@ -98,6 +98,7 @@ async function anthraxChains(wf) {
         // log('_prefseg:', prefseg)
         // log('_ptail:', ptail, breaks)
         let prefchains = await eachBreak(dag, breaks)
+        // log('_prefchains:', prefchains)
         // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
         delete prefseg.tail
         let bothchains = [] // внутренний или внешний префикс
@@ -221,25 +222,25 @@ async function eachBreak(dag, breaks) {
     let chains = []
     // let regdicts = await getRegVerbs(breaks)
     let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    log('_breaks-ids', breaksids)
+    // log('_breaks-ids', breaksids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
         let head_rdicts_list = headdicts.map(dict=> dict.rdict)
-        log('_head_rdicts_list', head_rdicts_list)
+        // log('_head_rdicts_list', head_rdicts_list)
         let taildicts = br.taildicts
         let pfls = br.fls.docs
 
         if (taildicts) {
 
         } else {
-            let dictgroups = _.groupBy(headdicts, 'dict')
+            let dictgroups = _.groupBy(headdicts, 'dict') // cdicts из разных словарей
             for (let dict in dictgroups) {
                 let cdicts = dictgroups[dict]
-                // let grdicts_list = grdicts.map(dict=> dict.rdict)
-                // log('_grdicts_list', grdicts_list)
-                // let probes = grdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ???
+                // let cdicts_list = cdicts.map(dict=> dict.rdict)
+                // log('_cdicts_list', cdicts_list)
                 let probeChains = eachProbechain(dag, br, cdicts, headdicts)
+                // log('_probeChains', probeChains)
                 chains.push(...probeChains)
             }
         }
@@ -263,7 +264,7 @@ async function eachBreak(dag, breaks) {
 
         //     let probes = grdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ???
         //     // let probeChains = eachProbechain(dag, probes, br, mainseg, grdicts, headdicts, regdicts, cognates)
-        //     let probeChains = eachProbechain(dag, probes, br, grdicts)
+        //     let probeChains = eachProbechain(dag, br, probes, grdicts)
         //     // chains.push(...probeChains)
         // }
     }
@@ -277,17 +278,21 @@ function eachProbechain(dag, br, cdicts, cognates) {
     for (let probe of probes) {
         let cfls = []
         let flsid = br.fls._id
-        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
+        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+
         // pfls = pfls.filter(flex=> flex.syllables == dag.syllables)
         // pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
         // log('_PROBE', probe.rdict, probe.stem, probe.syllables, 'DAG', dag.stress, dag.stressidx)
+        // log('_DAG', dag.stress, dag.stressidx)
         // log('_PFLS', pfls.length)
         // pfls = br.fls.docs
-        f('_PFLS', probe.rdict, pfls.length)
+        log('_PFLS', probe.rdict, probe.stem, pfls.length)
 
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
         else cfls = filterProbeName(probe, pfls)
+        // log('_CFLS', probe.rdict, cfls.length)
         // cfls = _.compact(cfls)
         if (!cfls.length) continue
         if (!probe.trns) probe.trns = ['non regular verb']
@@ -331,7 +336,7 @@ function filterProbeVerb(dict, pfls) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    log('_D-verb', dict.rdict, dict.stem, dict.syllables, dict.type) // , pfls.length
+    // log('_D-verb', dict.rdict, dict.stem, dict.syllables, dict.type) // , pfls.length
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
@@ -350,9 +355,6 @@ function filterProbeVerb(dict, pfls) {
     // log('_CFLS', cfls.length)
     return cfls
 }
-
-// TODO: === прилагательные. subkeys - os-a-on, и все остальные, найти в wkt/makeAdj
-// а здесь - adj filter probe, потому что свой dictkey
 
 function filterProbeName(dict, pfls) {
     f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
