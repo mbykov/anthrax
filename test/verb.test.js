@@ -50,15 +50,22 @@ for (let name of names) {
     for (let vtime of file.vtimes) {
         // log('_D', vtime)
         for (let form of vtime.forms) {
+
+            if (form.part) continue // убрать после participles. Или добавить обработку part.sg.nom здесь в verbs
+
             let wf = form.wf // .toLowerCase()
             tests.push(wf)
             if (!cache[wf]) cache[wf] = []
-            form.time = vtime.info.time
-            let tense = [vtime.info.time, form.voice, form.mood].join('.')
-            let numper = [form.number, form.person].join('.')
-            let res = [tense, numper].join(', ')
+            let res
+            if (form.inf) {
+                res = [vtime.info.time, form.voice, 'inf'].join('.')
+            } else {
+                let tense = [vtime.info.time, form.voice, form.mood].join('.')
+                let numper = [form.number, form.person].join('.')
+                res = [tense, numper].join(', ')
+            }
+            // cache[wf].push(form)
             cache[wf].push(res)
-            // let pwf = plain(form.wf) // нельзя, объединяются разные формы с острым и облеченным ударением, Ἀβδηρίτης
         }
     }
 }
@@ -77,7 +84,7 @@ for (let wf in cache) {
 if (only) {
     let conly = comb(only)
     log('_CACHE', only, cache[conly])
-    log('_CACHE-FW', cache['ἁγίως'])
+    log('_CACHE-FW', cache['ἀναβλέψετον'])
 }
 
 describe('test names:', async () => {
