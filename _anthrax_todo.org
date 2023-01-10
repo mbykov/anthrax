@@ -1,6 +1,10 @@
 #+STARTUP: hidestars
 #+STARTUP: overview
 
+* sheme
+
+  -
+
 * BUGS NOW
  - γῇ - лишние значения
 

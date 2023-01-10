@@ -60,6 +60,7 @@ export async function anthrax(wf) {
     return chains
 }
 
+
 async function anthraxChains(wf) {
     dag = new Map();
     dag.rawwf = wf
@@ -87,6 +88,15 @@ async function anthraxChains(wf) {
     let prefsegs = await makePrefSegs(dag) || []
     // log('_PREF_SEGS', prefsegs)
 
+    // anthrax
+    // -- getTermsNew
+    // -- anthraxChains
+    // -- dag: rawwf, cwf, pcwf, stress, stressidx,
+    // -- dag.flakes = scrape(), tails, flexes
+    // -- prefsegs = makePrefSegs()
+    // -- breaks = cleanBreaks()
+
+
     let chains = []
     let breaks = []
     prefsegs.forEach(async (prefseg, idx)=> {
@@ -101,7 +111,6 @@ async function anthraxChains(wf) {
         // log('_prefchains:', prefchains)
         // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
         delete prefseg.tail
-        let bothchains = [] // внутренний или внешний префикс
         prefchains.forEach(chain=> {
             let mainseg = chain.find(seg=> seg.mainseg)
             if (!mainseg) return
@@ -118,7 +127,7 @@ async function anthraxChains(wf) {
     })
 
     // if (!chains.length) {
-    dag.prefsegs = ''
+    // dag.prefsegs = ''
     let aug = parseAug(dag.pcwf)
     // log('_AUG', wf, dag.aug)
     if (aug) {
@@ -128,8 +137,8 @@ async function anthraxChains(wf) {
         // log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
         let augseg = {seg: dag.aug, aug: true}
         dag.augseg = augseg
-        // dag.prefsegs = [augseg]
     }
+
     breaks = await cleanBreaks(dag, dag.pcwf)
     // f('_Simple_breaks:', breaks)
     let augchains = await eachBreak(dag, breaks)
@@ -147,11 +156,6 @@ async function anthraxChains(wf) {
         }
     })
 
-    if (dag.augseg) {
-        // augchains.forEach(chain=> chain.unshift(dag.augseg))
-    }
-    // chains.push(...augchains)
-    // }
     return chains
 }
 
@@ -278,8 +282,10 @@ function eachProbechain(dag, br, cdicts, cognates) {
     for (let probe of probes) {
         let cfls = []
         let flsid = br.fls._id
-        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
+        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        // TODO: здесь нужно анализировать префикс в аористах и перфектах. Если коннектор усилен, E, то индикатив, но не императив
+
 
         // pfls = pfls.filter(flex=> flex.syllables == dag.syllables)
         // pfls = pfls.filter(flex=> flex.firststem == probe.stem[0])
@@ -287,16 +293,18 @@ function eachProbechain(dag, br, cdicts, cognates) {
         // log('_DAG', dag.stress, dag.stressidx)
         // log('_PFLS', pfls.length)
         // pfls = br.fls.docs
-        log('_PFLS', probe.rdict, probe.stem, pfls.length)
+        // log('_PFLS', probe.rdict, probe.stem, pfls.length)
 
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls))
         else cfls = filterProbeName(probe, pfls)
         // log('_CFLS', probe.rdict, cfls.length)
         // cfls = _.compact(cfls)
+        log('_PROBE', probe.rdict, pfls.length, cfls.length)
         if (!cfls.length) continue
         if (!probe.trns) probe.trns = ['non regular verb']
         // log('_PROBE-CFLS', probe.rdict, probe.augs, cfls.length)
+
         let chain = makeChain(probe, cdicts, cfls, cognates, flsid)
         // if (dag.augseg) chain.unshift(dag.augseg) // AUG
         // else if (dag.prefseg) chain.unshift(dag.prefseg)
@@ -395,6 +403,7 @@ function makeChain(probe, cdicts, fls, cognates, flsid) {
     let tailseg = {seg: probe.stem, cdicts: [probe], rdict: probe.rdict, cognates, rcogns, mainseg: true}
     if (probe.verb) tailseg.verb = true
     else if (probe.name) tailseg.name = true
+    // log('_T', tailseg)
     // если нужен regdict для одного из cdicts, перенести trns
     // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
     // if (regdict) tailseg.regdict = regdict
