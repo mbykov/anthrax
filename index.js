@@ -110,24 +110,24 @@ async function anthraxChains(wf) {
             if (!mainseg) return
             let cdict = mainseg.cdicts[0]
 
-            // == убрать в метод
-            log('_cdict_', cdict.rdict, cdict.prefix, cdict.stem)
-            // rdict: wf: ἀνεγνώσατον - два результата, imp и ind. разница в коннекторе prefseg (если e, то ind) но можно сравнить со значением в словаре:
-            let pdict = plain(cdict.dict)
-            let tail = pdict.replace(cdict.prefix, '')
-            let tailstart = tail[0]
-            log('_FP', pdict, cdict.prefix, tail, tailstart)
-            let flsseg = chain.find(seg=> seg.fls)
-            let fls = flsseg.fls
-            // === TODO: только в историч. временах === наверное, лучше тащить time, mood, voice, раз так
-            // а в pretty все обрезать, чтобы не гнать в браузер
-            if (tailstart != prefseg.conn) {
-                fls = fls.filter(flex=> /ind/.test(flex.tense))
-            } else {
-                fls = fls.filter(flex=> !/ind/.test(flex.tense))
-            }
-            // flsseg.fls = fls
-            // log('_FLS', fls)
+            // // == убрать в метод
+            // log('_cdict_', cdict.rdict, cdict.prefix, cdict.stem)
+            // // rdict: wf: ἀνεγνώσατον - два результата, imp и ind. разница в коннекторе prefseg (если e, то ind) но можно сравнить со значением в словаре:
+            // let pdict = plain(cdict.dict)
+            // let tail = pdict.replace(cdict.prefix, '')
+            // let tailstart = tail[0]
+            // log('_FP', pdict, cdict.prefix, tail, tailstart)
+            // let flsseg = chain.find(seg=> seg.fls)
+            // let fls = flsseg.fls
+            // // === TODO: только в историч. временах === наверное, лучше тащить time, mood, voice, раз так
+            // // а в pretty все обрезать, чтобы не гнать в браузер
+            // if (tailstart != prefseg.conn) {
+            //     fls = fls.filter(flex=> /ind/.test(flex.tense))
+            // } else {
+            //     fls = fls.filter(flex=> !/ind/.test(flex.tense))
+            // }
+            // // flsseg.fls = fls
+            // // log('_FLS', fls)
 
             if (cdict.prefix && cdict.prefix == prefseg.seg) {
                 chains.push(chain)
@@ -325,18 +325,20 @@ function filterProbeVerb(dict, pfls, conn) {
         if (!!dict.reg != !!flex.reg) continue
         if (dict.type != flex.type) continue
         if (dict.syllables != flex.syllables) continue
+        if (flex.part) continue
 
 
         if (dict.vtypes[flex.stype]) {
             if (flex.mood == 'ind' && dict.vtypes[flex.stype].ind != conn) continue
-            // else if (flex.mood != 'ind' && dict.vtypes[flex.stype].soi != conn) continue
+            else if (flex.mood != 'ind' && dict.vtypes[flex.stype].soi != conn) continue
         }
 
-        // log('_F', dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.mood)
+        // log('_F', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.mood)
+        log('_F', flex)
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
-        log('_F_OK', dag.stressidx, dict.verb, dict.stem, dict.type)
+        // log('_F_OK', dag.stressidx, dict.verb, dict.stem, dict.type)
 
         cfls.push(flex)
     }
