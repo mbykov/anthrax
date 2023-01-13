@@ -243,7 +243,8 @@ function eachProbechain(dag, br, cdicts, cognates) {
         // log('_PFLS', probe.rdict, probe.stem, pfls.length)
 
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
-        if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, dag.prefseg.conn))
+        let conn = dag.prefseg?.conn || dag.augseg?.seg
+        if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
         else cfls = filterProbeName(probe, pfls)
         // log('_PROBE', probe.rdict, pfls.length, cfls.length)
         if (!cfls.length) continue
@@ -324,14 +325,18 @@ function filterProbeVerb(dict, pfls, conn) {
         if (!!dict.reg != !!flex.reg) continue
         if (dict.type != flex.type) continue
         if (dict.syllables != flex.syllables) continue
-        if (dict.vtypes[flex.stype] != conn) continue
 
-        log('_F', dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], conn, flex.numper, flex.mood)
 
+        if (dict.vtypes[flex.stype]) {
+            if (flex.mood == 'ind' && dict.vtypes[flex.stype].ind != conn) continue
+            // else if (flex.mood != 'ind' && dict.vtypes[flex.stype].soi != conn) continue
+        }
+
+        // log('_F', dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.mood)
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
-        // log('_F_OK', dag.stressidx, dict.verb, dict.stem, dict.type)
+        log('_F_OK', dag.stressidx, dict.verb, dict.stem, dict.type)
 
         cfls.push(flex)
     }
