@@ -52,6 +52,15 @@ for (let name of names) {
         for (let form of vtime.forms) {
 
             if (form.part) continue // убрать после participles. Или добавить обработку part.sg.nom здесь в verbs
+            if (vtime.info.time == 'pf' && (form.voice == 'mp' || form.voice == 'mid') && (form.mood == 'sub' || form.mood == 'opt')) continue
+            // if (vtime.info.time == 'pf' && form.voice == 'mp' && form.mood == 'sub') log('_===================')
+            // if (vtime.info.time == 'pf' && form.voice == 'mp' && form.mood == 'sub') continue
+            // if (form.wf  == 'ὦ') log('_VVVV', form, vtime.info.time)
+
+            if (form.wf == 'ὦ') {
+                // log('_ZZZZZ', form, vtime.info.time )
+                // throw new Error()
+            }
 
             let wf = form.wf // .toLowerCase()
             tests.push(wf)

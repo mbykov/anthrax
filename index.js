@@ -91,8 +91,7 @@ async function anthraxChains(wf) {
     let chains = []
     let breaks = []
 
-    prefsegs.forEach(async (prefseg, idx)=> {
-        // log('_prefseg_', prefseg)
+    for await (let prefseg of prefsegs) {
         dag.prefseg = prefseg
         let ptail = plain(prefseg.tail)
         breaks = await cleanBreaks(dag, ptail)
@@ -101,7 +100,7 @@ async function anthraxChains(wf) {
         // log('_prefseg:', prefseg)
         // log('_ptail:', ptail, breaks)
         let prefchains = await eachBreak(dag, breaks)
-        // log('_prefchains:', prefchains)
+        // log('_prefchains:', prefchains.length)
         // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
         delete prefseg.tail
 
@@ -109,25 +108,6 @@ async function anthraxChains(wf) {
             let mainseg = chain.find(seg=> seg.mainseg)
             if (!mainseg) return
             let cdict = mainseg.cdicts[0]
-
-            // // == убрать в метод
-            // log('_cdict_', cdict.rdict, cdict.prefix, cdict.stem)
-            // // rdict: wf: ἀνεγνώσατον - два результата, imp и ind. разница в коннекторе prefseg (если e, то ind) но можно сравнить со значением в словаре:
-            // let pdict = plain(cdict.dict)
-            // let tail = pdict.replace(cdict.prefix, '')
-            // let tailstart = tail[0]
-            // log('_FP', pdict, cdict.prefix, tail, tailstart)
-            // let flsseg = chain.find(seg=> seg.fls)
-            // let fls = flsseg.fls
-            // // === TODO: только в историч. временах === наверное, лучше тащить time, mood, voice, раз так
-            // // а в pretty все обрезать, чтобы не гнать в браузер
-            // if (tailstart != prefseg.conn) {
-            //     fls = fls.filter(flex=> /ind/.test(flex.tense))
-            // } else {
-            //     fls = fls.filter(flex=> !/ind/.test(flex.tense))
-            // }
-            // // flsseg.fls = fls
-            // // log('_FLS', fls)
 
             if (cdict.prefix && cdict.prefix == prefseg.seg) {
                 chains.push(chain)
@@ -137,38 +117,27 @@ async function anthraxChains(wf) {
             }
         })
         delete dag.prefseg
-        // chains.push(...prefchains)
-        // log('_Pref Chains:', prefchains)
-    })
+    }
 
-    // if (!chains.length) {
-    // dag.prefsegs = ''
     let aug = parseAug(dag.pcwf)
-    // log('_AUG', wf, dag.aug)
     if (aug) {
         dag.aug = aug
         let re = new RegExp('^' + dag.aug)
         dag.pcwf = dag.pcwf.replace(re, '')
-        // log('_dag.aug, pcwf_', dag.aug, dag.pcwf)
         let augseg = {seg: dag.aug, aug: true}
         dag.augseg = augseg
     }
 
     breaks = await cleanBreaks(dag, dag.pcwf)
-    // f('_Simple_breaks:', breaks)
     let augchains = await eachBreak(dag, breaks)
-    p('_aug_chains:', augchains)
+
     augchains.forEach(chain=> {
         let mainseg = chain.find(seg=> seg.mainseg)
         if (!mainseg) return
         let cdict = mainseg.cdicts[0]
         if (cdict.prefix) return
-        if (cdict.aug && cdict.aug == dag.aug) {
-            chain.unshift(dag.augseg)
-            chains.push(chain)
-        } if (!cdict.aug && !dag.aug) {
-            chains.push(chain)
-        }
+        if (dag.augseg) chain.unshift(dag.augseg)
+        chains.push(chain)
     })
 
     return chains
@@ -177,12 +146,12 @@ async function anthraxChains(wf) {
 async function eachBreak(dag, breaks) {
     let chains = []
     // let regdicts = await getRegVerbs(breaks)
-    let breaksids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    // log('_breaks-ids', breaksids)
+    // let breakids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
+    // log('_break-ids', breakids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
-        let head_rdicts_list = headdicts.map(dict=> dict.rdict)
+        // let head_rdicts_list = headdicts.map(dict=> dict.rdict)
         // log('_head_rdicts_list', head_rdicts_list)
         let taildicts = br.taildicts
         let pfls = br.fls.docs
@@ -196,33 +165,10 @@ async function eachBreak(dag, breaks) {
                 // let cdicts_list = cdicts.map(dict=> dict.rdict)
                 // log('_cdicts_list', cdicts_list)
                 let probeChains = eachProbechain(dag, br, cdicts, headdicts)
-                // log('_probeChains', probeChains)
                 chains.push(...probeChains)
             }
         }
 
-        // let cognates = (br.tail) ? taildicts : headdicts  // cognates - совсем грязные
-        // // let mainseg = (br.tail) ? (br.tail) : (br.head)
-
-        // // cognates = cognates.filter(dict=> {
-        // //     // if (dict.dname == 'wkt') return false
-        // //     return true
-        // // })
-
-        // let dictgroups = _.groupBy(cognates, 'dict')
-
-        // for (let dict in dictgroups) {
-        //     let grdicts = dictgroups[dict]
-        //     // grdicts = grdicts.filter(dict=> dict.aug == dag.aug)
-        //     // grdicts = grdicts.filter(dict=> dict.keys.find(key=> key.aug == dag.aug))
-        //     // let probe = grdicts.find(dict=> dict.dname == 'wkt')  // || grdicts[0]
-        //     // if (!probe) continue
-
-        //     let probes = grdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ???
-        //     // let probeChains = eachProbechain(dag, probes, br, mainseg, grdicts, headdicts, regdicts, cognates)
-        //     let probeChains = eachProbechain(dag, br, probes, grdicts)
-        //     // chains.push(...probeChains)
-        // }
     }
     // return []
     return chains
@@ -230,16 +176,13 @@ async function eachBreak(dag, breaks) {
 
 function eachProbechain(dag, br, cdicts, cognates) {
     let probeChains = []
-    let probes = cdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ???
+    let probes = cdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ἅγιος - noun / adjective
 
     for (let probe of probes) {
-        // log('_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', probe.rdict, probe.prefix, probe.vtypes, dag.prefseg.conn)
         let cfls = []
         let flsid = br.fls._id
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
         let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
-        // TODO: здесь нужно анализировать префикс в аористах и перфектах. Если коннектор усилен, E, то индикатив, но не императив
-
         // log('_PFLS', probe.rdict, probe.stem, pfls.length)
 
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
@@ -249,11 +192,9 @@ function eachProbechain(dag, br, cdicts, cognates) {
         // log('_PROBE', probe.rdict, pfls.length, cfls.length)
         if (!cfls.length) continue
         if (!probe.trns) probe.trns = ['non regular verb']
-        // log('_PROBE-CFLS', probe.rdict, cfls.length)
+        // log('_PROBE-CFLS', probe.rdict, probe.stem, cfls.length)
 
         let chain = makeChain(probe, cdicts, cfls, cognates, flsid)
-        // if (dag.augseg) chain.unshift(dag.augseg) // AUG
-        // else if (dag.prefseg) chain.unshift(dag.prefseg)
         probeChains.push(chain)
     }
     return probeChains
@@ -319,7 +260,7 @@ function filterProbeVerb(dict, pfls, conn) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    // log('_D-verb', dict.rdict, dict.stem, dict.syllables, dict.type) // , pfls.length
+    // log('_D-verb', dict.rdict, dict.stem, dict.type) // , pfls.length
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
@@ -327,18 +268,18 @@ function filterProbeVerb(dict, pfls, conn) {
         if (dict.syllables != flex.syllables) continue
         if (flex.part) continue
 
-
+        // почему if ?
         if (dict.vtypes[flex.stype]) {
             if (flex.mood == 'ind' && dict.vtypes[flex.stype].ind != conn) continue
             else if (flex.mood != 'ind' && dict.vtypes[flex.stype].soi != conn) continue
         }
 
         // log('_F', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.mood)
-        log('_F', flex)
+        // log('_F', flex)
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
-        // log('_F_OK', dag.stressidx, dict.verb, dict.stem, dict.type)
+        log('_F_OK', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.tense)
 
         cfls.push(flex)
     }
