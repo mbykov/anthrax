@@ -184,6 +184,7 @@ function eachProbechain(dag, br, cdicts, cognates) {
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
         let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
         // log('_PFLS', probe.rdict, probe.stem, pfls.length)
+        // log('_DAG', probe.rdict, dag.stress, dag.stressidx)
 
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         let conn = dag.prefseg?.conn || dag.augseg?.seg
@@ -279,7 +280,7 @@ function filterProbeVerb(dict, pfls, conn) {
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
-        log('_F_OK', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.tense)
+        // log('_F_OK', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.tense)
 
         cfls.push(flex)
     }

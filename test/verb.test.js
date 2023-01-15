@@ -12,7 +12,7 @@ const currentdir = process.cwd()
 
 let only = process.argv.slice(9)[0] //  'ἀναβλέπω'
 
-import { prettyVerb } from '../lib/utils.js'
+import { prettyVerb, prettyIndecl } from '../lib/utils.js'
 
 import { anthrax } from '../index.js'
 
@@ -57,10 +57,6 @@ for (let name of names) {
             // if (vtime.info.time == 'pf' && form.voice == 'mp' && form.mood == 'sub') continue
             // if (form.wf  == 'ὦ') log('_VVVV', form, vtime.info.time)
 
-            if (form.wf == 'ὦ') {
-                // log('_ZZZZZ', form, vtime.info.time )
-                // throw new Error()
-            }
 
             let wf = form.wf // .toLowerCase()
             tests.push(wf)
@@ -110,15 +106,16 @@ async function testWF(wf, exp) {
         let chains = await anthrax(wf)
         if (!chains.length) {
             assert.deepEqual(true, true)
-            return
+            // return
         }
 
         for (let chain of chains) {
-            // let indecl = chain.find(seg=> seg.indecl)
-            // if (!indecl) continue
-            // let pretty = prettyIndecl(indecl)
-            // assert.deepEqual(pretty, exp)
-            // continue
+            let indecl = chain.find(seg=> seg.indecl)
+            if (!indecl) continue
+            let pretty = prettyIndecl(indecl)
+            log('_XXX', pretty, exp)
+            assert.deepEqual(pretty, exp)
+            return
         }
 
         // log('_EXP', exp)
@@ -155,7 +152,7 @@ async function testWF(wf, exp) {
 }
 
 
-function prettyIndecl(indecl) {
+function prettyIndecl_(indecl) {
     let vmorphs = []
     for (let cdict of indecl.cdicts) {
         let morphs = ''
