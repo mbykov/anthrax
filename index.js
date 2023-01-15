@@ -194,7 +194,7 @@ function eachProbechain(dag, br, cdicts, cognates) {
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         let conn = dag.prefseg?.conn || dag.augseg?.seg
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
-        else cfls = filterProbeName(probe, pfls)
+        // else cfls = filterProbeName(probe, pfls)
         // log('_PROBE', probe.rdict, pfls.length, cfls.length, 'DAG', dag.stress, dag.stressidx)
         if (!cfls.length) continue
         if (!probe.trns) probe.trns = ['non regular verb']
