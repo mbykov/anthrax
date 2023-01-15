@@ -113,7 +113,7 @@ async function testWF(wf, exp) {
             let indecl = chain.find(seg=> seg.indecl)
             if (!indecl) continue
             let pretty = prettyIndecl(indecl)
-            log('_XXX', pretty, exp)
+            // log('_XXX', pretty, exp)
             assert.deepEqual(pretty, exp)
             return
         }

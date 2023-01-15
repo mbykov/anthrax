@@ -109,6 +109,9 @@ async function anthraxChains(wf) {
             if (!mainseg) return
             let cdict = mainseg.cdicts[0]
 
+            // chains.push(chain)
+            if (cdict.prefix) cdict.prefix = cdict.prefix.replace(/-/g, '')
+            // log('_xxxxxxxxxxxxxxx', cdict.prefix, prefseg.seg)
             if (cdict.prefix && cdict.prefix == prefseg.seg) {
                 chains.push(chain)
             } if (!cdict.prefix) {
@@ -182,15 +185,17 @@ function eachProbechain(dag, br, cdicts, cognates) {
         let cfls = []
         let flsid = br.fls._id
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stressidx == dag.stressidx)
         // log('_PFLS', probe.rdict, probe.stem, pfls.length)
         // log('_DAG', probe.rdict, dag.stress, dag.stressidx)
+        if (!pfls.length) continue
 
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         let conn = dag.prefseg?.conn || dag.augseg?.seg
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
         else cfls = filterProbeName(probe, pfls)
-        // log('_PROBE', probe.rdict, pfls.length, cfls.length)
+        // log('_PROBE', probe.rdict, pfls.length, cfls.length, 'DAG', dag.stress, dag.stressidx)
         if (!cfls.length) continue
         if (!probe.trns) probe.trns = ['non regular verb']
         // log('_PROBE-CFLS', probe.rdict, probe.stem, cfls.length)
@@ -208,7 +213,7 @@ function makeChain(probe, cdicts, fls, cognates, flsid) {
     chain.push(flsseg)
 
     let rcogns = _.uniq(cognates.map(dict=> dict.rdict)).join(',')
-    let tailseg = {seg: probe.stem, cdicts: [probe], rdict: probe.rdict, cognates, rcogns, mainseg: true}
+    let tailseg = {seg: probe.stem, cdicts: [probe], rdict: probe.rdict, cognates, rcogns, prefix: probe.prefix, mainseg: true}
     if (probe.verb) tailseg.verb = true
     else if (probe.name) tailseg.name = true
     // log('_T', tailseg)
@@ -261,7 +266,7 @@ function filterProbeVerb(dict, pfls, conn) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    // log('_D-verb', dict.rdict, dict.stem, dict.type) // , pfls.length
+    // log('_D-verb', dict.rdict, dict.prefix, dict.stem, dict.type, pfls.length, dict.keys['pres.act.ind']) // , pfls.length
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
@@ -280,8 +285,8 @@ function filterProbeVerb(dict, pfls, conn) {
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
-        // log('_F_OK', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.tense)
 
+        // log('_F_OK', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.tense)
         cfls.push(flex)
     }
     // log('_CFLS', cfls.length)
