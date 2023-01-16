@@ -149,19 +149,22 @@ async function anthraxChains(wf) {
 async function eachBreak(dag, breaks) {
     let chains = []
     // let regdicts = await getRegVerbs(breaks)
-    // let breakids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    // log('_break-ids', breakids)
+    let breakids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
+    log('_break-ids', breakids)
 
     for (let br of breaks) {
         let headdicts = br.headdicts
-        // let head_rdicts_list = headdicts.map(dict=> dict.rdict)
-        // log('_head_rdicts_list', head_rdicts_list)
+
         let taildicts = br.taildicts
         let pfls = br.fls.docs
 
         if (taildicts) {
+            let tail_rdicts_list = taildicts.map(dict=> dict.rdict) // tail_cognates
+            log('_tail_rdicts_list', tail_rdicts_list)
 
         } else {
+            let head_rdicts_list = headdicts.map(dict=> dict.rdict)
+            log('_head_rdicts_list', head_rdicts_list)
             let dictgroups = _.groupBy(headdicts, 'dict') // cdicts из разных словарей
             for (let dict in dictgroups) {
                 let cdicts = dictgroups[dict]
@@ -184,9 +187,10 @@ function eachProbechain(dag, br, cdicts, cognates) {
     for (let probe of probes) {
         let cfls = []
         let flsid = br.fls._id
+        // stress - ἀναπήλαι - aor.act.inf, aor.act.opt - острое, обличенное ударение
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
-        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stressidx == dag.stressidx)
+        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stressidx == dag.stressidx)
         // log('_PFLS', probe.rdict, probe.stem, pfls.length)
         // log('_DAG', probe.rdict, dag.stress, dag.stressidx)
         if (!pfls.length) continue
@@ -270,18 +274,18 @@ function filterProbeVerb(dict, pfls, conn) {
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
-        if (dict.type != flex.type) continue
-        if (dict.syllables != flex.syllables) continue
+        // if (dict.type != flex.type) continue
+        // if (dict.syllables != flex.syllables) continue
         if (flex.part) continue
 
-        // почему if ?
         if (dict.vtypes[flex.stype]) {
             if (flex.mood == 'ind' && dict.vtypes[flex.stype].ind != conn) continue
             else if (flex.mood != 'ind' && dict.vtypes[flex.stype].soi != conn) continue
         }
 
         // log('_F', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.mood)
-        // log('_F', flex)
+        // log('_F', dict.rdict, dict.syllables, flex.syllables)
+
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
