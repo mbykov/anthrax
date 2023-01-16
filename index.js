@@ -149,28 +149,44 @@ async function anthraxChains(wf) {
 async function eachBreak(dag, breaks) {
     let chains = []
     // let regdicts = await getRegVerbs(breaks)
-    let breakids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
-    log('_break-ids', breakids)
+    // let breakids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
+    // log('_break-ids', breakids)
 
     for (let br of breaks) {
+        let breakid = [br.head, br.conn, br.tail, br.fls._id].join('-')
+        log('_break-id_', breakid)
         let headdicts = br.headdicts
-
         let taildicts = br.taildicts
-        let pfls = br.fls.docs
+        let pfls = br.fls.docs.filter(flex=> flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        let flexid = br.fls._id
+        let head_rdicts_list = headdicts.map(dict=> dict.rdict)
+        log('_head_rdicts_list', head_rdicts_list)
 
         if (taildicts) {
             let tail_rdicts_list = taildicts.map(dict=> dict.rdict) // tail_cognates
             log('_tail_rdicts_list', tail_rdicts_list)
+            let dictgroups = _.groupBy(taildicts, 'dict') // cdicts из разных словарей
+            for (let dict in dictgroups) {
+                let cdicts = dictgroups[dict]
+                let probeChains = eachProbechain(cdicts, flexid, pfls, taildicts)
+                if (br.conn) {
+                    let connseg = {seg: br.conn, connector: true}
+                    probeChains.forEach(chain=> chain.unshift(connseg))
+                }
+                let rcogns = headdicts.map(dict=> dict.rdict).join(',')
+                let headseg = {seg: br.head, cdicts: headdicts, rcogns}
+                probeChains.forEach(chain=> chain.unshift(headseg))
+                chains.push(...probeChains)
+            }
 
         } else {
-            let head_rdicts_list = headdicts.map(dict=> dict.rdict)
-            log('_head_rdicts_list', head_rdicts_list)
             let dictgroups = _.groupBy(headdicts, 'dict') // cdicts из разных словарей
             for (let dict in dictgroups) {
                 let cdicts = dictgroups[dict]
                 // let cdicts_list = cdicts.map(dict=> dict.rdict)
                 // log('_cdicts_list', cdicts_list)
-                let probeChains = eachProbechain(dag, br, cdicts, headdicts)
+                // let probeChains = eachProbechain(dag, br, cdicts, headdicts)
+                let probeChains = eachProbechain(cdicts, flexid, pfls, headdicts)
                 chains.push(...probeChains)
             }
         }
@@ -180,16 +196,18 @@ async function eachBreak(dag, breaks) {
     return chains
 }
 
-function eachProbechain(dag, br, cdicts, cognates) {
+// function eachProbechain(dag, br, cdicts, cognates) {
+function eachProbechain(cdicts, flexid, pfls, cognates) {
     let probeChains = []
     let probes = cdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ἅγιος - noun / adjective
 
     for (let probe of probes) {
         let cfls = []
-        let flsid = br.fls._id
+        // let flsid = br.fls._id
         // stress - ἀναπήλαι - aor.act.inf, aor.act.opt - острое, обличенное ударение
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-        let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        pfls = pfls.filter(flex=> flex.type == probe.type)
+        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stressidx == dag.stressidx)
         // log('_PFLS', probe.rdict, probe.stem, pfls.length)
         // log('_DAG', probe.rdict, dag.stress, dag.stressidx)
@@ -204,14 +222,14 @@ function eachProbechain(dag, br, cdicts, cognates) {
         if (!probe.trns) probe.trns = ['non regular verb']
         // log('_PROBE-CFLS', probe.rdict, probe.stem, cfls.length)
 
-        let chain = makeChain(probe, cdicts, cfls, cognates, flsid)
+        let chain = makeChain(probe, cognates, flexid, cfls)
         probeChains.push(chain)
     }
     return probeChains
 }
 
 // function makeChain(br, probe, cdicts, fls, mainseg, headdicts, regdicts, cognates) {
-function makeChain(probe, cdicts, fls, cognates, flsid) {
+function makeChain(probe, cognates, flsid, fls) {
     let chain = []
     let flsseg = {seg: flsid, fls}
     chain.push(flsseg)
