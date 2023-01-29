@@ -206,8 +206,8 @@ function eachProbechain(cdicts, flexid, pfls, cognates) {
         // let flsid = br.fls._id
         // stress - ἀναπήλαι - aor.act.inf, aor.act.opt - острое, обличенное ударение
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type)
-        pfls = pfls.filter(flex=> flex.type == probe.type)
-        // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        // pfls = pfls.filter(flex=> flex.type == probe.type)
+        pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
         // let pfls = br.fls.docs.filter(flex=> flex.type == probe.type && flex.stressidx == dag.stressidx)
         // log('_PFLS', probe.rdict, probe.stem, pfls.length)
         // log('_DAG', probe.rdict, dag.stress, dag.stressidx)
@@ -216,7 +216,7 @@ function eachProbechain(cdicts, flexid, pfls, cognates) {
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         let conn = dag.prefseg?.conn || dag.augseg?.seg
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
-        // else cfls = filterProbeName(probe, pfls)
+        else cfls = filterProbeName(probe, pfls)
         // log('_PROBE', probe.rdict, pfls.length, cfls.length, 'DAG', dag.stress, dag.stressidx)
         if (!cfls.length) continue
         if (!probe.trns) probe.trns = ['non regular verb']
@@ -328,12 +328,12 @@ function filterProbeName(dict, pfls) {
     let cfls = []
     for (let flex of pfls) {
         if (!flex.name) continue
-        if (dict.type != flex.type) continue
+        // if (dict.type != flex.type) continue
         let key = dict.keys.find(dkey=>
-            dkey.dialect == flex.dialect  &&
-                dkey.declension == flex.declension &&
-                dkey.stype == flex.stype
-                // dkey[flex.gend] == flex.key
+            // dkey.dialect == flex.dialect  &&
+            // dkey.declension == flex.declension &&
+            dkey.stype == flex.stype
+            // dkey[flex.gend] == flex.key
         )
         if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
         else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
