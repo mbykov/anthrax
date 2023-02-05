@@ -203,7 +203,8 @@ async function eachBreak(dag, breaks) {
 // function eachProbechain(dag, br, cdicts, cognates) {
 function eachProbechain(cdicts, flexid, pfls, cognates) {
     let probeChains = []
-    let probes = cdicts.filter(dict=> dict.dname == 'wkt')  // || [grdicts[0]] // ἅγιος - noun / adjective
+    let probes = cdicts.filter(dict=> dict.dname == 'wkt')  // ἅγιος - noun / adjective
+    if (!probes.length) probes = cdicts
 
     for (let probe of probes) {
         let cfls = []
@@ -320,18 +321,19 @@ function filterProbeVerb(dict, pfls, conn) {
 }
 
 function filterProbeName(dict, pfls) {
-    f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
+    // f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
     // let dialectnames = _.keys(dict).filter(dname=> !notdialectnames.includes(dname))
     // f('_dialectnames', dialectnames)
     if (!dict.keys) {
-        // log('_NO DICT.KEYS', dict)
-        // это пока что dvr и прочие словари
+        log('_NO DICT KEYS', dict)
+        // это пока что прочие словари
         return []
     }
 
     let cfls = []
     for (let flex of pfls) {
         if (!flex.name) continue
+        // cfls.push(flex)
         // if (dict.type != flex.type) continue
         let key = dict.keys.find(dkey=>
             // dkey.dialect == flex.dialect  &&
@@ -339,8 +341,11 @@ function filterProbeName(dict, pfls) {
             dkey.stype == flex.stype
             // dkey[flex.gend] == flex.key
         )
-        if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
-        else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
+
+        // ==== вот это теперь можно отбросить - потому что stype однозначно определяет flex.key
+        // if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
+        // else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
+
         if (!key) continue
         f('_filter-F', dict.rdict, dict.syllables, flex)
         cfls.push(flex)
