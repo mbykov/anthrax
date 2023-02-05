@@ -50,7 +50,8 @@ export async function anthrax(wf) {
     let termcdicts = await getDicts(keys)
     // log('_TERMS', termcdicts)
     if (termcdicts.length) {
-        let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
+        let rdicts = termcdicts.map(dict=> dict.rdict).join(',')
+        let termchain =  [{seg: cwf, cdicts: termcdicts, rdicts, indecl: true}]
         chains.push(termchain)
         // return chains
     }
