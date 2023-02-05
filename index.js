@@ -44,12 +44,15 @@ export async function anthrax(wf) {
     let cwf = oxia(comb(wf).toLowerCase())
     // let termcdicts = await getTerms(cwf)
     // log('_TD', termcdicts)
-    let termcdicts = await getTermsNew(cwf)
+
+    // let termcdicts = await getTermsNew(cwf)
+    let keys = [cwf]
+    let termcdicts = await getDicts(keys)
     // log('_TERMS', termcdicts)
     if (termcdicts.length) {
         let termchain =  [{seg: cwf, cdicts: termcdicts, indecl: true}]
         chains.push(termchain)
-        return chains
+        // return chains
     }
 
     let dictchains = await anthraxChains(wf)
@@ -462,6 +465,12 @@ async function cleanBreaks(dag, pcwf) {
     let breaks = makeBreaks(pcwf, dag.flexes)
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
+    let indecls = dicts.filter(dict=> dict.indecl)
+
+    if (indecls.length) {
+        let termchains =  [{seg: dag.cwf, cdicts: indecls, indecl: true}]
+        return termchains
+    }
     // dicts = dicts.filter(dict=> !dict.prefix)
     let rdicts = dicts.map(dict=> dict.rdict)
     // log('_break all rdicts:', rdicts, rdicts.length)
@@ -589,7 +598,7 @@ async function findDicts(breaks) {
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
     let keys = _.compact(headkeys.concat(tailkeys))
     // keys = ['δεικν']
-    // log('_findDicts', keys)
+    // log('_findDicts_keys', keys)
     let dicts = await getDicts(keys)
     // log('_findDicts', dicts)
     dag.dictids = _.uniq(dicts.map(ddict=> ddict.stem))
