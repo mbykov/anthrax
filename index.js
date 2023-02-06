@@ -389,7 +389,7 @@ function makeChain_old(br, probe, cdicts, fls) {
     return chain
 }
 
-// compound - προσαναβαίνω; ἀντιπαραγράφω; ἀποδείκνυμι; ἀναβλέπω
+// compound - προσαναβαίνω; ἀντιπαραγράφω; ἀποδείκνυμι; ἀναβλέπω // αὐτοχολωτός,χολωτός
 async function makePrefSegs(dag)  {
     let prefraw = parsePrefix(dag.pcwf)
     if (!prefraw) return
