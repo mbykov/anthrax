@@ -48,11 +48,12 @@ export async function anthrax(wf) {
     // let termcdicts = await getTermsNew(cwf)
     let keys = [cwf]
     let termcdicts = await getDicts(keys)
-    log('_TERMS', termcdicts)
+    log('_TERMS', termcdicts.length)
     if (termcdicts.length) {
         let rdicts = termcdicts.map(dict=> dict.rdict).join(',')
         let termchain =  [{seg: cwf, cdicts: termcdicts, rdicts, indecl: true}]
-        chains.push(termchain)
+        log('_==============:', rdicts)
+    chains.push(termchain)
         // return chains
     }
 
@@ -99,8 +100,9 @@ async function anthraxChains(wf) {
         dag.prefseg = prefseg
         let ptail = plain(prefseg.tail)
         breaks = await cleanBreaks(dag, ptail)
+        if (!breaks.length) continue
         // в цикле по префиксам не может быть cdicts с префиксами, они вычисляются в augs:
-        // log('_DAG:', dag)
+        // log('_==============:')
         // log('_prefseg:', prefseg)
         log('_ptail, breaks:', ptail, breaks)
         let prefchains = await eachBreak(dag, breaks)
@@ -126,6 +128,7 @@ async function anthraxChains(wf) {
         delete dag.prefseg
     }
 
+    // log('_==============:', chains.length)
     let aug = parseAug(dag.pcwf)
     if (aug) {
         dag.aug = aug
@@ -136,7 +139,8 @@ async function anthraxChains(wf) {
     }
 
     breaks = await cleanBreaks(dag, dag.pcwf)
-    // log('_aug breaks:', dag.pcwf, breaks)
+    log('_aug breaks:', dag.pcwf, breaks)
+    if (!breaks.length) return chains
 
     let augchains = await eachBreak(dag, breaks)
 
@@ -148,6 +152,7 @@ async function anthraxChains(wf) {
         if (dag.augseg) chain.unshift(dag.augseg)
         chains.push(chain)
     })
+    // log('_==============:', chains.length)
 
     return chains
 }
@@ -424,8 +429,9 @@ async function makePrefSegs(dag)  {
         }
         let prefdoc = prefdocs.find(prefdoc=> strip(prefdoc.dict) == strip(o.pref))
         if (!prefdoc) {
-            log('_NO PREF_DOC', rawpref, dag.rawwf)
-            throw new Error()
+            log('_NO PREF_DOC', rawpref, dag.rawwf) // τρίτη̣ => τρι
+            // throw new Error()
+            return
         }
         o.docs = [prefdoc]
 
@@ -469,7 +475,7 @@ function removeVowelBeg(wf) {
     return wf
 }
 
-async function getRegVerbs(breaks) {
+async function getRegVerbs_(breaks) {
     let regs = []
     breaks.forEach(br=> {
         let headregs = br.headdicts.filter(dict=> dict.reg)
@@ -486,8 +492,10 @@ async function getRegVerbs(breaks) {
 // clean breaks - только те, которые состоят из обнаруженных в словарях stems
 async function cleanBreaks(dag, pcwf) {
     let breaks = makeBreaks(pcwf, dag.flexes)
+    if (!breaks.length) return []
     // log('_BR', breaks)
     let dicts = await findDicts(breaks)
+    // log('_BR', breaks, dicts)
     // let indecls = dicts.filter(dict=> dict.indecl)
     // if (indecls.length) {
     //     let termchains =  [{seg: dag.cwf, cdicts: indecls, indecl: true}]
