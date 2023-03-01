@@ -16,7 +16,7 @@ else run(full)
 
 async function run(full) {
     let chains = await anthrax(wordform)
-    log('_run_chains_:', chains)
+    log('_run_chains_:', chains.length)
 
     if (!chains.length) {
         log('no result')
@@ -27,7 +27,7 @@ async function run(full) {
     // log('_INDECL_:', indecl)
 
     if (indecl) {
-        // log('_run_indecl_:', indecl)
+        log('_run_indecl_:', indecl)
         let pretty = prettyIndecl(indecl)
         log('_indecl morphs:', pretty)
         if (full) {
@@ -41,7 +41,7 @@ async function run(full) {
         let segs = chain.map(seg=> seg.seg).join('-')
         log('_scheme:', segs)
         let flseg = chain.find(seg=> seg.fls)
-        log('_fls_xx:', flseg.fls.length)
+        // log('_fls_xx:', flseg.fls.length)
         // let mainseg = chain.find(seg=> seg.mainseg)
         // log('_M:', mainseg.cdicts[0].keys)
         for (let flex of flseg.fls) {

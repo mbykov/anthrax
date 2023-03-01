@@ -50,11 +50,12 @@ export async function anthrax(wf) {
     let termcdicts = await getDicts(keys)
     log('_TERMS', termcdicts.length)
     if (termcdicts.length) {
+        termcdicts = termcdicts.filter(doc=> keys.includes(doc.dict))
         let rdicts = termcdicts.map(dict=> dict.rdict).join(',')
         let termchain =  [{seg: cwf, cdicts: termcdicts, rdicts, indecl: true}]
         log('_==============:', rdicts)
-    chains.push(termchain)
-        // return chains
+        chains.push(termchain)
+        return chains
     }
 
     let dictchains = await anthraxChains(wf)
@@ -104,7 +105,8 @@ async function anthraxChains(wf) {
         // в цикле по префиксам не может быть cdicts с префиксами, они вычисляются в augs:
         // log('_==============:')
         // log('_prefseg:', prefseg)
-        log('_ptail, breaks:', ptail, breaks)
+        f('_ptail, breaks:', ptail, breaks)
+        // let outerPrefix = true
         let prefchains = await eachBreak(dag, breaks)
         // log('_prefchains:', prefchains.length)
         // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
@@ -119,16 +121,17 @@ async function anthraxChains(wf) {
             if (cdict.prefix) cdict.prefix = cdict.prefix.replace(/-/g, '')
             // log('_xxxxxxxxxxxxxxx', cdict.prefix, prefseg.seg)
             if (cdict.prefix && cdict.prefix == prefseg.seg) {
-                chains.push(chain)
+                // chains.push(chain)
             } if (!cdict.prefix) {
                 chain.unshift(prefseg)
-                chains.push(chain)
+                // chains.push(chain)
             }
         })
         delete dag.prefseg
     }
 
-    // log('_==============:', chains.length)
+    log('_============== BEFORE AUGS:', chains.length)
+    dag.augcase = true
     let aug = parseAug(dag.pcwf)
     if (aug) {
         dag.aug = aug
@@ -139,9 +142,8 @@ async function anthraxChains(wf) {
     }
 
     breaks = await cleanBreaks(dag, dag.pcwf)
-    log('_aug breaks:', dag.pcwf, breaks)
+    // log('_aug breaks:', dag.pcwf, breaks)
     if (!breaks.length) return chains
-
     let augchains = await eachBreak(dag, breaks)
 
     augchains.forEach(chain=> {
@@ -149,6 +151,8 @@ async function anthraxChains(wf) {
         if (!mainseg) return
         let cdict = mainseg.cdicts[0]
         if (cdict.prefix) return
+        if (cdict.aug != dag.aug) return // ========= это д.б. раньше, в cleanBreak
+        // log('_xxxxxxxxxxxxxxxxxx', cdict.rdict, cdict.aug)
         if (dag.augseg) chain.unshift(dag.augseg)
         chains.push(chain)
     })
@@ -157,10 +161,8 @@ async function anthraxChains(wf) {
     return chains
 }
 
-async function eachBreak(dag, breaks) {
+async function eachBreak(dag, breaks, outerPrefix) {
     let chains = []
-    // let regdicts = await getRegVerbs(breaks)
-    // log('_breaks', breaks)
     // let breakids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
     // log('_break-ids', breakids)
 
@@ -173,7 +175,7 @@ async function eachBreak(dag, breaks) {
         let head_rdicts_list = headdicts.map(dict=> dict.rdict)
         // log('_head_rdicts_list', head_rdicts_list)
 
-        if (taildicts) {
+        if (taildicts && taildicts.length) {
             let tail_rdicts_list = taildicts.map(dict=> dict.rdict) // tail_cognates
             log('_tail_rdicts_list', tail_rdicts_list)
             let dictgroups = _.groupBy(taildicts, 'dict') // cdicts из разных словарей
@@ -189,21 +191,88 @@ async function eachBreak(dag, breaks) {
                 probeChains.forEach(chain=> chain.unshift(headseg))
                 chains.push(...probeChains)
             }
-
         } else {
+            let head_rdicts_list = headdicts.map(dict=> [dict.stem, dict.dname, dict.rdict].join('-')) // head_cognates
+            // log('_head_rdicts_list', br.head, br.fls._id, head_rdicts_list)
+
+            // outerPrefix ???
+            // здесь сложнее - м.б. вариант, где целое слово с префиксом, а м.б. составной случай, где префикс внешний
+            // разбить на разные функции?
+            // характерные примеры и общий test-стартер
+
+            let stemgroups = _.groupBy(headdicts, 'stem')
+            for (let stem in stemgroups) {
+                let cognates = stemgroups[stem]
+                let dictgroups = _.groupBy(cognates, 'dict') // cdicts из разных словарей
+                for (let dict in dictgroups) {
+                    let cdicts = dictgroups[dict] // dict-stem-group
+                    cdicts = cdicts.filter(dict=> {
+                        if (dag.augcase) {
+                            if (dict.prefix) return
+                            if (dag.aug && dict.aug == dag.aug) return dict
+                            else if (!dag.aug && !dict.aug) return dict
+                        } else {
+                            if (dict.aug) return
+                            // xxx etc
+                        }
+                    })
+                    // итого, имею корректные cdicts и cognates
+                    // начать со списка глаголов в dvr, стемы обязаны совпасть - и ἀλέγω - нет aug
+                    if (!cdicts.length) continue
+                    let cdicts_rdicts = cdicts.map(doc=> [doc.dname, doc.rdict].join('-'))
+                    log('_cdicts_rdicts', br.head, stem, dict, cdicts_rdicts, br.fls._id)
+
+                    // в cdicts выбрать probe-wkt
+                    let probe = cdicts.find(dict=> dict.dname == 'wkt') || cdicts[0]
+
+                    // далее здесь же фильтры на probe
+                    // объединить cdicts из всех словарей
+                    // и простой makeChain
+
+                    let cfls = []
+                    pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+                    if (!pfls.length) continue
+
+                    // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
+                    let conn = dag.prefseg?.conn || dag.aug
+                    if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
+                    else cfls = filterProbeName(probe, pfls)
+
+                    // log('_PROBE', probe.rdict, pfls.length, cfls.length, 'DAG', dag.stress, dag.stressidx)
+                    if (!cfls.length) continue
+                    // if (!cdicts.length) log('_PROBE-CDICTS', probe.rdict, probe.stem, 'cdicts', cdicts.length)
+
+                    let chain = makeChain(probe, cdicts, cognates, flexid, cfls)
+                    chains.push(chain)
+                }
+            }
+
+            continue
+
+            // а здесь в группе stem м.б. разный:
             let dictgroups = _.groupBy(headdicts, 'dict') // cdicts из разных словарей
             for (let dict in dictgroups) {
                 let cdicts = dictgroups[dict]
-                // let cdicts_list = cdicts.map(dict=> dict.rdict)
+                cdicts = cdicts.filter(dict=> {
+                    if (dag.aug) {
+                        if (dict.aug == dag.aug) return dict
+                    } else {
+                        if (!dict.aug) return dict
+                    }
+                })
+                if (!cdicts.length) continue
+                let cdicts_list = cdicts.map(dict=> dict.rdict+ '-' + dict.dname)
                 // log('_cdicts_list', cdicts_list)
                 // TODO: сделать метод - если stem.length < 2, проверить первый символ окнчания
                 let cognates = headdicts.filter(dict=> {
                     if (dag.aug)  {
                         if (dict.aug || dict.prefix) return dict
                     } else {
-                        return dict
+                        if (!dict.aug && !dict.prefix) return dict
+                        // return dict
                     }
                 })
+                // log('_cognates', dict, cognates.length)
 
                 let probeChains = eachProbechain(cdicts, flexid, pfls, cognates)
                 chains.push(...probeChains)
@@ -239,12 +308,14 @@ function eachProbechain(cdicts, flexid, pfls, cognates) {
         // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
         let conn = dag.prefseg?.conn || dag.augseg?.seg
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
-        // else cfls = filterProbeName(probe, pfls)
+        else cfls = filterProbeName(probe, pfls)
 
         // log('_PROBE', probe.rdict, pfls.length, cfls.length, 'DAG', dag.stress, dag.stressidx)
         if (!cfls.length) continue
         if (!probe.trns) probe.trns = ['non regular verb']
-        // log('_PROBE-CFLS', probe.rdict, probe.stem, cfls.length)
+        else cdicts = cognates.filter(doc=> doc.dict == probe.dict)
+        if (!cdicts.length) continue
+        // if (!cdicts.length) log('_PROBE-CDICTS', probe.rdict, probe.stem, 'cdicts', cdicts.length)
 
         let chain = makeChain(probe, cdicts, cognates, flexid, cfls)
         probeChains.push(chain)
@@ -281,29 +352,36 @@ function makeChain(probe, cdicts, cognates, flsid, fls) {
     return chain
 }
 
-function filterProbePart(dict, pfls) {
-    // log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
-    if (!dict.verb || !dict.reg) return []
-    let cfls = []
-    let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
-    // log('_Part keys', dict.rdict) // , dkeys
-    for (let flex of pfls) {
-        // if (!flex) log('_________________NO FLEX', dict.rdict)
-        if (!flex.part) continue
-
-        // if (dict.type != flex.type) continue
-        // log('_PF', flex.term)
-        cfls.push(flex)
-
-        let fkeys = dkeys[flex.type]?.[flex.tense]
-        // log('_Fkeys', flex.type, flex.tense, fkeys)
-        if (!fkeys) continue
-        // log('_PF', flex.key)
-        if (!dkeys.includes(flex.terms)) continue
-        cfls.push(flex)
-        // log('_P-KEYS', partkeys)
+function filterProbeName(dict, pfls) {
+    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.keys) // , dict.keys
+    // let dialectnames = _.keys(dict).filter(dname=> !notdialectnames.includes(dname))
+    // f('_dialectnames', dialectnames)
+    if (!dict.keys) {
+        log('_NO DICT KEYS', dict)
+        // это пока что прочие словари
+        return []
     }
-    // log('_P-CFLS', cfls.length)
+
+    let cfls = []
+    for (let flex of pfls) {
+        if (!flex.name) continue
+        // cfls.push(flex)
+        // if (dict.type != flex.type) continue
+        let key = dict.keys.find(dkey=>
+            // dkey.dialect == flex.dialect  &&
+            // dkey.declension == flex.declension &&
+            dkey.stype == flex.stype
+            // dkey[flex.gend] == flex.key
+        )
+
+        // ==== вот это теперь можно отбросить - потому что stype однозначно определяет flex.key
+        // if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
+        // else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
+
+        if (!key) continue
+        f('_filter-F', dict.rdict, flex)
+        cfls.push(flex)
+    }
     return cfls
 }
 
@@ -342,36 +420,29 @@ function filterProbeVerb(dict, pfls, conn) {
     return cfls
 }
 
-function filterProbeName(dict, pfls) {
-    // f('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname) // , dict.keys
-    // let dialectnames = _.keys(dict).filter(dname=> !notdialectnames.includes(dname))
-    // f('_dialectnames', dialectnames)
-    if (!dict.keys) {
-        log('_NO DICT KEYS', dict)
-        // это пока что прочие словари
-        return []
-    }
-
+function filterProbePart(dict, pfls) {
+    // log('_filter-Dict-Part =====', dict.rdict, dict.stem, dict.type, dict.dname)
+    if (!dict.verb || !dict.reg) return []
     let cfls = []
+    let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
+    // log('_Part keys', dict.rdict) // , dkeys
     for (let flex of pfls) {
-        if (!flex.name) continue
-        // cfls.push(flex)
+        // if (!flex) log('_________________NO FLEX', dict.rdict)
+        if (!flex.part) continue
+
         // if (dict.type != flex.type) continue
-        let key = dict.keys.find(dkey=>
-            // dkey.dialect == flex.dialect  &&
-            // dkey.declension == flex.declension &&
-            dkey.stype == flex.stype
-            // dkey[flex.gend] == flex.key
-        )
-
-        // ==== вот это теперь можно отбросить - потому что stype однозначно определяет flex.key
-        // if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
-        // else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
-
-        if (!key) continue
-        f('_filter-F', dict.rdict, dict.syllables, flex)
+        // log('_PF', flex.term)
         cfls.push(flex)
+
+        let fkeys = dkeys[flex.type]?.[flex.tense]
+        // log('_Fkeys', flex.type, flex.tense, fkeys)
+        if (!fkeys) continue
+        // log('_PF', flex.key)
+        if (!dkeys.includes(flex.terms)) continue
+        cfls.push(flex)
+        // log('_P-KEYS', partkeys)
     }
+    // log('_P-CFLS', cfls.length)
     return cfls
 }
 
@@ -514,7 +585,7 @@ async function cleanBreaks(dag, pcwf) {
     }
 
     let vow = (prefcon) ? prefcon.seg : dag.aug ? dag.aug : ''
-    f('_VOW-connector:', vow)
+    log('_VOW-connector:', vow)
 
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
@@ -524,17 +595,15 @@ async function cleanBreaks(dag, pcwf) {
         // log('_HEAD-RDICTS', br.head, rdicts)
         // теперь aug в диалектах
         // headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
-
-        rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS_2', rdicts)
         if (headdicts.length) br.headdicts = headdicts
 
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
-
         taildicts = taildicts.filter(dict=> dict.stem.length > 2) // очень много лишних, маловероятных схем, ex: γαλ-α-ξ-ίου
         // taildicts = taildicts.filter(dict=> !dict.pos) // спец.формы
 
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
+
         if (taildicts.length) {
             headdicts = headdicts.filter(dict=> dict.stem.length > 2)
             taildicts = taildicts.filter(dict=> !dict.pos) // спец.формы
