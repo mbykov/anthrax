@@ -107,7 +107,7 @@ async function anthraxChains(wf) {
         // log('_prefseg:', prefseg)
         f('_ptail, breaks:', ptail, breaks)
         // let outerPrefix = true
-        let prefchains = await eachBreak(dag, breaks)
+        let prefchains = [ ] //await eachBreak(dag, breaks)
         // log('_prefchains:', prefchains.length)
         // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
         delete prefseg.tail
@@ -130,7 +130,7 @@ async function anthraxChains(wf) {
         delete dag.prefseg
     }
 
-    log('_============== BEFORE AUGS:', chains.length)
+    log('_============== BEFORE AUGS:', chains.length, dag.pcwf)
     dag.augcase = true
     let aug = parseAug(dag.pcwf)
     if (aug) {
@@ -139,19 +139,22 @@ async function anthraxChains(wf) {
         dag.pcwf = dag.pcwf.replace(re, '')
         let augseg = {seg: dag.aug, aug: true}
         dag.augseg = augseg
+    } else {
+        dag.aug = false
     }
+    // log('_============== AUG:', dag.pcwf, dag.aug)
 
     breaks = await cleanBreaks(dag, dag.pcwf)
     // log('_aug breaks:', dag.pcwf, breaks)
     if (!breaks.length) return chains
     let augchains = await eachBreak(dag, breaks)
+    // log('_PCH', augchains.length)
 
     augchains.forEach(chain=> {
         let mainseg = chain.find(seg=> seg.mainseg)
         if (!mainseg) return
         let cdict = mainseg.cdicts[0]
         if (cdict.prefix) return
-        if (cdict.aug != dag.aug) return // ========= это д.б. раньше, в cleanBreak
         // log('_xxxxxxxxxxxxxxxxxx', cdict.rdict, cdict.aug)
         if (dag.augseg) chain.unshift(dag.augseg)
         chains.push(chain)
@@ -195,6 +198,8 @@ async function eachBreak(dag, breaks, outerPrefix) {
             let head_rdicts_list = headdicts.map(dict=> [dict.stem, dict.dname, dict.rdict].join('-')) // head_cognates
             // log('_head_rdicts_list', br.head, br.fls._id, head_rdicts_list)
 
+            if (!dag.augcase) continue
+            // начать со списка глаголов в dvr, стемы обязаны совпасть - и ἀλέγω - нет aug
             // outerPrefix ???
             // здесь сложнее - м.б. вариант, где целое слово с префиксом, а м.б. составной случай, где префикс внешний
             // разбить на разные функции?
@@ -202,87 +207,58 @@ async function eachBreak(dag, breaks, outerPrefix) {
 
             let stemgroups = _.groupBy(headdicts, 'stem')
             for (let stem in stemgroups) {
+                if (stem != 'λεγ') continue
                 let cognates = stemgroups[stem]
                 let dictgroups = _.groupBy(cognates, 'dict') // cdicts из разных словарей
                 for (let dict in dictgroups) {
                     let cdicts = dictgroups[dict] // dict-stem-group
-                    cdicts = cdicts.filter(dict=> {
-                        if (dag.augcase) {
-                            if (dict.prefix) return
-                            if (dag.aug && dict.aug == dag.aug) return dict
-                            else if (!dag.aug && !dict.aug) return dict
-                        } else {
-                            if (dict.aug) return
-                            // xxx etc
-                        }
-                    })
                     // итого, имею корректные cdicts и cognates
-                    // начать со списка глаголов в dvr, стемы обязаны совпасть - и ἀλέγω - нет aug
-                    if (!cdicts.length) continue
-                    let cdicts_rdicts = cdicts.map(doc=> [doc.dname, doc.rdict].join('-'))
-                    log('_cdicts_rdicts', br.head, stem, dict, cdicts_rdicts, br.fls._id)
+                    cdicts = cdicts.filter(dict=> {
+                        if (dict.prefix) return
+                        // log('_xxxxxx', dag.aug, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
+                        // if (dict.firstvowel) log('_DFV', dict)
+                        if (dag.aug && !dict.firstvowel) return
+                        else if (!dag.aug && dict.firstvowel) return
+                        // log('_yyyyyy', dag.aug, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
+                        return dict
+                    })
 
-                    // в cdicts выбрать probe-wkt
-                    let probe = cdicts.find(dict=> dict.dname == 'wkt') || cdicts[0]
+                    let pchains = tryDictFls(cdicts, cognates, pfls, flexid)
+                    chains.push(...pchains)
 
-                    // далее здесь же фильтры на probe
-                    // объединить cdicts из всех словарей
-                    // и простой makeChain
-
-                    let cfls = []
-                    pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
-                    if (!pfls.length) continue
-
-                    // if (probe.verb) cfls.push(...filterProbePart(probe, pfls))
-                    let conn = dag.prefseg?.conn || dag.aug
-                    if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
-                    else cfls = filterProbeName(probe, pfls)
-
-                    // log('_PROBE', probe.rdict, pfls.length, cfls.length, 'DAG', dag.stress, dag.stressidx)
-                    if (!cfls.length) continue
-                    // if (!cdicts.length) log('_PROBE-CDICTS', probe.rdict, probe.stem, 'cdicts', cdicts.length)
-
-                    let chain = makeChain(probe, cdicts, cognates, flexid, cfls)
-                    chains.push(chain)
                 }
             }
-
-            continue
-
-            // а здесь в группе stem м.б. разный:
-            let dictgroups = _.groupBy(headdicts, 'dict') // cdicts из разных словарей
-            for (let dict in dictgroups) {
-                let cdicts = dictgroups[dict]
-                cdicts = cdicts.filter(dict=> {
-                    if (dag.aug) {
-                        if (dict.aug == dag.aug) return dict
-                    } else {
-                        if (!dict.aug) return dict
-                    }
-                })
-                if (!cdicts.length) continue
-                let cdicts_list = cdicts.map(dict=> dict.rdict+ '-' + dict.dname)
-                // log('_cdicts_list', cdicts_list)
-                // TODO: сделать метод - если stem.length < 2, проверить первый символ окнчания
-                let cognates = headdicts.filter(dict=> {
-                    if (dag.aug)  {
-                        if (dict.aug || dict.prefix) return dict
-                    } else {
-                        if (!dict.aug && !dict.prefix) return dict
-                        // return dict
-                    }
-                })
-                // log('_cognates', dict, cognates.length)
-
-                let probeChains = eachProbechain(cdicts, flexid, pfls, cognates)
-                chains.push(...probeChains)
-            }
         }
-
     }
     // return []
     return chains
 }
+
+function tryDictFls(cdicts, cognates, pfls, flexid) {
+    let poses = ['verb', 'name']
+    let pchains = []
+    for (let pos of poses) {
+        let cpos = cdicts.filter(dict=> dict[pos])
+        if (!cpos.length) continue
+        let cpos_rdicts = cpos.map(doc=> [doc.dname, doc.rdict].join('-'))
+        // log('_cpos_rdicts', br.head, dict, cdicts_rdicts, br.fls._id)
+        let probe = cpos.find(dict=> dict.dname == 'wkt') || cdicts[0]
+        // log('_probe', probe.rdict, dag.aug)
+
+        let cfls = []
+        pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        if (!pfls.length) continue
+        let connector = dag.prefseg?.conn || dag.aug
+        if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, connector))
+        else cfls = filterProbeName(probe, pfls)
+        if (!cfls.length) continue
+        let chain = makeChain(probe, cdicts, cognates, flexid, cfls)
+        pchains.push(chain)
+    } // pos
+    return pchains
+}
+
+
 
 // function eachProbechain(dag, br, cdicts, cognates) {
 function eachProbechain(cdicts, flexid, pfls, cognates) {
@@ -392,28 +368,31 @@ function filterProbeVerb(dict, pfls, conn) {
     let cfls = []
     // log('_D-verb', dict.dname, dict.rdict, dict.prefix, dict.stem, dict.type, pfls.length, dict.vtypes, conn) // , pfls.length
 
-    if (!dict.vtypes) return [] // DVR, как тут быть?
+    if (!dict.vtypes) return []
 
     for (let flex of pfls) {
         if (!!dict.reg != !!flex.reg) continue
-        // if (dict.type != flex.type) continue
+        if (dict.type != flex.type) continue
         // if (dict.syllables != flex.syllables) continue
         if (flex.part) continue
 
-        // log('_CONN', flex.stype, dict.vtypes[flex.stype], conn)
         if (dict.vtypes[flex.stype]) {
             if (flex.mood == 'ind' && dict.vtypes[flex.stype].ind != conn) continue
             else if (flex.mood != 'ind' && dict.vtypes[flex.stype].soi != conn) continue
+            // log('_xxxxxxxxxxxxxxxxxxx', dict.rdict, flex.stype, dict.vtypes[flex.stype], 'conn:', conn, dict.vtypes[flex.stype].ind != conn)
+        } else {
+            // log('_FLEX', flex)
+            if (conn) continue
+            // log('_yyyyyyyyyyyyyyyyyyyyy', dict.rdict, flex.stype, dict.vtypes[flex.stype], 'conn:', conn, !!conn, !!flex.conn, !!conn != !!flex.conn)
         }
 
-        // log('_F', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.mood)
-        // log('_F', dict.rdict, dict.syllables, flex.syllables)
+        // log('_F', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  '->', dict.vtypes[flex.stype], 'CONN:', conn, flex.mood)
 
         let fkeys = dkeys[flex.tense]
         if (!fkeys) continue
         if (!fkeys.includes(flex.key)) continue
 
-        // log('_F_OK', dict.rdict, dict.stem, dict.type, '_vtypes', flex.stype,  dict.vtypes[flex.stype], 'CONN:', conn, flex.numper, flex.tense)
+        // log('_F_OK', dict.rdict, dict.stem, dict.type, '_vtypes', flex.time, flex.stype,  '->', dict.vtypes[flex.stype], 'CONN:', conn, flex.tense)
         cfls.push(flex)
     }
     // log('_CFLS', cfls.length)
