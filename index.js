@@ -88,7 +88,7 @@ async function anthraxChains(wf) {
     dag.pcwf = plain(dag.cwf)
     d('_pcwf', dag.pcwf)
 
-    // ἀδικέω - odd δικάζω
+    // ἀδικέω - odd δικάζω; παραναβαίνω
     // проверить ἀνθράκινα, д.б. два результата
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
     let prefsegs = await makePrefSegs(dag) || []
@@ -104,12 +104,12 @@ async function anthraxChains(wf) {
         if (!breaks.length) continue
         // в цикле по префиксам не может быть cdicts с префиксами, они вычисляются в augs:
         // log('_==============:')
-        // log('_prefseg:', prefseg)
+        log('_prefseg_______________:', prefseg)
         f('_ptail, breaks:', ptail, breaks)
         // let outerPrefix = true
-        let prefchains = [ ] //await eachBreak(dag, breaks)
+        let prefchains = await eachBreak(dag, breaks)
         // log('_prefchains:', prefchains.length)
-        // это временно, до компаундов. Потом makePrefSegs будет создавать сразу prefSegs:
+        // это временно, до компаундов. Потом make_PrefSegs будет создавать сразу prefSegs:
         delete prefseg.tail
 
         prefchains.forEach(chain=> {
@@ -129,6 +129,8 @@ async function anthraxChains(wf) {
         })
         delete dag.prefseg
     }
+
+    return chains
 
     log('_============== BEFORE AUGS:', chains.length, dag.pcwf)
     dag.augcase = true
@@ -180,7 +182,7 @@ async function eachBreak(dag, breaks, outerPrefix) {
 
         if (taildicts && taildicts.length) {
             let tail_rdicts_list = taildicts.map(dict=> dict.rdict) // tail_cognates
-            log('_tail_rdicts_list', tail_rdicts_list)
+            // log('_tail_rdicts_list', tail_rdicts_list)
             let dictgroups = _.groupBy(taildicts, 'dict') // cdicts из разных словарей
             for (let dict in dictgroups) {
                 let cdicts = dictgroups[dict]
@@ -196,38 +198,34 @@ async function eachBreak(dag, breaks, outerPrefix) {
             }
         } else {
             let head_rdicts_list = headdicts.map(dict=> [dict.stem, dict.dname, dict.rdict].join('-')) // head_cognates
-            // log('_head_rdicts_list', br.head, br.fls._id, head_rdicts_list)
-
-            if (!dag.augcase) continue
-            // начать со списка глаголов в dvr, стемы обязаны совпасть - и ἀλέγω - нет aug
-            // outerPrefix ???
-            // здесь сложнее - м.б. вариант, где целое слово с префиксом, а м.б. составной случай, где префикс внешний
-            // разбить на разные функции?
-            // характерные примеры и общий test-стартер
+            log('_head_rdicts_list_only', br.head, br.fls._id, head_rdicts_list)
 
             let stemgroups = _.groupBy(headdicts, 'stem')
             for (let stem in stemgroups) {
-                if (stem != 'λεγ') continue
                 let cognates = stemgroups[stem]
                 let dictgroups = _.groupBy(cognates, 'dict') // cdicts из разных словарей
                 for (let dict in dictgroups) {
                     let cdicts = dictgroups[dict] // dict-stem-group
                     // итого, имею корректные cdicts и cognates
                     cdicts = cdicts.filter(dict=> {
-                        if (dict.prefix) return
-                        // log('_xxxxxx', dag.aug, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
+                        // if (dict.prefix) return
+                        // log('_xxxxxx', dag.aug, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel, 'PREF-CONN', dag.prefseg.seg, dag.prefseg.conn)
                         // if (dict.firstvowel) log('_DFV', dict)
                         if (dag.aug && !dict.firstvowel) return
                         else if (!dag.aug && dict.firstvowel) return
                         // log('_yyyyyy', dag.aug, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
+                        // log('_=====================', stem, dag.prefseg.seg, dict.prefix)
+                        if (dag.prefseg.seg && !dict.prefix) return
                         return dict
                     })
+                    if (!cdicts.length) continue
+                    log('_zzzz', cdicts.length, stem, dict, 'PREF-CONN', dag.prefseg.seg, dag.prefseg.conn)
 
                     let pchains = tryDictFls(cdicts, cognates, pfls, flexid)
                     chains.push(...pchains)
-
-                }
-            }
+                    if (pchains.length) log('_head_only_chains_', stem, dict, pchains.length)
+                } // dict
+            } // stem
         }
     }
     // return []
@@ -243,14 +241,15 @@ function tryDictFls(cdicts, cognates, pfls, flexid) {
         let cpos_rdicts = cpos.map(doc=> [doc.dname, doc.rdict].join('-'))
         // log('_cpos_rdicts', br.head, dict, cdicts_rdicts, br.fls._id)
         let probe = cpos.find(dict=> dict.dname == 'wkt') || cdicts[0]
-        // log('_probe', probe.rdict, dag.aug)
 
         let cfls = []
         pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
         if (!pfls.length) continue
         let connector = dag.prefseg?.conn || dag.aug
+        // log('_probe', probe.rdict, '_conn', connector)
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, connector))
         else cfls = filterProbeName(probe, pfls)
+        // log('_cfls.length', cfls.length)
         if (!cfls.length) continue
         let chain = makeChain(probe, cdicts, cognates, flexid, cfls)
         pchains.push(chain)
@@ -261,7 +260,7 @@ function tryDictFls(cdicts, cognates, pfls, flexid) {
 
 
 // function eachProbechain(dag, br, cdicts, cognates) {
-function eachProbechain(cdicts, flexid, pfls, cognates) {
+function eachProbechain_(cdicts, flexid, pfls, cognates) {
     let probeChains = []
     let probes = cdicts.filter(dict=> dict.dname == 'wkt')  // ἅγιος - noun / adjective
     if (!probes.length) probes = cdicts
@@ -375,6 +374,7 @@ function filterProbeVerb(dict, pfls, conn) {
         if (dict.type != flex.type) continue
         // if (dict.syllables != flex.syllables) continue
         if (flex.part) continue
+        // cfls.push(flex)
 
         if (dict.vtypes[flex.stype]) {
             if (flex.mood == 'ind' && dict.vtypes[flex.stype].ind != conn) continue
