@@ -94,11 +94,21 @@ async function anthraxChains(wf) {
     let prefsegs = makePrefSegs(dag) || []
     log('_PREF_SEGS', prefsegs.length)
 
-    let ptails = makePrefTails(dag.cwf)
-    log('_PREF_TAILS', ptails)
-
     let chains = []
     let breaks = []
+
+    let preftails = makePrefTails(dag.cwf)
+    for (let preftail of preftails) {
+        dag.preftail = preftail
+        let ptail = plain(preftail.tail)
+        breaks = await cleanBreaks(dag, ptail)
+        let prefchains = await eachBreak(dag, breaks)
+        log('_prefchains:', ptail, prefchains.length)
+        if (!prefchains.length) continue
+        chains.push(...prefchains)
+    }
+
+
 
     // TODO: тут не цикл. Тут цепь tails, [baino, nabaino]. Берем кратчайчий
     // И потом еще запрос, проверить anabaino и prosanabaino
@@ -218,7 +228,11 @@ async function eachBreak(dag, breaks) {
                     let cdicts = dictgroups[dict] // dict-stem-group
                     // итого, имею корректные cdicts и cognates
                     cdicts = cdicts.filter(dict=> {
-                        if (dag.prefseg) {
+                        if (dag.preftail) {
+                            if (dict.prefix && strip(dict.prefix) == strip(dag.preftail.pref)) return dict
+                        }
+
+                        if (dag.prefseg && false) {
                             if (!dict.verb) return
                             let ok = false
                             let lastdict = _.last(dag.prefseg.docs).dict
@@ -228,6 +242,7 @@ async function eachBreak(dag, breaks) {
                             // log('_=== PREF SEG ===', dag.prefseg.seg, stem, dict.rdict)
                             if (ok) return dict
                         } else {
+                            return // TODO: ================== del
                             log('_=== AUG SEG', stem, dict.rdict)
                             if (dag.aug && !dict.firstvowel) return
                             else if (!dag.aug && dict.firstvowel) return
@@ -734,5 +749,5 @@ function makePrefTails(cwf) {
         tails.push(taildoc)
     })
 
-    return tails
+    return tails.reverse()
 }
