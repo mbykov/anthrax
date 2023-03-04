@@ -92,27 +92,37 @@ async function anthraxChains(wf) {
     // проверить ἀνθράκινα, д.б. два результата
     // prefix м.б. обманом - καθαίρω, в wkt-словаре он будет καθαιρ-ω, а в lsj, интересно?
     let prefsegs = makePrefSegs(dag) || []
-    // log('_PREF_SEGS', prefsegs)
+    log('_PREF_SEGS', prefsegs.length)
+
+    let ptails = makePrefTails(dag.cwf)
+    log('_PREF_TAILS', ptails)
 
     let chains = []
     let breaks = []
 
+    // TODO: тут не цикл. Тут цепь tails, [baino, nabaino]. Берем кратчайчий
+    // И потом еще запрос, проверить anabaino и prosanabaino
+    // затем сформировать все цепочки
+    // должно быть {pdocs, tail}
+
+    prefsegs = []
+
     for await (let prefseg of prefsegs) {
+        log('_prefseg___________:', prefseg)
+        continue
         dag.prefseg = prefseg
         let ptail = plain(prefseg.tail)
         breaks = await cleanBreaks(dag, ptail)
         if (!breaks.length) continue
-        // log('_==============:')
-        log('_prefseg_______________:', prefseg)
         f('_ptail, breaks:', ptail, breaks)
 
         let prefchains = await eachBreak(dag, breaks)
-        // log('_prefchains:', prefchains.length)
+        log('_prefchains:', prefseg.seg, prefchains.length)
         // это временно, до компаундов. Потом make_PrefSegs будет создавать сразу prefSegs:
         delete prefseg.tail
 
         prefchains.forEach(chain=> {
-            log('_prefchain', chain)
+            // log('_prefchain', chain)
             let mainseg = chain.find(seg=> seg.mainseg)
             if (!mainseg) return
             let cdict = mainseg.cdicts[0]
@@ -126,12 +136,12 @@ async function anthraxChains(wf) {
                 chains.push(chain)
             }
         })
-        delete dag.prefseg
     }
 
-    // return chains
+    return chains
 
     log('_============== BEFORE AUGS:', chains.length, dag.pcwf)
+    delete dag.prefseg
     // dag.augcase = true
     let aug = parseAug(dag.pcwf)
     if (aug) {
@@ -198,7 +208,7 @@ async function eachBreak(dag, breaks) {
             }
         } else {
             let head_rdicts_list = headdicts.map(dict=> [dict.stem, dict.dname, dict.rdict].join('-')) // head_cognates
-            log('_head_rdicts_list_only', br.head, br.fls._id, head_rdicts_list.length)
+            log('_head_rdicts_list_only', dag.prefseg?.seg, br.head, br.fls._id, head_rdicts_list.length)
 
             let stemgroups = _.groupBy(headdicts, 'stem')
             for (let stem in stemgroups) {
@@ -210,10 +220,13 @@ async function eachBreak(dag, breaks) {
                     cdicts = cdicts.filter(dict=> {
                         if (dag.prefseg) {
                             if (!dict.verb) return
+                            let ok = false
                             let lastdict = _.last(dag.prefseg.docs).dict
-                            if (dict.prefix && dict.prefix != lastdict) return
-                            // else
-                            log('_=== PREF SEG', stem, dict.rdict)
+                            // if (dict.prefix && dict.prefix != lastdict) return
+                            if (dict.prefix && dict.prefix == lastdict) ok = true // ἀναβαινω - ἀν-βαιν-ω
+                            // if ()
+                            // log('_=== PREF SEG ===', dag.prefseg.seg, stem, dict.rdict)
+                            if (ok) return dict
                         } else {
                             log('_=== AUG SEG', stem, dict.rdict)
                             if (dag.aug && !dict.firstvowel) return
@@ -252,8 +265,10 @@ function tryDictFls(cdicts, cognates, pfls, flexid) {
         pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
         if (!pfls.length) continue
         let connector = dag.prefseg?.conn || dag.aug
-        if (dag.prefseg && !probe.prefix) connector = '' // dict = stem при анализе слова с префиксом
-        log('_probe', probe.rdict, '_conn', connector)
+        if (dag.prefseg && !probe.prefix) connector = '' // dict - только stem при анализе слова с префиксом
+
+        // log('_probe', probe.rdict, '_conn', connector)
+
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, connector))
         else cfls = filterProbeName(probe, pfls)
         // log('_cfls.length', cfls.length)
@@ -411,7 +426,6 @@ function filterProbePart(dict, pfls) {
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     // log('_Part keys', dict.rdict) // , dkeys
     for (let flex of pfls) {
-        // if (!flex) log('_________________NO FLEX', dict.rdict)
         if (!flex.part) continue
 
         // if (dict.type != flex.type) continue
@@ -505,14 +519,8 @@ async function cleanBreaks(dag, pcwf) {
     let dicts = await findDicts(breaks)
     // log('_BR', breaks, dicts)
 
-    let prefcon
-    if (dag.prefsegs) {
-        let conns = dag.prefsegs.filter(seg=> seg.conn)
-        prefcon = _.last(conns)
-    }
-
-    let vow = (prefcon) ? prefcon.seg : dag.aug ? dag.aug : ''
-    // log('_VOW-connector:', vow)
+    // let vow = (dag.prefseg) ? dag.prefseg.conn : dag.aug ? dag.aug : ''
+    // log('_VOW-connector:', dag.prefseg.seg, vow)
 
     breaks.forEach(br=> {
         // log('_BR', br.head, br.conn, br.tail, 'fls', br.fls._id)
@@ -520,20 +528,19 @@ async function cleanBreaks(dag, pcwf) {
         // if (br.head == 'γοραζ') log('_XXXX', br.head, headdicts.length)
         let rdicts = headdicts.map(dict=> dict.rdict)
         // log('_HEAD-RDICTS', br.head, rdicts)
-        // теперь aug в диалектах
-        // headdicts = headdicts.filter(dict=> vowDictMapping(vow, dict))
-        // log('_HEAD-RDICTS_2', rdicts)
         if (headdicts.length) br.headdicts = headdicts
 
         let taildicts = dicts.filter(dict=> dict.stem == br.tail)
         taildicts = taildicts.filter(dict=> dict.stem.length > 2) // очень много лишних, маловероятных схем, ex: γαλ-α-ξ-ίου
-        // taildicts = taildicts.filter(dict=> !dict.pos) // спец.формы
 
         taildicts = taildicts.filter(dict=> vowDictMapping(br.conn, dict))
 
         if (taildicts.length) {
             headdicts = headdicts.filter(dict=> dict.stem.length > 2)
-            taildicts = taildicts.filter(dict=> !dict.pos) // спец.формы
+            taildicts = taildicts.filter(dict=> {
+                if (dict.name) return true
+                else if (dict.verb && dict.reg) return true
+            })
             headdicts = headdicts.filter(dict=> {
                 if (dict.name) return true
                 else if (dict.verb && dict.reg) return true
@@ -689,4 +696,43 @@ function makePrefSegs(dag)  {
         segs.push(seg)
     })
     return segs
+}
+
+function makePrefTails(cwf) {
+    let pcwf = plain(cwf)
+    let prefraw = parsePrefix(pcwf)
+    if (!prefraw) return
+    let prefs = prefraw.split('-')
+    if (prefs.join('') == pcwf) return []
+
+    let tails = []
+    let tail = cwf
+    let full = ''
+    let tdocs = []
+    prefs.forEach(pref=> {
+        full += pref
+        let repref = new RegExp('^' + pref)
+        tail = tail.replace(repref, '')
+        let ptail = plain(tail)
+        if (tail == cwf) tail = ptail.replace(repref, '')
+        // log('_================', pref, cwf, tail)
+        let shorttail = removeVowelBeg(tail)
+        let retail = new RegExp(shorttail + '$')
+        let conn = tail.replace(retail, '')
+
+        if (pref == 'δι') conn = ''
+        else if (pref.endsWith('ι')) {
+            conn = 'ι'
+            pref = pref.replace(/ι$/, '')
+        }
+
+        let taildoc = {pref, conn, tail: shorttail}
+        if (full != pref) taildoc.full = full
+        let prefdoc = prefdocs.find(prefdoc=> strip(prefdoc.dict) == strip(pref))
+        tdocs.push(prefdoc)
+        taildoc.docs = _.clone(tdocs)
+        tails.push(taildoc)
+    })
+
+    return tails
 }
