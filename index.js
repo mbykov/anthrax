@@ -191,19 +191,21 @@ async function eachBreak(dag, breaks) {
                     cdicts = cdicts.filter(dict=> {
                         if (dag.preftail) {
                             if (dict.prefix && strip(dict.prefix) == strip(dag.preftail.pref)) return dict
-                            // else if (dict.firstvowel == dag.preftail.conn) return dict
+                            else if (dict.firstvowel == dag.preftail.conn) return dict
                             else if (!dict.prefix) return dict // && !dict.firstvowel
-
                         } else {
                             // log('_=== AUG SEG', stem, dict.rdict)
+                            if (dict.prefix) return
                             if (dag.aug && !dict.firstvowel) return
                             else if (!dag.aug && dict.firstvowel) return
                             else return dict
+                            // return dict
                         }
                         // log('_DICT-OK', dag.aug, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
                     })
-                    // log('_cdicts.length', cdicts.length, stem, dict)
                     if (!cdicts.length) continue
+
+                    if (stem == 'βαιν')  log('_cdicts.length============', cdicts.length, stem, dict)
 
                     let pchains = tryDictFls(cdicts, cognates, pfls, flexid)
                     // log('_pchains.length', stem, dict, pchains.length)
@@ -233,7 +235,7 @@ function tryDictFls(cdicts, cognates, pfls, flexid) {
         let connector = dag.preftail?.conn || dag.aug
         // if (dag.preftail?.conn && !probe.prefix) connector = '' // dict - только stem при анализе слова с префиксом
 
-        log('_probe', probe.rdict, probe.stem, probe.prefix, '_conn:', connector)
+        log('_probe', probe.rdict, probe.stem, '_prefix:', probe.prefix, '_conn:', connector)
 
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, connector))
         else cfls = filterProbeName(probe, pfls)
@@ -312,7 +314,6 @@ function filterProbeVerb(dict, pfls, conn) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    if (dict.rdict != 'ἄγω') return []
     // log('_D-verb', dict.dname, dict.rdict, dict.prefix, dict.stem, dict.type, pfls.length, dict.vtypes, conn) // , pfls.length
 
     if (!dict.vtypes) return []
