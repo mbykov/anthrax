@@ -74,6 +74,7 @@ async function anthraxChains(wf) {
     let {stress, stressidx} = getStress(dag.cwf)
     dag.stress = stress
     dag.stressidx = stressidx
+
     // log('_DAG', dag)
 
     let flakes = scrape(dag.cwf).reverse()
@@ -95,19 +96,11 @@ async function anthraxChains(wf) {
     let chains = []
     let breaks = []
 
-    let preftails = makePrefTails(dag.cwf)
-    for (let preftail of preftails) {
-        dag.preftail = preftail
-        let ptail = plain(preftail.tail)
-        breaks = await cleanBreaks(dag, ptail)
-        let prefchains = await eachBreak(dag, breaks)
-        log('_prefchains:', ptail, prefchains.length)
-        // if (!prefchains.length) continue
-        chains.push(...prefchains)
-        // log('_===', ptail, prefchains)
-    }
+    let preftails = await makePrefTails(dag.cwf)
+    let prefchains = await parsePrefTails(dag, preftails)
+    chains.push(...prefchains)
 
-    // ============ HERE: затем сформировать все цепочки
+    // log('_C', chains.length)
 
     if (chains.length) return chains
     // return chains
@@ -180,6 +173,7 @@ async function eachBreak(dag, breaks) {
             }
         } else {
             let head_rdicts_list = headdicts.map(dict=> [dict.stem, dict.dname, dict.rdict].join('-')) // head_cognates
+            // log('_head_rdicts_list', head_rdicts_list)
 
             let stemgroups = _.groupBy(headdicts, 'stem')
             for (let stem in stemgroups) {
@@ -188,6 +182,7 @@ async function eachBreak(dag, breaks) {
                 for (let dict in dictgroups) {
                     let cdicts = dictgroups[dict] // dict-stem-group
                     // итого, имею корректные cdicts и cognates
+                    // log('_cdicts-before', dag.aug, !!dag.preftail, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
                     cdicts = cdicts.filter(dict=> {
                         if (dag.preftail) {
                             if (dict.prefix && strip(dict.prefix) == strip(dag.preftail.pref)) return dict
@@ -205,7 +200,7 @@ async function eachBreak(dag, breaks) {
                     })
                     if (!cdicts.length) continue
 
-                    if (stem == 'βαιν')  log('_cdicts.length============', cdicts.length, stem, dict)
+                    // if (stem == 'βαιν')  log('_cdicts.length============', cdicts.length, stem, dict)
 
                     let pchains = tryDictFls(cdicts, cognates, pfls, flexid)
                     // log('_pchains.length', stem, dict, pchains.length)
@@ -232,12 +227,13 @@ function tryDictFls(cdicts, cognates, pfls, flexid) {
         let cfls = []
         pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
         if (!pfls.length) continue
-        let connector = dag.preftail?.conn || dag.aug
+        let conn = dag.preftail?.conn || dag.aug || ''
+        conn = strip(conn)
         // if (dag.preftail?.conn && !probe.prefix) connector = '' // dict - только stem при анализе слова с префиксом
 
-        log('_probe', probe.rdict, probe.stem, '_prefix:', probe.prefix, '_conn:', connector)
+        // log('_probe', probe.rdict, probe.stem, '_prefix:', probe.prefix, '_conn:', conn)
 
-        if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, connector))
+        if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
         else cfls = filterProbeName(probe, pfls)
         // log('_cfls.length', cfls.length)
         if (!cfls.length) continue
@@ -253,6 +249,15 @@ function makeChain(probe, cdicts, cognates, flsid, fls) {
     let flsseg = {seg: flsid, fls}
     chain.push(flsseg)
 
+    // если стем короткий, то cognates не имеют смысла, много лишних
+    // cognates = cognates.filter(dict=> dict.stem.length > 1)
+    // ниже фантазия на эту тему
+    cognates = cognates.filter(dict=> {
+        let ok = false
+        if (dict.stem.length > 1) ok = true
+        else if (probe.type[0] == dict.type[0]) ok = true
+        return ok
+    })
     let rcogns = _.uniq(cognates.map(dict=> dict.rdict)).join(',')
     let tailseg = {seg: probe.stem, cdicts, rdict: probe.rdict, cognates, rcogns, prefix: probe.prefix, mainseg: true}
     if (probe.verb) tailseg.verb = true
@@ -301,8 +306,7 @@ function filterProbeName(dict, pfls) {
         // ==== вот это теперь можно отбросить - потому что stype однозначно определяет flex.key
         // if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
         // else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
-
-        if (!key) continue
+        // if (!key) continue
         f('_filter-F', dict.rdict, flex)
         cfls.push(flex)
     }
@@ -326,9 +330,9 @@ function filterProbeVerb(dict, pfls, conn) {
         // cfls.push(flex)
 
         if (dict.vtypes[flex.stype]) {
-            if (flex.mood == 'ind' && strip(dict.vtypes[flex.stype].ind) != strip(conn)) continue
-            else if (flex.mood != 'ind' && strip(dict.vtypes[flex.stype].soi) != strip(conn)) continue
-            // log('_xxxxxxxxxxxxxxxxxxx', dict.rdict, flex.stype, dict.vtypes[flex.stype], 'conn:', conn, dict.vtypes[flex.stype].ind != conn)
+            // log('_xxxxxxxxxxxxxxxxxxx', dict.rdict, flex.stype, dict.vtypes[flex.stype].ind, 'conn:', conn, dict.vtypes[flex.stype].ind != conn)
+            if (flex.mood == 'ind' && strip(dict.vtypes[flex.stype].ind) != conn) continue
+            else if (flex.mood != 'ind' && strip(dict.vtypes[flex.stype].soi) != conn) continue
         } else {
             // log('_FLEX', flex)
             if (conn) continue
@@ -560,16 +564,16 @@ function makePrefTails(cwf) {
         tail = tail.replace(repref, '')
         let ptail = plain(tail)
         if (tail == cwf) tail = ptail.replace(repref, '')
-        // log('_================', pref, cwf, tail)
+        // log('_================', cwf, pref, tail)
         let shorttail = removeVowelBeg(tail)
         let retail = new RegExp(shorttail + '$')
         let conn = tail.replace(retail, '')
 
-        if (pref == 'δι') conn = ''
-        else if (pref.endsWith('ι')) {
-            conn = 'ι'
-            pref = pref.replace(/ι$/, '')
-        }
+        // if (pref == 'δι') conn = ''
+        // else if (pref.endsWith('ι')) {
+        //     conn = 'ι'
+        //     pref = pref.replace(/ι$/, '')
+        // }
 
         let taildoc = {pref, conn, tail: shorttail}
         if (full != pref) taildoc.full = full
@@ -580,4 +584,24 @@ function makePrefTails(cwf) {
     })
 
     return tails.reverse()
+}
+
+async function parsePrefTails(dag, preftails) {
+    let preftail = _.first(preftails)
+    dag.preftail = preftail
+    let ptail = plain(preftail.tail)
+    let breaks = await cleanBreaks(dag, ptail)
+    let prefchains = await eachBreak(dag, breaks)
+    for (let preftail of preftails) {
+        // log('_========', preftail.pref)
+        for (let prefchain of prefchains) {
+            let main = prefchain.find(seg=> seg.mainseg)
+            let chainpref = main.prefix
+            // log('_=================', chainpref)
+            if (chainpref != preftail.pref) prefchain.unshift(preftail)
+        }
+    }
+    log('_===', prefchains)
+
+    return prefchains
 }

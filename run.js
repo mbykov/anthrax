@@ -41,7 +41,7 @@ async function run(full) {
         let mainseg = chain.find(seg=> seg.mainseg)
         let rdict = mainseg.cdicts[0].rdict
         // log('_M:', mainseg.cdicts[0].keys)
-        let segs = chain.map(seg=> seg.seg).join('-')
+        let segs = chain.map(seg=> seg.pref || seg.seg).join('-')
         log('_scheme:', rdict, segs)
         let flseg = chain.find(seg=> seg.fls)
         // log('_fls_xx:', flseg.fls.length)
