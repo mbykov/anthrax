@@ -39,10 +39,15 @@ async function run(full) {
     for (let chain of chains) {
         // log('_chain:', chain)
         let mainseg = chain.find(seg=> seg.mainseg)
-        let rdict = mainseg.cdicts[0].rdict
-        // log('_M:', mainseg.cdicts[0].keys)
-        let segs = chain.map(seg=> seg.pref || seg.seg).join('-')
-        log('_scheme:', rdict, segs)
+        let cdict = mainseg.cdicts[0]
+        // let rdict = cdict.rdict
+        // // log('_M:', mainseg.cdicts[0].keys)
+        // let segs = chain.map(seg=> {
+        //     if (seg.pref) return [seg.pref, seg.conn].join('-')
+        //     else if (seg.seg) return [seg.prefix, seg.seg].join('.')
+        //     else if (seg.fls) return seg.fls
+        // }).join('')
+        log('_scheme:', cdict.rdict, cdict.scheme)
         let flseg = chain.find(seg=> seg.fls)
         // log('_fls_xx:', flseg.fls.length)
         // let mainseg = chain.find(seg=> seg.mainseg)

@@ -61,11 +61,14 @@ export async function anthrax(wf) {
     let dictchains = await anthraxChains(wf)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
     // let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
-
+    // сначала длиннейшие
+    dictchains = _.sortBy(dictchains, [function(chain) {
+        let mainseg = chain.find(seg=> seg.mainseg)
+        return -mainseg.rdict.length
+    }]);
     chains.push(...dictchains)
     return chains
 }
-
 
 async function anthraxChains(wf) {
     dag = new Map();
@@ -131,7 +134,7 @@ async function anthraxChains(wf) {
         let mainseg = chain.find(seg=> seg.mainseg)
         if (!mainseg) return
         let cdict = mainseg.cdicts[0]
-        if (cdict.prefix) return
+        if (cdict.pref) return
         // log('_xxxxxxxxxxxxxxxxxx', cdict.rdict, cdict.aug)
         if (dag.augseg) chain.unshift(dag.augseg)
         chains.push(chain)
@@ -185,14 +188,16 @@ async function eachBreak(dag, breaks) {
                     // log('_cdicts-before', dag.aug, !!dag.preftail, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
                     cdicts = cdicts.filter(dict=> {
                         if (dag.preftail) {
-                            if (dict.prefix && strip(dict.prefix) == strip(dag.preftail.pref)) return dict
-                            else if (dict.firstvowel == dag.preftail.conn) return dict
-                            else if (!dict.prefix) return dict // && !dict.firstvowel
+                            if (dict.pref && strip(dict.pref) == strip(dag.preftail.pref)) return dict
+                            // else if (dict.firstvowel == dag.preftail.conn) return dict
+                            else if (dict.aug == dag.preftail.conn) return dict
+                            else if (!dict.pref) return dict // && !dict.firstvowel
                         } else {
                             // log('_=== AUG SEG', stem, dict.rdict)
-                            if (dict.prefix) return
-                            if (dag.aug && !dict.firstvowel) return
-                            else if (!dag.aug && dict.firstvowel) return
+                            if (dict.pref) return
+                            // if (dag.aug && !dict.firstvowel) return
+                            // else if (!dag.aug && dict.firstvowel) return
+                            if (dag.aug != dict.aug) return
                             else return dict
                             // return dict
                         }
@@ -229,9 +234,9 @@ function tryDictFls(cdicts, cognates, pfls, flexid) {
         if (!pfls.length) continue
         let conn = dag.preftail?.conn || dag.aug || ''
         conn = strip(conn)
-        // if (dag.preftail?.conn && !probe.prefix) connector = '' // dict - только stem при анализе слова с префиксом
+        // if (dag.preftail?.conn && !probe.pref) connector = '' // dict - только stem при анализе слова с префиксом
 
-        // log('_probe', probe.rdict, probe.stem, '_prefix:', probe.prefix, '_conn:', conn)
+        // log('_probe', probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn)
 
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
         else cfls = filterProbeName(probe, pfls)
@@ -259,7 +264,7 @@ function makeChain(probe, cdicts, cognates, flsid, fls) {
         return ok
     })
     let rcogns = _.uniq(cognates.map(dict=> dict.rdict)).join(',')
-    let tailseg = {seg: probe.stem, cdicts, rdict: probe.rdict, cognates, rcogns, prefix: probe.prefix, mainseg: true}
+    let tailseg = {seg: probe.stem, cdicts, rdict: probe.rdict, cognates, rcogns, pref: probe.pref, mainseg: true}
     if (probe.verb) tailseg.verb = true
     else if (probe.name) tailseg.name = true
     // log('_T', tailseg)
@@ -318,7 +323,7 @@ function filterProbeVerb(dict, pfls, conn) {
     if (!dict.keys) dict.reg = true
     let dkeys = dict.keys ? dict.keys : vkeys[dict.type] ? vkeys[dict.type] : []
     let cfls = []
-    // log('_D-verb', dict.dname, dict.rdict, dict.prefix, dict.stem, dict.type, pfls.length, dict.vtypes, conn) // , pfls.length
+    // log('_D-verb', dict.dname, dict.rdict, dict.pref, dict.stem, dict.type, pfls.length, dict.vtypes, conn) // , pfls.length
 
     if (!dict.vtypes) return []
 
@@ -587,6 +592,7 @@ function makePrefTails(cwf) {
 }
 
 async function parsePrefTails(dag, preftails) {
+    if (!preftails.length) return []
     let preftail = _.first(preftails)
     dag.preftail = preftail
     let ptail = plain(preftail.tail)
@@ -596,12 +602,12 @@ async function parsePrefTails(dag, preftails) {
         // log('_========', preftail.pref)
         for (let prefchain of prefchains) {
             let main = prefchain.find(seg=> seg.mainseg)
-            let chainpref = main.prefix
+            let chainpref = main.pref
             // log('_=================', chainpref)
             if (chainpref != preftail.pref) prefchain.unshift(preftail)
         }
     }
-    log('_===', prefchains)
+    // log('_===', prefchains)
 
     return prefchains
 }

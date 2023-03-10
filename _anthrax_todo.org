@@ -1,10 +1,14 @@
 #+STARTUP: hidestars
 #+STARTUP: overview
 
-* словари terms / indecls
- непонятно, как с ними работать. может быть, не выделять их? Добавляю словоформу целиком в первый запрос и ищу doc.indecl
- и не нужен первый запрос вовсе
 
+* текстовые словари :TODO:
+  сделать до LSJ - https://biblicaltext.com/dictionary/%CE%B4 - это BBL
+  - в wkt создаю лист упрощенных docs = prefs / aug, stem, type, stype
+  - то же в BBL
+  - в DVR, LSJ
+  - смотрю в списках слов сначала, потом определяю по typical-keys
+  -
 
 * текстовые словари :TODO:
  - ищу в списках слов wkt, lsj, dvr - проверяю наличие и pos
@@ -15,7 +19,6 @@
  - name
  - == но terms добавляются в lsj, dvr ==
  - поэтому verb, name, adj - списки list, а terms - полностью docs
- - неясно, если typical-keys дает однозначный ответ, то нужны ли списки слов из предыдущих словарей (по порядку обработки)?
 
 * 31 января 2023 :TODO:
 - typical-keys-verb
