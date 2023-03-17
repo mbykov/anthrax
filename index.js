@@ -5,7 +5,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, aug2vow, aspirations } from './lib/utils.js'
-import { getTerms, getTermsNew, getFlexes, getDicts, getPrefs } from './lib/remote.js'
+import { getFlexes, getDicts } from './lib/remote.js' // getTerms, getTermsNew,  getPrefs
 import Debug from 'debug'
 
 import { vkeys } from '../anthrax-dicts/WKT/wkt/wkt-keys/keys-verb.js'
@@ -39,7 +39,17 @@ let dag = {}
 // προσεπεισφορέω
 // εὐδαιμονία; εὐτυχία
 
-export async function anthrax(wf) {
+export async function anthrax(obj) {
+    let dbs = [], wf
+    if (typeof(obj) == 'string') {
+        log('_TYPEOF IS STRING')
+        wf = obj
+    } else {
+        dbs = obj.dbs
+        wf = obj.wf
+    }
+    log('_WF', typeof(wf), wf, '_DBS', dbs)
+
     let chains = []
     let cwf = oxia(comb(wf).toLowerCase())
     // let termcdicts = await getTerms(cwf)
@@ -47,18 +57,20 @@ export async function anthrax(wf) {
 
     // let termcdicts = await getTermsNew(cwf)
     let keys = [cwf]
-    let termcdicts = await getDicts(keys)
+    let termcdicts = await getDicts(keys, dbs)
     log('_TERMS', termcdicts.length)
+    let wktterm = false
     if (termcdicts.length) {
         termcdicts = termcdicts.filter(doc=> keys.includes(doc.dict))
+        wktterm = termcdicts.find(doc=> doc.dname == 'wkt')
         let rdicts = termcdicts.map(dict=> dict.rdict).join(',')
         let termchain =  [{seg: cwf, cdicts: termcdicts, rdicts, indecl: true}]
         log('_==============:', rdicts)
         chains.push(termchain)
-        return chains
     }
+    if (wktterm) return chains
 
-    let dictchains = await anthraxChains(wf)
+    let dictchains = await anthraxChains(wf, dbs)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
     // let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
     // сначала длиннейшие
@@ -70,7 +82,7 @@ export async function anthrax(wf) {
     return chains
 }
 
-async function anthraxChains(wf) {
+async function anthraxChains(wf, dbs) {
     dag = new Map();
     dag.rawwf = wf
     dag.cwf = comb(wf)
@@ -100,7 +112,7 @@ async function anthraxChains(wf) {
     let breaks = []
 
     let preftails = await makePrefTails(dag.cwf)
-    let prefchains = await parsePrefTails(dag, preftails)
+    let prefchains = await parsePrefTails(dag, preftails, dbs)
     chains.push(...prefchains)
 
     // log('_C', chains.length)
@@ -123,7 +135,7 @@ async function anthraxChains(wf) {
     }
     // log('_============== AUG:', dag.pcwf, dag.aug)
 
-    breaks = await cleanBreaks(dag, dag.pcwf)
+    breaks = await cleanBreaks(dag, dag.pcwf, dbs)
     // log('_aug breaks:', dag.pcwf, breaks)
     if (!breaks.length) return chains
     let augchains = await eachBreak(dag, breaks)
@@ -197,15 +209,18 @@ async function eachBreak(dag, breaks) {
                             if (dict.pref) return
                             // if (dag.aug && !dict.firstvowel) return
                             // else if (!dag.aug && dict.firstvowel) return
+                            // log('_=== AUG SEG', stem, dict.rdict, dag.aug, dict.aug, dag.aug != dict.aug)
+                            // TODO: привести к единому виду
+                            if (!dict.aug) dict.aug = false
                             if (dag.aug != dict.aug) return
                             else return dict
                             // return dict
                         }
-                        // log('_DICT-OK', dag.aug, dict.rdict, dict.stem, dict.firstvowel, 333, dag.aug && !dict.firstvowel)
+                        // log('_DICT-OK', dag.aug, dict.rdict, dict.stem, '_dag.aug:', dag.aug)
                     })
                     if (!cdicts.length) continue
 
-                    // if (stem == 'βαιν')  log('_cdicts.length============', cdicts.length, stem, dict)
+                    // if (stem == 'δαιμ')  log('_cdicts.length============', cdicts.length, stem, dict)
 
                     let pchains = tryDictFls(cdicts, cognates, pfls, flexid)
                     // log('_pchains.length', stem, dict, pchains.length)
@@ -236,7 +251,7 @@ function tryDictFls(cdicts, cognates, pfls, flexid) {
         conn = strip(conn)
         // if (dag.preftail?.conn && !probe.pref) connector = '' // dict - только stem при анализе слова с префиксом
 
-        // log('_probe', probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn)
+        log('_probe', probe.dname, probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn)
 
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
         else cfls = filterProbeName(probe, pfls)
@@ -292,8 +307,9 @@ function filterProbeName(dict, pfls) {
     // f('_dialectnames', dialectnames)
     if (!dict.keys) {
         log('_NO DICT KEYS', dict)
+        dict.keys = []
         // это пока что прочие словари
-        return []
+        // return []
     }
 
     let cfls = []
@@ -400,25 +416,25 @@ function removeVowelBeg(wf) {
     return wf
 }
 
-async function getRegVerbs_(breaks) {
-    let regs = []
-    breaks.forEach(br=> {
-        let headregs = br.headdicts.filter(dict=> dict.reg)
-        regs.push(...headregs)
-        if (!br.taildicts) return
-        let tailregs = br.taildicts.filter(dict=> dict.reg)
-        regs.push(...tailregs)
-    })
-    let regstems = _.uniq(_.compact(regs.map(dict=> dict.regstem)))
-    let regdicts = await getDicts(regstems)
-    return regdicts
-}
+// async function getRegVerbs_(breaks) {
+//     let regs = []
+//     breaks.forEach(br=> {
+//         let headregs = br.headdicts.filter(dict=> dict.reg)
+//         regs.push(...headregs)
+//         if (!br.taildicts) return
+//         let tailregs = br.taildicts.filter(dict=> dict.reg)
+//         regs.push(...tailregs)
+//     })
+//     let regstems = _.uniq(_.compact(regs.map(dict=> dict.regstem)))
+//     let regdicts = await getDicts(regstems)
+//     return regdicts
+// }
 
 // clean breaks - только те, которые состоят из обнаруженных в словарях stems
-async function cleanBreaks(dag, pcwf) {
+async function cleanBreaks(dag, pcwf, dbs) {
     let breaks = makeBreaks(pcwf, dag.flexes)
     if (!breaks.length) return []
-    let dicts = await findDicts(breaks)
+    let dicts = await findDicts(breaks, dbs)
     // log('_BR', breaks, dicts)
 
     breaks.forEach(br=> {
@@ -527,13 +543,13 @@ function makeBreaks(pcwf, flexes) {
     return breaks
 }
 
-async function findDicts(breaks) {
+async function findDicts(breaks, dbs) {
     let headkeys = _.uniq(breaks.map(br=> br.head))
     let tailkeys = _.uniq(breaks.map(br=> br.tail))
     let keys = _.compact(headkeys.concat(tailkeys))
     // keys = ['δεικν']
     // log('_findDicts_keys', keys)
-    let dicts = await getDicts(keys)
+    let dicts = await getDicts(keys, dbs)
     dicts = dicts.filter(dict=> !dict.indecl)
     // log('_findDicts', dicts)
     dag.dictids = _.uniq(dicts.map(ddict=> ddict.stem))
@@ -596,7 +612,7 @@ async function parsePrefTails(dag, preftails) {
     let preftail = _.first(preftails)
     dag.preftail = preftail
     let ptail = plain(preftail.tail)
-    let breaks = await cleanBreaks(dag, ptail)
+    let breaks = await cleanBreaks(dag, ptail, dbs)
     let prefchains = await eachBreak(dag, breaks)
     for (let preftail of preftails) {
         // log('_========', preftail.pref)
