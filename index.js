@@ -53,7 +53,7 @@ export async function anthrax(wf, dbs) {
     // let termcdicts = await getTermsNew(cwf)
     let keys = [cwf]
     let termcdicts = await getDicts(keys, dbs)
-    log('_TERMS', termcdicts.length)
+    // log('_TERMS', termcdicts.length) // ***
     let wktterm = false
     if (termcdicts.length) {
         termcdicts = termcdicts.filter(doc=> keys.includes(doc.dict))
@@ -73,7 +73,7 @@ export async function anthrax(wf, dbs) {
         let main = chain.find(seg=> seg.main)
         return -main.cdicts[0].rdict.length
     }]);
-    log('_CHAINS', dictchains.length)
+    // log('_CHAINS', dictchains.length) // ***
     chains.push(...dictchains)
     return chains
 }
@@ -237,7 +237,7 @@ function tryDictFls(cdicts, rels, pfls, flexid) {
         let cpos = cdicts.filter(dict=> dict[pos])
         if (!cpos.length) continue
         let cpos_rdicts = cpos.map(doc=> [doc.dname, doc.rdict].join('-'))
-        log('_cpos_rdicts', pos, cpos_rdicts)
+        // log('_cpos_rdicts', pos, cpos_rdicts) // ***
         let probe = cpos.find(dict=> dict.dname == 'wkt') || cdicts[0]
         // log('_cpos_rdicts_probe', pos, probe.rdict)
 
@@ -248,7 +248,7 @@ function tryDictFls(cdicts, rels, pfls, flexid) {
         conn = strip(conn)
         // if (dag.preftail?.conn && !probe.pref) connector = '' // dict - только stem при анализе слова с префиксом
 
-        log('_probe', pos, probe.dname, probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn)
+        // log('_probe', pos, probe.dname, probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn) // ***
 
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
         else cfls = filterProbeName(probe, pfls)

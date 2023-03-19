@@ -7,30 +7,32 @@ import Debug from 'debug'
 const d = Debug('dicts')
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
-let full = process.argv.slice(3)[0] //  'ἀργυρῷ'
+let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
 const log = console.log
 
 if (!wordform) log('no wordform')
-else run(full)
+else run(verbose)
 
-async function run(full) {
+async function run(verbose) {
     let chains = await anthrax(wordform)
     log('_run_chains_:', chains.length)
 
     for (let chain of chains) {
-        log('_=CHAIN=',)
+        let res = {}
         for (let seg of chain) {
-            let str = ''
-            if (seg.pref && !seg.main) log('_pref:', [seg.pref, seg.conn].join('-'))
+            if (seg.aug) res.aug = seg.aug
+            else if (seg.pref && !seg.main) res.pref = [seg.pref, seg.conn].join('-')
             else if (seg.main) {
                 let probe = chain.find(seg=> seg.main).cdicts[0]
-                log('_main rdict:', probe.rdict, '_stem:', probe.stem, '_dname', probe.dname)
-                if (probe.verb) log('_verb')
-                else if (probe.name) log('_name')
+                res.rdict = probe.rdict, res.stem = probe.stem, res.dname = probe.dname
+                if (probe.pref) res.pref_main = probe.pref
+                if (probe.verb) res.verb = true
+                else if (probe.name) res.name = true
             }
-            else if (seg.fls) log('_fls', seg.seg)
+            else if (seg.fls) res.fls = seg.seg
         } // seg
+        if (verbose) log('_chain', res)
     }
 
 
@@ -46,7 +48,7 @@ async function run(full) {
         log('_run_indecl_:', indecl)
         let pretty = prettyIndecl(indecl)
         log('_indecl morphs:', pretty)
-        if (full) {
+        if (verbose) {
             log('_cdicts:', indecl.cdicts)
         }
         return
@@ -85,10 +87,6 @@ async function run(full) {
 
         let pretty = prettyFLS(chain)
         log('_morphs:', pretty)
-        if (full) {
-            let main = chain.find(seg=> seg.main)
-            log('_cdicts:', main.cdicts)
-        }
     }
 }
 
