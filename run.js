@@ -60,10 +60,11 @@ async function run(verbose) {
         // let cdict = main.cdicts[0]
         // let rdict = cdict.rdict
         // // log('_M:', main.cdicts[0].keys)
-        let probe
+        let probe, dbs
         let segs = chain.map(seg=> {
             if (seg.pref && !seg.main) return [seg.pref, seg.conn].join('-')
             else if (seg.main) {
+                dbs = seg.cdicts.map(dict=> dict.dname)
                 probe = seg.cdicts[0]
                 let scheme = [seg.seg]
                 if (seg.aug) scheme.unshift(seg.aug)
@@ -76,7 +77,7 @@ async function run(verbose) {
             }
             else if (seg.fls) return seg.seg
         }).join('-')
-        log('_scheme:', probe.rdict, '_segs:', segs) // , cdict.scheme
+        log('_scheme:', probe.rdict, '_segs:', segs, '_dbs:', dbs) // , cdict.scheme
         let flseg = chain.find(seg=> seg.fls)
         // log('_fls_xx:', flseg.fls.length)
         // let main = chain.find(seg=> seg.main)

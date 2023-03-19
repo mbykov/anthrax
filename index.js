@@ -65,7 +65,7 @@ export async function anthrax(wf, dbs) {
     }
     if (wktterm) return chains
 
-    let dictchains = await anthraxChains(wf, dbs)
+    let dictchains = await anthraxChains(cwf, dbs)
     // если есть короткий chain, то отбросить те chains, где sc имеет стемы с длиной = 1 // TODO = аккуратно сделать
     // let bestchain = chains.find(chain=> chain.slice(-2,-1)[0].seg.length > 1)        // ломается на ἀγαπητός
     // сначала длиннейшие
