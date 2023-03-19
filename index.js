@@ -71,7 +71,7 @@ export async function anthrax(wf, dbs) {
     // сначала длиннейшие
     dictchains = _.sortBy(dictchains, [function(chain) {
         let main = chain.find(seg=> seg.main)
-        return -main.probe.rdict.length
+        return -main.cdicts[0].rdict.length
     }]);
     log('_CHAINS', dictchains.length)
     chains.push(...dictchains)
@@ -254,12 +254,12 @@ function tryDictFls(cdicts, rels, pfls, flexid) {
         else cfls = filterProbeName(probe, pfls)
         // log('_cfls.length', pos, probe.dname, probe.rdict, cfls.length)
         if (!cfls.length) continue
-        log('_probe_BEFORE_CHAIN', pos, probe.dname, probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn)
+        // log('_probe_BEFORE_CHAIN', pos, probe.dname, probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn)
         let chain = makeChain(probe, cdicts, rels, flexid, cfls)
-        log('_probe_AFTER_CHAIN', pos, probe.dname, probe.rdict, )
+        // log('_probe_AFTER_CHAIN', pos, probe.dname, probe.rdict, )
         pchains.push(chain)
     } // pos
-    log('_probe_AFTER_CHAIN_pchains', pchains.length )
+    // log('_probe_AFTER_CHAIN_pchains', pchains.length )
     return pchains
 }
 
@@ -278,15 +278,12 @@ function makeChain(probe, cdicts, rels, flsid, fls) {
         return ok
     })
     let reldicts = _.uniq(rels.map(dict=> dict.rdict)).join(',')
-    // let tailseg = {seg: probe.stem, cdicts, rdict: probe.rdict, rels, reldicts, pref: probe.pref, main: true}
-    let tailseg = {seg: probe.stem, probe, rdict: probe.rdict, dname: probe.dname, cdicts, rels, reldicts, main: true}
-    // if (probe.conn) tailseg.conn = probe.conn
+    // let tailseg = {seg: probe.stem, probe, rdict: probe.rdict, dname: probe.dname, cdicts, rels, reldicts, main: true}
+    let tailseg = {seg: probe.stem, cdicts, rels, main: true}
+
     if (probe.verb) tailseg.verb = true
     else if (probe.name) tailseg.name = true
     // log('_T', tailseg)
-    // если нужен regdict для одного из cdicts, перенести trns
-    // let regdict = regdicts.find(regdict=> regdict.dict == cdict.dict)
-    // if (regdict) tailseg.regdict = regdict
     chain.unshift(tailseg)
 
     // if (br.head && br.tail) {
@@ -599,7 +596,7 @@ async function parsePrefChains(dag, preftails, dbs) {
     if (!preftails.length) return []
     let preftail = _.first(preftails)
     dag.preftail = preftail
-    log('_================= preftail', preftail)
+    // log('_================= preftail', preftail)
     let ptail = plain(preftail.tail)
     let breaks = await cleanBreaks(dag, ptail, dbs)
     let prefchains = await eachBreak(dag, breaks)
@@ -607,8 +604,9 @@ async function parsePrefChains(dag, preftails, dbs) {
         // log('_========', preftail.pref)
         for (let prefchain of prefchains) {
             let main = prefchain.find(seg=> seg.main)
-            log('_==================================== main_pref', main.pref, main.rdict, preftail.pref)
-            if (!main.probe.pref) prefchain.unshift(preftail)
+            let probe = main.cdicts[0]
+            // log('_==================================== main_pref', main.pref, main.rdict, preftail.pref)
+            if (!probe.pref) prefchain.unshift(preftail)
         }
     }
     // log('_===', prefchains)

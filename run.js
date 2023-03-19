@@ -16,7 +16,23 @@ else run(full)
 
 async function run(full) {
     let chains = await anthrax(wordform)
-    log('_run_chains_:', chains)
+    log('_run_chains_:', chains.length)
+
+    for (let chain of chains) {
+        log('_=CHAIN=',)
+        for (let seg of chain) {
+            let str = ''
+            if (seg.pref && !seg.main) log('_pref:', [seg.pref, seg.conn].join('-'))
+            else if (seg.main) {
+                let probe = chain.find(seg=> seg.main).cdicts[0]
+                log('_main rdict:', probe.rdict, '_stem:', probe.stem, '_dname', probe.dname)
+                if (probe.verb) log('_verb')
+                else if (probe.name) log('_name')
+            }
+            else if (seg.fls) log('_fls', seg.seg)
+        } // seg
+    }
+
 
     if (!chains.length) {
         log('no result')
@@ -38,25 +54,27 @@ async function run(full) {
 
     for (let chain of chains) {
         // log('_chain:', chain)
-        let main = chain.find(seg=> seg.main)
-        let cdict = main.cdicts[0]
+        // let main = chain.find(seg=> seg.main)
+        // let cdict = main.cdicts[0]
         // let rdict = cdict.rdict
         // // log('_M:', main.cdicts[0].keys)
+        let probe
         let segs = chain.map(seg=> {
             if (seg.pref && !seg.main) return [seg.pref, seg.conn].join('-')
             else if (seg.main) {
+                probe = seg.cdicts[0]
                 let scheme = [seg.seg]
                 if (seg.aug) scheme.unshift(seg.aug)
-                else if (seg.probe.pref) {
-                    if (seg.probe.conn) scheme.unshift(seg.probe.conn)
-                    scheme.unshift(seg.probe.pref)
+                else if (probe.pref) {
+                    if (probe.conn) scheme.unshift(probe.conn)
+                    scheme.unshift(probe.pref)
                 }
                 scheme = scheme.join('.')
                 return scheme
             }
             else if (seg.fls) return seg.seg
         }).join('-')
-        log('_scheme:', cdict.rdict, '_segs:', segs) // , cdict.scheme
+        log('_scheme:', probe.rdict, '_segs:', segs) // , cdict.scheme
         let flseg = chain.find(seg=> seg.fls)
         // log('_fls_xx:', flseg.fls.length)
         // let main = chain.find(seg=> seg.main)
