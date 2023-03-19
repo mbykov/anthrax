@@ -16,7 +16,7 @@ else run(full)
 
 async function run(full) {
     let chains = await anthrax(wordform)
-    log('_run_chains_:', chains.length)
+    log('_run_chains_:', chains)
 
     if (!chains.length) {
         log('no result')
@@ -38,20 +38,29 @@ async function run(full) {
 
     for (let chain of chains) {
         // log('_chain:', chain)
-        let mainseg = chain.find(seg=> seg.mainseg)
-        let cdict = mainseg.cdicts[0]
+        let main = chain.find(seg=> seg.main)
+        let cdict = main.cdicts[0]
         // let rdict = cdict.rdict
-        // // log('_M:', mainseg.cdicts[0].keys)
-        // let segs = chain.map(seg=> {
-        //     if (seg.pref) return [seg.pref, seg.conn].join('-')
-        //     else if (seg.seg) return [seg.prefix, seg.seg].join('.')
-        //     else if (seg.fls) return seg.fls
-        // }).join('')
-        log('_scheme:', cdict.rdict, cdict.scheme)
+        // // log('_M:', main.cdicts[0].keys)
+        let segs = chain.map(seg=> {
+            if (seg.pref && !seg.main) return [seg.pref, seg.conn].join('-')
+            else if (seg.main) {
+                let scheme = [seg.seg]
+                if (seg.aug) scheme.unshift(seg.aug)
+                else if (seg.probe.pref) {
+                    if (seg.probe.conn) scheme.unshift(seg.probe.conn)
+                    scheme.unshift(seg.probe.pref)
+                }
+                scheme = scheme.join('.')
+                return scheme
+            }
+            else if (seg.fls) return seg.seg
+        }).join('-')
+        log('_scheme:', cdict.rdict, '_segs:', segs) // , cdict.scheme
         let flseg = chain.find(seg=> seg.fls)
         // log('_fls_xx:', flseg.fls.length)
-        // let mainseg = chain.find(seg=> seg.mainseg)
-        // log('_M:', mainseg.cdicts[0].keys)
+        // let main = chain.find(seg=> seg.main)
+        // log('_M:', main.cdicts[0].keys)
         for (let flex of flseg.fls) {
             // log('_FLEX', flex.aug, flex.rdict)
         }
@@ -59,14 +68,14 @@ async function run(full) {
         let pretty = prettyFLS(chain)
         log('_morphs:', pretty)
         if (full) {
-            let main = chain.find(seg=> seg.mainseg)
+            let main = chain.find(seg=> seg.main)
             log('_cdicts:', main.cdicts)
         }
     }
 }
 
 function prettyFLS(chain) {
-    let mseg = chain.find(seg=> seg.mainseg)
+    let mseg = chain.find(seg=> seg.main)
     let fls = chain.find(seg=> seg.fls).fls
     let morphs = ''
     if (mseg.name) morphs = prettyName(fls)
