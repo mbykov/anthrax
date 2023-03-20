@@ -43,7 +43,7 @@ let dbsdefault = ['wkt', 'bbl'] // , 'lsj' , 'dvr'
 
 export async function anthrax(wf, dbs) {
     if (!dbs) dbs = dbsdefault
-    log('_WF', wf, '_DBS', dbs)
+    // log('_WF', wf, '_DBS', dbs)
 
     let chains = []
     let cwf = oxia(comb(wf).toLowerCase())
@@ -116,7 +116,7 @@ async function anthraxChains(wf, dbs) {
     if (chains.length) return chains
     // return chains
 
-    log('_============== BEFORE AUGS:', chains.length, dag.pcwf)
+    // log('_============== BEFORE AUGS:', chains.length, dag.pcwf)
 
     // dag.augcase = true
     let aug = parseAug(dag.pcwf)
@@ -156,12 +156,15 @@ async function eachBreak(dag, breaks) {
     let chains = []
     // let breakids = breaks.map(br=> [br.head, br.conn, br.tail, br.fls._id].join('-')) // todo: del
     // log('_break-ids', breakids)
+    // log('_DAG.stressidx', dag.stressidx)
 
     for (let br of breaks) {
         let breakid = [br.head, br.conn, br.tail, br.fls._id].join('-')
         let headdicts = br.headdicts
         let taildicts = br.taildicts
         let pfls = br.fls.docs.filter(flex=> flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        // log('_pfls', pfls)
+        // let pfls = br.fls.docs
         let flexid = br.fls._id
         let head_rdicts_list = headdicts.map(dict=> dict.rdict)
         // log('_head_rdicts_list', head_rdicts_list)
@@ -242,13 +245,13 @@ function tryDictFls(cdicts, rels, pfls, flexid) {
         // log('_cpos_rdicts_probe', pos, probe.rdict)
 
         let cfls = []
-        pfls = pfls.filter(flex=> flex.type == probe.type && flex.stress == dag.stress && flex.stressidx == dag.stressidx)
+        pfls = pfls.filter(flex=> flex.type == probe.type)
         if (!pfls.length) continue
         let conn = dag.preftail?.conn || dag.aug || ''
         conn = strip(conn)
         // if (dag.preftail?.conn && !probe.pref) connector = '' // dict - только stem при анализе слова с префиксом
 
-        // log('_probe', pos, probe.dname, probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn) // ***
+        // log('_probe', pos, probe.dname, probe.rdict, probe.stem, '_prefix:', probe.pref, '_conn:', conn, '_dag_aug:', dag.aug, '_probe_aug', probe.aug) // ***
 
         if (probe.verb) cfls.push(...filterProbeVerb(probe, pfls, conn))
         else cfls = filterProbeName(probe, pfls)
@@ -267,7 +270,6 @@ function makeChain(probe, cdicts, rels, flsid, fls) {
     let chain = []
     let flsseg = {seg: flsid, fls}
     chain.push(flsseg)
-
     // если стем короткий, то rels не имеют смысла, много лишних
     // rels = rels.filter(dict=> dict.stem.length > 1)
     // ниже фантазия на эту тему
@@ -300,7 +302,7 @@ function makeChain(probe, cdicts, rels, flsid, fls) {
 }
 
 function filterProbeName(dict, pfls) {
-    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.keys) // , dict.keys
+    // log('_filter-D-Name =====', dict.rdict, dict.stem, dict.type, dict.dname, dict.gends) // , dict.keys
     // let dialectnames = _.keys(dict).filter(dname=> !notdialectnames.includes(dname))
     // f('_dialectnames', dialectnames)
     if (!dict.keys) {
@@ -310,25 +312,36 @@ function filterProbeName(dict, pfls) {
         // return []
     }
 
+    if (!dict.gends) {
+        dict.gends = ['macs', 'fem', 'neut'] // adjectives
+    }
+
     let cfls = []
     for (let flex of pfls) {
         if (!flex.name) continue
         // cfls.push(flex)
-        // if (dict.type != flex.type) continue
+        if (!dict.gends.includes(flex.gend)) continue
+        // log('_filter-F-', dict.rdict, flex.numcase, flex.gend)
+        // if (flex.gend == 'fem') log('_filter-F-', dict.rdict, flex.numcase, flex.gend)
+
         let key = dict.keys.find(dkey=>
             // dkey.dialect == flex.dialect  &&
             // dkey.declension == flex.declension &&
             dkey.stype == flex.stype
             // dkey[flex.gend] == flex.key
         )
+        if (!key) continue
 
-        // ==== вот это теперь можно отбросить - потому что stype однозначно определяет flex.key
-        // if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
-        // else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
-        // if (!key) continue
-        f('_filter-F', dict.rdict, flex)
+        // ==== вот это теперь можно отбросить - потому что stype однозначно определяет flex.key => нет, нельзя, не определяет. ἄγκυρα - ἀγκύρα
+        if (flex.adv) key = dict.keys.find(dkey=> dkey.adv == flex.key)
+        else key = dict.keys.find(dkey=> dkey[flex.gend] == flex.key)
+        if (!key) continue
+        // log('_filter-F-OK', dict.rdict, flex.num, flex.case, flex.gend)
         cfls.push(flex)
+        // log('_filter-F-', dict.rdict, flex.numcase, flex.gend)
     }
+    let fems = cfls.filter(flex=> flex.gend == 'fem')
+    // log('_FEMS', dict.gends, fems.length)
     return cfls
 }
 

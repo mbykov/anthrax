@@ -62,7 +62,8 @@ async function run(verbose) {
         // // log('_M:', main.cdicts[0].keys)
         let probe, dbs
         let segs = chain.map(seg=> {
-            if (seg.pref && !seg.main) return [seg.pref, seg.conn].join('-')
+            if (seg.aug) return seg.seg
+            else if (seg.pref && !seg.main) return [seg.pref, seg.conn].join('-')
             else if (seg.main) {
                 dbs = seg.cdicts.map(dict=> dict.dname)
                 probe = seg.cdicts[0]
