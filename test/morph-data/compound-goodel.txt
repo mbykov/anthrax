@@ -4,13 +4,13 @@
 
 νεώσοικος = ναῦς + οἶκος - ship-houses
 
-ναυσίπορος = ναῦς + πορος - passable by ships
+ναυσίπορος = ναῦς + πορος - passable by ships # -, ναῦς - stem ν, и согласная в коннекторе. Это проблема
 
 ὁδοιπόρος = ὁδός + πόρος - traveler (ὁδοι- locative, § 228)
 
 ὀρειβάτης = ὄρος + βάτης - walking on the mountain
 
-Ἑλλήσ-ποντος = Ἕλλης + πόντος - Helle's sea, Hellespont
+Ἑλλήσποντος = Ἕλλης + πόντος - Helle's sea, Hellespont
 
 # verbs
 
@@ -34,11 +34,13 @@
 
 ἐπι-βουλή = ἐπί + βουλή - a plan against
 
-σύμ-πᾱς = σύν +πᾶς - all together
+σύμ-πᾱς = σύν + πᾶς - all together
 
 συν-αίτιος = σύν +αἴτιος - jointly causing
 
+
 # nouns derived from compound verbs and adjectives
+
 
 σύνθημα = συν + τίθημι - watchword
 
@@ -66,11 +68,13 @@
 
 δυσ-πόρευτος = δυσ + πορευτός - hardly passable
 
-# The second member is thought of as object
 
-ἀρχιτέκτων = ἄρχω + τέκτων - master-builder
+    # The second member is thought of as object
+
+ἀρχιτέκτων = ἄρχω + τέκτων - master-builder # +
 
 φερέγγυος = φέρω + ἐγγύη - bringing surety, capable
+φερεγγύη = φέρω + ἐγγύη - bringing surety, capable # + φερεγγύη = φέρω + ἐγγύη ; ἐγγύος - нет в wkt
 
 λιποταξίᾱ = λείπω (λιπ-) + τάξις = desertion (leaving the ranks)
 

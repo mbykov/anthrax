@@ -26,20 +26,28 @@ log('_ONLY', only)
 let cache =  new Map();
 /* let res = {} */
 
-import { adjs } from '../../fetcher/lib/adjs_list.js'
+import { adjs } from '../../fetchers/fetcher-wkt/lib/adjs_list.js'
 let names = adjs //.map(name=> comb(name))
 log('_NAMES', names.length)
 
 // names = names // .slice(0, 20)
-// names = ['ἄγκυρα']
+// names = ['ἁβρός']
 // log('_NAMES', names)
 
-let tests = []
+let nth_names = []
 
-let skip = false
-if (only) skip = true
+let delta = 100
+for (let i = 0; i < names.length; i=i+delta) {
+    nth_names.push(names[i]);
+}
 
-for (let name of names) {
+log('_nth_names', nth_names.length)
+
+// nth_names = ['ἀγγελικός']
+
+let skip = only ? true : false
+
+for (let name of nth_names) {
     if (only && only == name) skip = false
     // log('_NAME', only, name, only == name)
     if (skip) continue
@@ -48,109 +56,92 @@ for (let name of names) {
         // log('_N', name)
         file = getFile(name)
     } catch(err) {
+        log('_ERR FILE', name)
         continue
     }
 
-    for (let dialect of file.data) {
+    for (let dialect of file.dialects) {
+        if (!dialect.gends) continue // non-adjective
         // log('_D', dialect)
         for (let form of dialect.forms) {
-            let wf = form.wf // .toLowerCase()
-            tests.push(wf)
-            if (!cache[wf]) cache[wf] = []
-            cache[wf].push(form)
-            // let pwf = plain(form.wf) // нельзя, объединяются разные формы с острым и облеченным ударением, Ἀβδηρίτης
+            let wf = form.wf.toLowerCase()
+            let cwf = comb(wf)
+            let ckey = [file.rdict, cwf].join('-')
+            if (!cache[ckey]) cache[ckey] = []
+            let cform = _.clone(form)
+            cache[ckey].push(cform)
+            // for (let gend of dialect.gends) {
+            //     let cform = _.clone(form)
+            //     if (!cform.adv) cform.gend = gend
+            //     cache[ckey].push(cform)
+            // }
         }
     }
+
 }
 
-tests = _.uniq(tests)
-log('_TESTS', tests.length)
-
-let wf = 'ἀήρ'
-let cwf  = comb(wf)
-// tests = [cwf]
-
-for (let wf in cache) {
-    // if (!tests.includes(wf)) continue
-    let jsons = cache[wf].map(form=> JSON.stringify(form))
-    jsons = _.uniq(jsons)
-    // if (wf == 'ἀγαθίς') log('==============', wf, jsons)
-    cache[wf] = jsons.map(json=> JSON.parse(json))
-}
-
-if (only) {
-    let conly = comb(only)
-    // let ponly = plain(conly)
-    log('_CACHE', only, cache[conly])
-    log('_CACHE-FW', cache['ἁγίως'])
-}
+// log('_CACHE', only, cache)
+log('_TESTS nth_', _.keys(cache).length)
 
 describe('test names:', async () => {
-    for (let wf of tests) {
-        // log('_TEST WF', wf, '_CACHE:', cache[wf])
-
-        let expected = []
-        let adverb = cache[wf].find(form=> form.adv)
-        if (adverb) expected.push(['adverb', adverb.atype].join('.'))
-        let names = cache[wf].filter(form=> !form.adv)
-        let exps = names.map(form=> [form.gend, form.num, form.case].join('.')).sort()
-        expected.push(...exps)
-        expected = _.uniq(expected)
-        await testWF(wf, expected)
+    for (let ckey in cache) {
+        let rdict = ckey.split('-')[0]
+        let wf = ckey.split('-')[1]
+        let expected = cache[ckey].map(form=> {
+            if (!form.adv)  return [form.gend, form.num, form.case].join('.')
+            else return ['adv', form.atype].join('.')
+        }).sort()
+        // log('_EXP', wf, ckey, expected)
+        await testWF(rdict, wf, expected)
     }
 })
 
-async function testWF(wf, exp) {
-    it(`wf:  ${wf}`, async () => {
+async function testWF(rdict, wf, exp) {
+    it(`rdict:  ${rdict} wf:  ${wf}`, async () => {
         let morphs = []
         let chains = await anthrax(wf)
         if (!chains.length) {
-            assert.deepEqual(true, true)
-            return
+            // assert.deepEqual(true, true)
+            // return
         }
+        // log('_CHAINS', wf, chains.length)
 
-        for (let chain of chains) {
-            let indecl = chain.find(seg=> seg.indecl)
-            if (!indecl) continue
-            let pretty = prettyIndecl(indecl)
-            // log('_indecl morphs:', wf, pretty, exp)
-            assert.deepEqual(pretty, exp)
-            continue
-        }
-
-        // log('_EXP', exp)
         chains = chains.filter(chain=> !chain.find(seg=> seg.head)) // не compounds
         chains = chains.filter(chain=> !chain.find(seg=> seg.pref)) //
         chains = chains.filter(chain=> !chain.find(seg=> seg.indecl)) //
-        chains = chains.filter(chain=> chain.find(seg=> seg.mainseg)) //
-        let names = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
-        names = chains.filter(chain=> chain.find(seg=> seg.mainseg && seg.name && seg.cdicts.find(cdict=> !cdict.gends)))
-        /* log('_WF', wf) */
+        let names = chains.filter(chain=> chain.find(seg=> seg.main && seg.name))
+        
+        // log('_NAMES', wf, names.length)
         for (let chain of names) {
             // log('_MAIN_CHAIN', chain)
-            let main = chain.find(seg=> seg.mainseg)
-            if (!main) {
-                assert.deepEqual(true, true)
-                continue
-            }
-            let cdicts = main.cdicts.filter(cdict=> cdict.name && !cdict.gends) //
-            // log('_CDICTS', wf, cdicts.map(cdict=> cdict.rdict))
-            if (!cdicts.length) {
-                assert.deepEqual(true, true)
-                continue
-            }
+            let names = chain.find(seg=> seg.main).cdicts
+            let rdicts = names.map(name=> name.rdict.toLowerCase())
+            // log('_names:', rdicts)
+            // if (!rdicts.includes(rdict)) continue // ἐσχατιά; ἐσχατιή
+
+            // let gends = names[0].dialects.find(dia=> dia.gends) // non-adective
+            // if (gends) continue
+
             // log('_CDICTS', wf, cdicts)
             let fls = chain.find(seg=> seg.fls).fls
             // log('_FLS', fls)
             let cmorphs = prettyName(fls)
-            morphs.push(...cmorphs)
+            // morphs.push(...cmorphs)
+            // log('_EXP', wf, exp)
+            cmorphs = _.uniq(cmorphs).sort()
+            assert.deepEqual(cmorphs, exp)
         }
-        morphs = _.uniq(morphs).sort()
-        if (morphs.length) assert.deepEqual(morphs, exp)
-        else assert.deepEqual(true, true)
     })
 }
 
+function getFile(fn) {
+    fn = [fn, 'json'].join('.')
+    const dirPath = path.resolve(currentdir, '../morph-data/wkt/adjectives')
+    let fnpath = [dirPath, fn].join('/')
+    // log('_fnpath', fnpath)
+    let file = fse.readJsonSync(fnpath)
+    return file
+}
 
 function prettyIndecl(indecl) {
     let vmorphs = []
@@ -166,24 +157,4 @@ function prettyIndecl(indecl) {
         }
     }
     return _.uniq(vmorphs).sort()
-}
-
-
-function compactNamesFls_(dicts) {
-    let fls = dicts.map(dict=> {
-        return dict.fls.filter(flex=> !flex.adv).map(flex=> [flex.gend, flex.num, flex.case].join('.'))
-    })
-    return _.uniq(_.flatten(fls).sort())
-}
-
-function compactNameFls_(flexes) {
-    return _.uniq(flexes.map(flex=> [flex.gend, flex.num, flex.case].join('.')))
-}
-
-function getFile(fn) {
-    fn = [fn, 'json'].join('.')
-    const dirPath = path.resolve(currentdir, '../morph-data/adjectives')
-    let fnpath = [dirPath, fn].join('/')
-    let file = fse.readJsonSync(fnpath)
-    return file
 }

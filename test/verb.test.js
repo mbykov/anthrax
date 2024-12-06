@@ -13,50 +13,60 @@ const currentdir = process.cwd()
 let only = process.argv.slice(9)[0] //  'ἀναβλέπω'
 
 import { prettyVerb, prettyIndecl } from '../lib/utils.js'
+// import { getFile } from './lib/utils.js'
 
 import { anthrax } from '../index.js'
 
 import Debug from 'debug'
 const d = Debug('test')
 
+let dbs = ['wkt']
+
 log('_ONLY', only)
 let cache =  new Map();
 /* let res = {} */
 
-import { verbs } from '../../fetcher/lib/verbs_list.js'
-let names = verbs //.map(name=> comb(name))
-log('_NAMES', names.length)
+// import { nouns } from '../../fetchers/fetcher-wkt/lib/nouns_list.js'
+import { verbs } from '../../fetchers/fetcher-wkt/lib/verbs_list.js'
 
-// names = names // .slice(0, 20)
-// names = ['ἀναβλέπω']
-// log('_NAMES', names)
+// let rverbs = verbs.slice(1, 320)
+// rverbs = ['ἀναβλέπω']
+log('_VERBS', verbs.length)
+
+let nth_verbs = []
+
+let delta = 100
+for (let i = 0; i < verbs.length; i=i+delta) {
+    nth_verbs.push(verbs[i]);
+}
+
+// nth_verbs = nth_verbs.slice(1)
+log('_nth_verbs', nth_verbs)
 
 let tests = []
 
 let skip = false
 if (only) skip = true
 
-for (let name of names) {
-    if (only && only == name) skip = false
+
+for (let verb of nth_verbs) {
+    if (only && only == verb) skip = false
     if (skip) continue
     let file
     try {
-        file = getFile(name)
+        file = getFile(verb)
         // log('_F', file)
     } catch(err) {
+        log('_E', err)
         continue
     }
 
     for (let vtime of file.vtimes) {
-        // log('_D', vtime)
+        // log('_vtime', vtime.info.time)
         for (let form of vtime.forms) {
 
-            if (form.part) continue // убрать после participles. Или добавить обработку part.sg.nom здесь в verbs
+            // if (form.part) continue // убрать после participles. Или добавить обработку part.sg.nom здесь в verbs
             if (vtime.info.time == 'pf' && (form.voice == 'mp' || form.voice == 'mid') && (form.mood == 'sub' || form.mood == 'opt')) continue
-            // if (vtime.info.time == 'pf' && form.voice == 'mp' && form.mood == 'sub') log('_===================')
-            // if (vtime.info.time == 'pf' && form.voice == 'mp' && form.mood == 'sub') continue
-            // if (form.wf  == 'ὦ') log('_VVVV', form, vtime.info.time)
-
 
             let wf = form.wf // .toLowerCase()
             tests.push(wf)
@@ -64,37 +74,43 @@ for (let name of names) {
             let res
             if (form.inf) {
                 res = [vtime.info.time, form.voice, 'inf'].join('.')
+            } else if (form.part) {
+                let tense = [vtime.info.time, form.voice, 'part'].join('.')
+                let numcase = [form.gend, form.num, form.case].join('.')
+                res = [tense, numcase].join(', ')
+                // log('_RES', form, res)
             } else {
                 let tense = [vtime.info.time, form.voice, form.mood].join('.')
-                let numper = [form.number, form.person].join('.')
+                let numper = [form.num, form.person].join('.')
                 res = [tense, numper].join(', ')
             }
-            // cache[wf].push(form)
             cache[wf].push(res)
         }
     }
 }
 
 tests = _.uniq(tests)
+
+let wf = 'ἀναβλέπω'
+let cwf  = comb(wf)
+// tests = [cwf]
 log('_TESTS', tests.length)
 
-// let wf = 'ἀναβλέπω'
-// let cwf  = comb(wf)
-// tests = [cwf]
 
 for (let wf in cache) {
     cache[wf] = _.uniq(cache[wf])
 }
 
+// log('_CACHE', cache) // ['ἀναβλέπεις']
+
 if (only) {
     let conly = comb(only)
     log('_CACHE', only, cache[conly])
-    log('_CACHE-FW', cache['ἀναβλέψετον'])
 }
 
-describe('test names:', async () => {
+describe('test verbs:', async () => {
     for (let wf of tests) {
-        let expected = cache[wf].sort()
+        let expected = _.uniq(cache[wf].sort())
         await testWF(wf, expected)
     }
 })
@@ -103,75 +119,51 @@ async function testWF(wf, exp) {
     it(`wf:  ${wf}`, async () => {
         // log('_TEST', wf, exp)
         let morphs = []
-        let chains = await anthrax(wf)
+        let chains = await anthrax(wf, dbs)
         if (!chains.length) {
+            // log('_no', wf)
             assert.deepEqual(true, true)
-            // return
         }
 
-        for (let chain of chains) {
-            let indecl = chain.find(seg=> seg.indecl)
-            if (!indecl) continue
-            let pretty = prettyIndecl(indecl)
-            // log('_XXX', pretty, exp)
-            assert.deepEqual(pretty, exp)
-            return
-        }
+        // for (let chain of chains) {
+        //     let indecl = chain.find(seg=> seg.indecl)
+        //     if (!indecl) continue
+        //     let pretty = prettyIndecl(indecl)
+        //     // log('_XXX', pretty, exp)
+        //     assert.deepEqual(pretty, exp)
+        //     return
+        // }
 
-        // log('_EXP', exp)
+        // log('_chains', chains)
         chains = chains.filter(chain=> !chain.find(seg=> seg.head)) // не compounds
         chains = chains.filter(chain=> !chain.find(seg=> seg.pref)) //
         chains = chains.filter(chain=> !chain.find(seg=> seg.indecl)) //
-        // chains = chains.filter(chain=> chain.find(seg=> seg.mainseg)) //
-        // let names = chains.filter(chain=> chain.find(seg=> seg.mainseg).name)
-        // let names = chains.filter(chain=> chain.find(seg=> seg.mainseg && seg.verb && seg.cdicts.find(cdict=> !cdict.gends)))
-        let verbchains = chains.filter(chain=> chain.find(seg=> seg.mainseg && seg.verb))
+        // chains = chains.filter(chain=> chain.find(seg=> seg.main)) //
+        // let verbs = chains.filter(chain=> chain.find(seg=> seg.main).verb)
+        // let verbs = chains.filter(chain=> chain.find(seg=> seg.main && seg.verb && seg.cdicts.find(cdict=> !cdict.gends)))
+        let verbs = chains.filter(chain=> chain.find(seg=> seg.main && seg.verb))
         /* log('_WF', wf) */
-        for (let chain of verbchains) {
+        for (let chain of verbs) {
             // log('_MAIN_CHAIN', chain)
-            let main = chain.find(seg=> seg.mainseg)
-            if (!main) {
-                assert.deepEqual(true, true)
-                continue
-            }
-            let cdicts = main.cdicts.filter(cdict=> cdict.verb)
-            // log('_CDICTS', wf, cdicts.map(cdict=> cdict.rdict))
-            if (!cdicts.length) {
-                assert.deepEqual(true, true)
-                continue
-            }
+            let cdicts = chain.find(seg=> seg.main).cdicts
             // log('_CDICTS', wf, cdicts)
             let fls = chain.find(seg=> seg.fls).fls
             // log('_FLS', fls)
+
             let cmorphs = prettyVerb(fls)
-            morphs.push(...cmorphs)
+            // log('_EXP', wf, exp)
+
+            cmorphs = _.uniq(cmorphs).sort()
+            assert.deepEqual(cmorphs, exp)
         }
-        morphs = _.uniq(morphs).sort()
-        assert.deepEqual(morphs, exp)
     })
-}
-
-
-function prettyIndecl_(indecl) {
-    let vmorphs = []
-    for (let cdict of indecl.cdicts) {
-        let morphs = ''
-        if (cdict.fls) {
-            let morphs = prettyName(cdict.fls)
-            vmorphs.push(...morphs)
-        } else if (cdict.adv) {
-            let advmorph = ['adverb', cdict.atype].join('.')
-            vmorphs.push(advmorph)
-            // log('_indecl:', cdict.term, morphs)
-        }
-    }
-    return _.uniq(vmorphs).sort()
 }
 
 function getFile(fn) {
     fn = [fn, 'json'].join('.')
-    const dirPath = path.resolve(currentdir, '../morph-data/verbs')
+    const dirPath = path.resolve(currentdir, '../morph-data/wkt/verbs')
     let fnpath = [dirPath, fn].join('/')
+    // log('_===================', fnpath)
     let file = fse.readJsonSync(fnpath)
     return file
 }

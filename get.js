@@ -1,39 +1,43 @@
 //
 
 const log = console.log
-// import fetch from "node-fetch";
-import axios from 'axios';
-import _  from 'lodash'
+import PouchDB from 'pouchdb'
+import _ from 'lodash'
+// import fse from 'fs-extra'
+import path  from 'path'
+import {oxia, comb, plain, strip} from 'orthos'
 
-let stem = process.argv.slice(2)[0] //  'ἀργυρῷ'
-let url = 'http://localhost:3003/grc/wkt'
+let stem = process.argv.slice(2)[0] //  'ἀργυρῷ' // ἡγέομαι
 
-log('_STEM', stem)
+stem = comb(stem)
 
-let heads = [stem]
-// heads = ['γανακτ']
-// heads = ['δεικν']
-getDicts(url, heads)
+let dname = process.argv.slice(3)[0] || 'wkt'
 
-async function getDicts (url, heads) {
-    let data = { heads }
-    log('_heads_data', url, data)
-    let wkts = await doPost(url, data)
+log('_STEM', stem) // γανακτ ; δεικν ;
+// let heads = [stem]
 
-    log('_WKTS', wkts)
-    let wktdocs = _.flatten(wkts.map(dict=> dict.docs))
-    log('_WKT_DOCS', wktdocs)
 
-    return wktdocs
-}
+const currentdir = process.cwd()
+// const dbpath = path.resolve(currentdir, '../pouch-anthrax')
+const dbpath = '/home/michael/greek/pouch-anthrax'
+log('_dbpath', dbpath)
+const dnamepath = path.resolve(dbpath, dname)
+log('_dnamepath ', dnamepath)
+const db = new PouchDB(dnamepath);
 
-async function doPost (url, data) {
-    let res = []
+getDicts(stem)
+
+async function getDicts (stem) {
+    log('_getDicts_', stem)
     try {
-        res = await axios.post(url, data);
-        res = res.data
-    } catch(err) {
-        log('_ECONNREFUSED')
+        let doc = await db.get(stem);
+        let docs = doc.docs
+        for (let doc of docs) {
+            // if (doc.rdict != 'νύξ') continue
+            log('_get_doc_', doc)
+        }
+    } catch (err) {
+        console.log('_not_found');
     }
-    return res
+
 }
