@@ -28,6 +28,7 @@ const n = Debug('chain')
 const f = Debug('filter')
 const c = Debug('compound')
 const o = Debug('probe')
+const a = Debug('aug')
 
 let dag = {}
 
@@ -119,7 +120,6 @@ export async function anthrax(wf, dnames) {
 
     let leadAug = parseAug(dag.pcwf)
     if (leadAug) leads.push(leadAug)
-    // if (atail) tails.push(atail)
     // log('____leadAug', leadAug)
     d(leadAug) // '_AUG tail',
 
@@ -229,61 +229,71 @@ function probeForFlex(lead, br, fls) {
     for (let cdict of proxies) {
         if (cdict.person) continue // TODO::
 
+        let dagaug = ''
+        let daglead = ''
         let augmented = false
         if (lead.pref) {
             // log('______________LEAD PREF', cdict.rdict, lead)
-            // log('______________PREF cdict', cdict.prefix)
-            // log('______________xxxxxxxxxxx', lead.con, cdict.prefix.con)
-            if (cdict.prefix && lead.con != cdict.prefix.con) augmented = true // ἐνόμιζον
+            if (cdict.prefix && lead.con != cdict.prefix.con) augmented = true // ἐνόμιζον -> это настоящий aug
+            // TODO: тут пока непонятно, flex.aug <-> lead.con
+            // if (lead.con) augmented = true
+            daglead = lead.con
         } else if (lead && lead.aug) {
-            // log('______________LEAD AUG', cdict.rdict, lead)
             if (cdict.aug != lead.aug) augmented = true
+            dagaug = lead.aug
+            daglead = lead.aug
+            // log('_LEAD AUG', lead)
+            // log('______________LEAD AUG cdict.rdict:', cdict.rdict, 'cdict.aug', cdict.aug, 'lead', lead.aug, cdict.aug == lead.aug)
         }
         // log('_AUGMENTED', augmented)
-        // hstfls - impf, ppf, aor.ind, но не pf. Там м.б. удвоение - важно не пустить impf, etc, где аугмента нет
-        // vfls = (augmented) ? hstfls : simplefls //  - так нельзя
-        // ταράσσω - τετάραχα, pf - аугмента нет, а pf
 
-        // if (augmented) vfls = hstfls
-
-        // == если augmented, всегда либо impf либа aor.ind
-        // если flex.hst, augmented должен быть
-        // если нет augmented, то в pf - hst, а в остальных все равно может быть не hst
-
-
-        // if (cdict.rdict != 'ἀγαπάω') continue // agapao
-
-        // log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
-        // log('_AUG cdict', cdict.aug, '_lead', lead.aug)
-        // log('_var probe', cdict.rdict, cdict.var['άω-ησα']['aor.act.part'])
+        // if (cdict.rdict != 'ἀνακοσμέω') continue // RFORM
+        // log('_cdict', cdict)
 
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
 
-        let stypes = cdict.var ? _.keys(cdict.var) : cdict.stypes
-        if (cdict.keys) stypes = cdict.keys.map(key=> key.stype)
+        if (!cdict.ckeys) cdict.ckeys = [] // TODO - до names
+        // let stypes = cdict.ckeys.map(key=> key.stype)
+        // stypes = _.uniq(stypes)
         // log('_STYPES', cdict.rdict, stypes)
 
-        if (!cdict.keys) cdict.keys = [] // TODO - до names
-        let keys = cdict.keys
-        if (augmented) keys = cdict.keys.filter(flex=> flex.aug)
-        else keys = cdict.keys.filter(flex=> !flex.aug)
+        // log('_dagaug', dagaug)
+        let ckeys = cdict.ckeys
+
+        if (daglead) ckeys = cdict.ckeys.filter(ckey=> ckey.lead == daglead || !ckey.lead) // или нет lead - простые глаголы + внешний префикс - ἀνακοσμέω - κοσμέω
+        // else ckeys = cdict.ckeys.filter(ckey=> !ckey.lead)
+
+        if (!ckeys.length) continue
+
+        log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
+        // log('____probe :', cdict.rdict, 'daglead', daglead, 'ckeys:', cdict.ckeys.slice(2,4),)
+        // log('____probe pref :', cdict.rdict, )
+
+        // if (dagaug) ckeys = cdict.ckeys.filter(tense=> tense.aug == dagaug)
+        // else ckeys = cdict.ckeys.filter(tense=> !tense.aug)
+
+        // if (augmented) keys = cdict.ckeys.filter(flex=> flex.aug)
+        // else keys = cdict.ckeys.filter(flex=> !flex.aug)
+
+        // log('_ckeys', cdict.rdict, 'ckeys', cdict.ckeys.length, '_fls', nfls.length)
+
+        // participles - есть stype3: 'άουσα-άον', нет keys
+        ckeys = ckeys.filter(ckey=> ckey.keys)
 
         let cfls = []
         if (cdict.name) {
             for (let flex of nfls) {
-                if (!stypes.includes(flex.stype)) continue
-                // if (cdict.gends && !cdict.gends.includes(flex.gend)) continue // nouns
                 // log('_f', cdict.rdict, cdict.stypes, flex.stype, flex.term, '_key', flex.key)
-                let keys = cdict.var?.[flex.stype]?.[flex.gend]
-                // if (!keys && !cdict.var?.[flex.stype]) keys = nameKey[flex.stype]?.[flex.gend]
 
-                if (!keys) continue
-                // log('_keys', keys)
+                for (let ckey of ckeys) {
+                    if (ckey.stype != flex.stype) continue
+                    if (ckey.gend != flex.gend) continue
+                    if (ckey.keys.includes(flex.key)) cfls.push(flex)
+                }
 
-                if (flex.adverb || keys.includes(flex.key)) cfls.push(flex)
-                // log('_F_OK', flex)
-
+                // if (flex.adverb || ckeys.includes(flex.key)) cfls.push(flex)
+                // log('_F_N_OK', flex)
             }
             for (let flex of advfls) {
                 let keys = cdict.var?.[flex.stype] //  || nameKey[flex.stype] ??
@@ -294,24 +304,14 @@ function probeForFlex(lead, br, fls) {
             for (let flex of vfls) {
                 // log('_F', flex.tense)
                 // cfls.push(flex)
-
-                // if (flex.hst && !augmented) continue
-                // if (!flex.hst && augmented) continue
-                // if (!!flex.hst != !!augmented) continue
-
-                if (!stypes.includes(flex.stype)) continue
-
-                // if (flex.tense == 'aor.mid.imp') log('_TEST_FLEX', flex)
-
-                // let keys = []
-                // let ok = false
-                for (let key of keys) {
-                    if (key.stype != flex.stype) continue
-                    if (key.tense != flex.tense) continue
-                    if (key.keys.includes(flex.key)) cfls.push(flex)
+                for (let ckey of ckeys) {
+                    // if (ckey.lead != flex.lead) continue
+                    if (ckey.stype != flex.stype) continue
+                    if (ckey.tense != flex.tense) continue
+                    if (ckey.keys.includes(flex.key)) cfls.push(flex)
+                    // if (ckey.keys.includes(flex.key)) log('_F_OK', ckeys.length, cdict.rdict, flex.tense, flex)
                 }
 
-                // log('_F_OK', flex)
                 continue
 
                 // let keys = cdict.var?.[flex.stype]?.[flex.tense] // || verbKey[flex.stype]?.[flex.tense] - НЕЛЬЗЯ
@@ -324,7 +324,7 @@ function probeForFlex(lead, br, fls) {
                 if (!keys) continue
                 if (!keys.includes(flex.key)) continue
                 cfls.push(flex)
-                log('_F_OK', flex)
+                // log('_F_OK', flex.tense, flex.key)
 
                 continue
 
