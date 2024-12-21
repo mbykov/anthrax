@@ -170,7 +170,7 @@ function probeForFlex(lead, br, fls) {
     if (!maindicts.length) return []
     let stem = (compound) ? br.tail : br.head
 
-    // let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
+    let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
     // log('___br.head', br.head, mainrdicts)
     // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
 
@@ -267,6 +267,7 @@ function probeForFlex(lead, br, fls) {
         if (!ckeys.length) continue
 
         log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
+
         // log('____probe :', cdict.rdict, 'daglead', daglead, 'ckeys:', cdict.ckeys.slice(2,4),)
         // log('____probe pref :', cdict.rdict, )
 
@@ -496,7 +497,7 @@ function parseScheme(lead, probe, term) {
 }
 
 function parseHeadTails(dag, ptail) {
-    // log('____________________________________________________________________________', dag.flsterms)
+    log('____________________________________________________________________________', dag.flsterms)
     let headtails = [] // possible stems
     for (let term of dag.flsterms) {
         let pterm = plain(term)
