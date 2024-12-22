@@ -180,7 +180,7 @@ function probeForFlex(lead, br, fls) {
             // if (cdict.aug) continue
             if (!cdict.prefix) cdict.proxy = true // составной chain с префиксом
             else if (lead.pref == cdict.prefix.pref) cdict.proxy = true
-
+            cdict.test_pref = true
             // leadPref { pref: 'ἀμφ', con: 'ι', tail: 'βαλλετον' }
             // здесь-ли проверка на аугмент исторического времени?
             // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить
@@ -191,11 +191,12 @@ function probeForFlex(lead, br, fls) {
             if (cdict.prefix) continue
             if (lead.aug == cdict.aug) cdict.proxy = true
             if (!lead.aug && !cdict.aug) cdict.proxy = true
+            cdict.test_cdict_aug = true
+            cdict.lead_aug = lead.aug
 
             if (cdict.verb) {
-                // log('_VERB', cdict.rdict)
-                // imperfect - есть aug
-                cdict.proxy = true
+                cdict.test_aug_verb = true
+                // cdict.proxy = true
             }
             // log('____xxxxxxxxxxxxxxxxxxxxxxxxxxxx_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, 'proxy', cdict.proxy)
         }
@@ -266,7 +267,7 @@ function probeForFlex(lead, br, fls) {
 
         if (!ckeys.length) continue
 
-        log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
+        // log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
 
         // log('____probe :', cdict.rdict, 'daglead', daglead, 'ckeys:', cdict.ckeys.slice(2,4),)
         // log('____probe pref :', cdict.rdict, )
@@ -421,7 +422,7 @@ function cleanChain(chain) {
         delete cdict.cfls
         // delete cdict.stem
         // delete cdict.astem
-        delete cdict.aug
+        // delete cdict.aug
         delete cdict.proxy
         delete cdict.dname
         delete cdict.raw
@@ -434,7 +435,7 @@ function cleanChain(chain) {
         delete cdict.cfls
         // delete cdict.stem
         // delete cdict.astem
-        delete cdict.aug
+        // delete cdict.aug
         delete cdict.proxy
         delete cdict.dname
         delete cdict.raw
@@ -484,7 +485,7 @@ function parseScheme(lead, probe, term) {
         schemobj.stem = stem
     } else {
         log('_NO_LEAD', lead)
-        scheme.push('__kukuku_no_lead_убрать')
+        scheme.push('__kukuku_no_lead_убрать') // TODO:
     }
     scheme.push({seg: term, dict: term, term: true})
     // schemobj.term = term
@@ -497,7 +498,6 @@ function parseScheme(lead, probe, term) {
 }
 
 function parseHeadTails(dag, ptail) {
-    log('____________________________________________________________________________', dag.flsterms)
     let headtails = [] // possible stems
     for (let term of dag.flsterms) {
         let pterm = plain(term)

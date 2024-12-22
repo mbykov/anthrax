@@ -26,16 +26,15 @@ async function run(verbose) {
 
     for (let chain of chains) {
         let xxx = _.clone(chain)
-        xxx.cfls = 'cfls'
-        xxx.trns = 'trns'
-        xxx.rels = 'rels'
-        xxx.vars = 'vars'
+        chain.cfls = 'cfls'
+        chain.trns = 'trns'
+        chain.rels = 'rels'
         // log('\n_chain:', xxx)
         if (chain.indecl) {
-            // log('\n_indecl chain:', chain)
+            log('\n_indecl chain:', chain)
             if (verbose) log('_trns:', chain.cdicts[0].trn)
         } else {
-            log('\n_chain_reg:', xxx)
+            log('\n_chain_reg:', chain)
             for (let cdict of chain.cdicts) {
                 log('\n_rdict', cdict.rdict, '_pos:', cdict.pos, '_morphs:', cdict.morphs)
                 if (verbose) log('T', cdict.trn)
