@@ -161,12 +161,49 @@ async function main(dag, lead) {
     return chains
 }
 
+function proxyByConnector(con, dicts) {
+    let proxies = []
+    for (let cdict of dicts) {
+        if (con != cdict.aug) continue // соответствие Second Component и BR
+    }
+    return proxies
+}
+
+function proxyByLead(lead, dicts) {
+    let proxies = []
+    for (let cdict of dicts) {
+        if (lead.pref) {
+            // if (cdict.aug) continue
+            if (!cdict.prefix) proxies.push(cdict)  // составной chain с префиксом
+            else if (lead.pref == cdict.prefix.pref) proxies.push(cdict)
+            cdict.test_pref = true
+            // leadPref { pref: 'ἀμφ', con: 'ι', tail: 'βαλλετον' }
+            // здесь-ли проверка на аугмент исторического времени?
+            // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить
+
+        } else if (lead) { // lead.aug can be ''
+            // log('____lead aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
+            if (cdict.prefix) continue
+            if (lead.aug == cdict.aug) proxies.push(cdict)
+            if (!lead.aug && !cdict.aug) proxies.push(cdict)
+            cdict.test_cdict_aug = true
+
+            // log('____xxxxxxxxxxxxxxxxxxxxxxxxxxxx_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, 'proxy', cdict.proxy)
+        }
+        // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_prefix', cdict.prefix)
+        // if (cdict.rdict == 'εἰλύω') log('_C', cdict)
+    }
+    return proxies
+}
+
 function probeForFlex(lead, br, fls) {
+    // log('_____________fls', lead, br.head, br.headdicts.length)
     if (br.taildicts.length && !br.headdicts.length) return []
     if (!br.taildicts.length && br.con) return []
 
     let compound = !!br.taildicts.length && !!br.headdicts.length
     let maindicts = (compound) ? br.taildicts : br.headdicts
+    // log('___maindicts', maindicts.length)
     if (!maindicts.length) return []
     let stem = (compound) ? br.tail : br.head
 
@@ -174,54 +211,39 @@ function probeForFlex(lead, br, fls) {
     // log('___br.head', br.head, mainrdicts)
     // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
 
-    for (let cdict of maindicts) {
-        if (compound && br.con != cdict.aug) continue // соответствие Second Component и BR
-        if (lead.pref) {
-            // if (cdict.aug) continue
-            if (!cdict.prefix) cdict.proxy = true // составной chain с префиксом
-            else if (lead.pref == cdict.prefix.pref) cdict.proxy = true
-            cdict.test_pref = true
-            // leadPref { pref: 'ἀμφ', con: 'ι', tail: 'βαλλετον' }
-            // здесь-ли проверка на аугмент исторического времени?
-            // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить
-
-
-        } else if (lead) { // lead.aug can be ''
-            // log('____lead_aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
-            if (cdict.prefix) continue
-            if (lead.aug == cdict.aug) cdict.proxy = true
-            if (!lead.aug && !cdict.aug) cdict.proxy = true
-            cdict.test_cdict_aug = true
-            cdict.lead_aug = lead.aug
-
-            if (cdict.verb) {
-                cdict.test_aug_verb = true
-                // cdict.proxy = true
-            }
-            // log('____xxxxxxxxxxxxxxxxxxxxxxxxxxxx_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, 'proxy', cdict.proxy)
-        }
-        // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_prefix', cdict.prefix)
-        // if (cdict.rdict == 'εἰλύω') log('_C', cdict)
-    }
-
-    let proxies = maindicts.filter(cdict=> cdict.proxy)
+    let proxies = (compound) ? proxyByConnector(br.con, maindicts) : proxyByLead(lead, maindicts)
     // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
     if (!proxies.length) return []
 
-    // let proxy_rdicts = proxies.map(cdict=> cdict.rdict)
-    // log('_proxies_rdicts head:', br.head, 'rdicts:', proxy_rdicts)
+    let proxy_rdicts = proxies.map(cdict=> cdict.rdict)
+    // log('_p_roxies_rdicts head:', br.head, 'rdicts:', proxy_rdicts)
 
+    let daglead = ''
+    if (lead.pref) {
+        // log('______________LEAD PREF', cdict.rdict, lead)
+        // TODO: тут пока непонятно, flex.aug <-> lead.con
+        daglead = lead.con
+    } else if (lead && lead.aug) {
+        daglead = lead.aug
+        // log('_LEAD AUG', lead)
+        // log('______________LEAD AUG cdict.rdict:', cdict.rdict, 'cdict.aug', cdict.aug, 'lead', lead.aug, cdict.aug == lead.aug)
+    }
+
+    // log('_lead', lead)
+    // log('_daglead', daglead)
+
+    fls = fls.filter(flex=> {
+        if (daglead) return flex.lead == daglead
+        else return !flex.lead
+    })
 
     let nfls = fls.filter(flex=> flex.name)
     let advfls = fls.filter(flex=> flex.adverb)
-
-    let hstfls = fls.filter(flex=> flex.verb && flex.hst) // historical times, impf or aor
-    let simplefls = fls.filter(flex=> flex.verb && !flex.hst)
-
     let vfls = fls.filter(flex=> flex.verb)
     // let pfls = fls.filter(flex=> flex.part)
-    // log('_hstfls', stem, vfls.length)
 
+    if (!fls.length) return []
+    // log('_fls', fls.length)
     // TODO: αἴθων - Αἴθων - оба nouns ; nest неверно считает cstype ; а makeWKT неверно считает tgen
 
     let brchains = []
@@ -229,37 +251,13 @@ function probeForFlex(lead, br, fls) {
 
     for (let cdict of proxies) {
         if (cdict.person) continue // TODO::
-
-        let dagaug = ''
-        let daglead = ''
-        let augmented = false
-        if (lead.pref) {
-            // log('______________LEAD PREF', cdict.rdict, lead)
-            if (cdict.prefix && lead.con != cdict.prefix.con) augmented = true // ἐνόμιζον -> это настоящий aug
-            // TODO: тут пока непонятно, flex.aug <-> lead.con
-            // if (lead.con) augmented = true
-            daglead = lead.con
-        } else if (lead && lead.aug) {
-            if (cdict.aug != lead.aug) augmented = true
-            dagaug = lead.aug
-            daglead = lead.aug
-            // log('_LEAD AUG', lead)
-            // log('______________LEAD AUG cdict.rdict:', cdict.rdict, 'cdict.aug', cdict.aug, 'lead', lead.aug, cdict.aug == lead.aug)
-        }
-        // log('_AUGMENTED', augmented)
-
-        // if (cdict.rdict != 'ἀνακοσμέω') continue // RFORM
-        // log('_cdict', cdict)
-
+        // if (cdict.rdict != 'γλῶττα') continue // RFORM
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
+        // log('_cdict', cdict)
 
-        if (!cdict.ckeys) cdict.ckeys = [] // TODO - до names
-        // let stypes = cdict.ckeys.map(key=> key.stype)
-        // stypes = _.uniq(stypes)
-        // log('_STYPES', cdict.rdict, stypes)
 
-        // log('_dagaug', dagaug)
+        if (!cdict.ckeys) continue // βάδην
         let ckeys = cdict.ckeys
 
         if (daglead) ckeys = cdict.ckeys.filter(ckey=> ckey.lead == daglead || !ckey.lead) // или нет lead - простые глаголы + внешний префикс - ἀνακοσμέω - κοσμέω
@@ -269,33 +267,26 @@ function probeForFlex(lead, br, fls) {
 
         // log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
 
-        // log('____probe :', cdict.rdict, 'daglead', daglead, 'ckeys:', cdict.ckeys.slice(2,4),)
-        // log('____probe pref :', cdict.rdict, )
-
-        // if (dagaug) ckeys = cdict.ckeys.filter(tense=> tense.aug == dagaug)
-        // else ckeys = cdict.ckeys.filter(tense=> !tense.aug)
-
-        // if (augmented) keys = cdict.ckeys.filter(flex=> flex.aug)
-        // else keys = cdict.ckeys.filter(flex=> !flex.aug)
-
-        // log('_ckeys', cdict.rdict, 'ckeys', cdict.ckeys.length, '_fls', nfls.length)
-
         // participles - есть stype3: 'άουσα-άον', нет keys
-        ckeys = ckeys.filter(ckey=> ckey.keys)
+        // log('_CKEYS', cdict.rdict, cdict.rstress)
 
         let cfls = []
         if (cdict.name) {
             for (let flex of nfls) {
+                if (cdict.rstress != flex.rstress) continue // различить γλῶττα / φάττα - разные ударения
+                // log('_rstress', cdict.rdict, cdict.rstress, flex.rstress, flex.term)
                 // log('_f', cdict.rdict, cdict.stypes, flex.stype, flex.term, '_key', flex.key)
 
                 for (let ckey of ckeys) {
+                    // if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
                     if (ckey.stype != flex.stype) continue
                     if (ckey.gend != flex.gend) continue
-                    if (ckey.keys.includes(flex.key)) cfls.push(flex)
+                    if (!ckey.keys.includes(flex.key)) continue
+                    cfls.push(flex)
+                    // log('_F_Name_OK', flex.diarform, flex.lead)
                 }
 
                 // if (flex.adverb || ckeys.includes(flex.key)) cfls.push(flex)
-                // log('_F_N_OK', flex)
             }
             for (let flex of advfls) {
                 let keys = cdict.var?.[flex.stype] //  || nameKey[flex.stype] ??
@@ -307,47 +298,21 @@ function probeForFlex(lead, br, fls) {
                 // log('_F', flex.tense)
                 // cfls.push(flex)
                 for (let ckey of ckeys) {
+                    if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
                     // if (ckey.lead != flex.lead) continue
                     if (ckey.stype != flex.stype) continue
                     if (ckey.tense != flex.tense) continue
                     if (ckey.keys.includes(flex.key)) cfls.push(flex)
+                    // cfls.push(flex)
                     // if (ckey.keys.includes(flex.key)) log('_F_OK', ckeys.length, cdict.rdict, flex.tense, flex)
                 }
-
-                continue
-
-                // let keys = cdict.var?.[flex.stype]?.[flex.tense] // || verbKey[flex.stype]?.[flex.tense] - НЕЛЬЗЯ
-                // if (!keys && !cdict.var?.[flex.stype]) keys = verbKey[flex.stype]?.[flex.tense]
-
-                if (flex.part) keys = cdict.var?.[flex.stype]?.[flex.tense]?.[flex.gend]
-                else keys = cdict.var?.[flex.stype]?.[flex.tense]
-                // log('_flex keys', flex.stype, flex.tense, flex.gend, 'keys:', keys)
-
-                if (!keys) continue
-                if (!keys.includes(flex.key)) continue
-                cfls.push(flex)
-                // log('_F_OK', flex.tense, flex.key)
-
-                continue
-
-                if (flex.part) keys = cdict.var?.[flex.stype]?.[flex.tense]?.[flex.gend]
-                if (flex.part) log('_Part', flex.stype, flex.tense, flex.gend, keys, flex.term)
-                // log('_K_', keys)
-                if (!keys) continue
-                if (!keys.includes(flex.key)) continue
-                cfls.push(flex)
-
-                // tense здесь, во флексии. Историческое время - здесь определяется. След., аугмент здесь проверять?
-                // если время историческое, то либо prefix-connector сильный, либо аугмент есть
-                // но есть же и неусиленные времена у Гомера
-
             }
         }
 
         if (!cfls.length) continue
         cdict.cfls = cfls
 
-        // log('____probe_ok', cdict.pos, cdict.rdict, cdict.stem,  '_cfls:', cdict.cfls.length)
+        // log('probe_ok', cdict.pos, cdict.rdict, cdict.stem,  '_cfls:', cdict.cfls.length)
 
         stemdicts.push(cdict)
         // let probeFLS = {cdict.dict, cdicts, rels: maindicts, term: br.term}
@@ -370,7 +335,7 @@ function probeForFlex(lead, br, fls) {
         let cdicts = dictgroups[dict]
 
         let probe = cdicts[0] // определить pos и scheme  // ἀντιδιαβάλλω
-        if (!probe) log('_NO_PROBE_DICT___!!!', dict, maindicts.length, cdicts)
+        if (!probe) log('_NO_P_ROBE_DICT___!!!', dict, maindicts.length, cdicts)
 
         let probeFLS = {dict, cdicts, rels: maindicts, term: br.term}
         if (probe.verb) probeFLS.verb = true
