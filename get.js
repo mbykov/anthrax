@@ -25,16 +25,20 @@ const dnamepath = path.resolve(dbpath, dname)
 log('_dnamepath ', dnamepath)
 const db = new PouchDB(dnamepath);
 
+stem = comb(stem) // на случай поиска dict, а не stem в словарях
+
 getDicts(stem)
 
 async function getDicts (stem) {
     log('_getDicts_', stem)
     try {
-        let doc = await db.get(stem);
+        let doc = await db.get(stem, {include_docs: true});
+        // log('_get_doc_', doc)
         let docs = doc.docs
         for (let doc of docs) {
             // if (doc.rdict != 'νύξ') continue
-            log('_get_doc_', doc)
+            doc.ckeys = doc.ckeys.length
+            log('_get_docs_', doc)
         }
     } catch (err) {
         console.log('_not_found');

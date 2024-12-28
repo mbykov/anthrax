@@ -18,7 +18,6 @@ import { verbKey } from '../parse-dicts/WKT/wkt-keys/key-verb.js'
 
 // let nounKey, adjKey, verbKey = {}
 
-
 import { preflist } from './lib/prefix/preflist.js'
 import { prefDocList } from '../prefslist/dst/prefDocList.js'
 
@@ -30,67 +29,13 @@ const c = Debug('compound')
 const o = Debug('probe')
 const a = Debug('aug')
 
-let dag = {}
+// let dag = {}
 
 log('_ANTHRAX START')
-//  ἵνα πᾶς ὁ πιστεύ­ων ἐν αὐτῷ ἔχῃ ζωὴν αἰώνιον
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> второй запрос к словарям по cdict.dict - за trns
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> восстановить prefdoc - чтобы показать по клику
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> scheme prefdocs / stems
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> // добавить morphs - и схему forms
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> // убрать vars, probe
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> убрать лишнее из cdicts и rels
-// plus - сохранять examples
-
-// οἶδα - oida
-
-// prefix:
-// ἀπογραφή
-// false prefix: ἡμέραι
-
-// indecls: πρίν
-// ψευδο - убрать из префиксов!
-// ἐπεξήγησις
-// πολύτροπος, ψευδολόγος, χρονοκρατέω, βαρύτονος
-// εὐχαριστία,
-// προσαναμιμνήσκω, προσδιαιρέω
-// παραγγέλλω = vow
-// ἀμφίβραχυς - adj
-// προσδιαγράφω, προσδιαφορέω, προσεπεισφορέω
-// note: συγκαθαιρέω - получаю συγ-καθαιρέω, и из него συγ-καθ-αιρέω, и еще συγκαθ-αιρέω, и из него συγ-καθ-αιρέω, т.е. 2 раза.
-// συγκαθαιρέω - καθαιρέω - αἱρέω <==
-// προσεπεισφορέω
-// εὐδαιμονία; εὐτυχία
-// ἀγάπη
-
-// compound: χρονοκρατέω - χρόνος; κρατέω
-
-// ========== еще проверить
-// ἦρ; ἡρωίς; τηρός; ἄγγελος; τρωγλοδύτης; γόνυ; συνίημι; γέγωνα; δείδω; κατανεύω; ὁράω; καλός;
-// ἶλιγξ; δοῦλος; βοηθός; αἰθαλίων; ἀδελφός; κακός; ἀντίπαις; ἀοιδός; ἅγιος; πολύς; ἀγαθός; αἶρα; καθαίρω; ἀγαθοεργέω; ἁλίσκομαι; ἀγαλλιάω;
-// χάσκω; βλέπω; ἀναβλέπω; ἀνήρ; πόρος; γιγνώσκω; ἀναγιγνώσκω; βλέπω; λαμβάνω; αὐλικός; αἴρω
-
-
-// === BUGS === πάντων - πας нет, а есть π + άντων, где π от глагола, где д.б. aug
-
-// ἐξέρχομαι
-// ἀδικέω - odd δικάζω; παραναβαίνω
-// проверить ἀνθράκινα, д.б. два результата
-// prefix м.б. обманом - καθαίρω, в main-словаре он будет καθαιρ-ω, а в lsj, интересно?
-// ἡμέρα
-
-let dbdefaults = ['wkt', 'bbh', 'dvr', 'lsj'] // , 'lsj' , 'bbl'
-// let dbdefaults = ['bbl'] // , 'lsj' , 'dvr'
-
-export async function anthrax(wf, dnames) {
-    // log('_____________DNAMES', wf, dnames)
+export async function anthrax(wf) {
     if (!wf) return []
-
-    if (!dnames) dnames = dbdefaults
-    dnames.push('nest')
-
-    await createDBs(dnames)
+    // await createDBs(dnames)
 
     let chains = []
     let termdicts = await getIndecls(wf)
@@ -135,7 +80,7 @@ export async function anthrax(wf, dnames) {
 
     // πολυμαθίη νόον ἔχειν οὐ διδάσκει
     // let cdicts = dicts.filter(dict=> dict.dict == chain.cdict.dict && dict.pos == chain.cdict.pos)
-    await addTrns(chains)
+    // await addTrns(chains)
 
     return chains
 }
@@ -147,8 +92,8 @@ async function main(dag, lead) {
     let dictbreaks = await parseDictBreaks(headtails, dag.termflex)
     // log('_dictbreaks', dictbreaks)
 
-    // let d_br_str = dictbreaks.map(br=> ['_head:', br.head, br.term].join(' - '))
-    // log('_d_br_str', lead.aug, d_br_str)
+    let br_strs = dictbreaks.map(br=> ['_head:', br.head, br.term].join(' - '))
+    // log('_br_strs', lead.aug, br_strs)
 
     let chains = []
     for (let br of dictbreaks) {
@@ -166,6 +111,7 @@ function proxyByConnector(con, dicts) {
     for (let cdict of dicts) {
         if (con != cdict.aug) continue // соответствие Second Component и BR
     }
+    return []
     return proxies
 }
 
@@ -177,15 +123,13 @@ function proxyByLead(lead, dicts) {
             if (!cdict.prefix) proxies.push(cdict)  // составной chain с префиксом
             else if (lead.pref == cdict.prefix.pref) proxies.push(cdict)
             cdict.test_pref = true
-            // leadPref { pref: 'ἀμφ', con: 'ι', tail: 'βαλλετον' }
-            // здесь-ли проверка на аугмент исторического времени?
-            // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить
+            // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить, // TODO: сделано?
 
         } else if (lead) { // lead.aug can be ''
             // log('____lead aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
             if (cdict.prefix) continue
             if (lead.aug == cdict.aug) proxies.push(cdict)
-            if (!lead.aug && !cdict.aug) proxies.push(cdict)
+            else if (!lead.aug && !cdict.aug) proxies.push(cdict)
             cdict.test_cdict_aug = true
 
             // log('____xxxxxxxxxxxxxxxxxxxxxxxxxxxx_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, 'proxy', cdict.proxy)
@@ -203,6 +147,7 @@ function probeForFlex(lead, br, fls) {
 
     let compound = !!br.taildicts.length && !!br.headdicts.length
     let maindicts = (compound) ? br.taildicts : br.headdicts
+    // log('___compound', compound, 'lead:', lead)
     // log('___maindicts', maindicts.length)
     if (!maindicts.length) return []
     let stem = (compound) ? br.tail : br.head
@@ -216,7 +161,7 @@ function probeForFlex(lead, br, fls) {
     if (!proxies.length) return []
 
     let proxy_rdicts = proxies.map(cdict=> cdict.rdict)
-    // log('_p_roxies_rdicts head:', br.head, 'rdicts:', proxy_rdicts)
+    // log('_p_roxies_rdicts:', br.head, 'rdicts:', proxy_rdicts)
 
     let daglead = ''
     if (lead.pref) {
@@ -231,6 +176,7 @@ function probeForFlex(lead, br, fls) {
 
     // log('_lead', lead)
     // log('_daglead', daglead)
+    // log('_fls', fls.length)
 
     fls = fls.filter(flex=> {
         if (daglead) return flex.lead == daglead
@@ -242,6 +188,7 @@ function probeForFlex(lead, br, fls) {
     let vfls = fls.filter(flex=> flex.verb)
     // let pfls = fls.filter(flex=> flex.part)
 
+    // log('_fls', fls.length)
     if (!fls.length) return []
     // log('_fls', fls.length)
     // TODO: αἴθων - Αἴθων - оба nouns ; nest неверно считает cstype ; а makeWKT неверно считает tgen
@@ -251,13 +198,13 @@ function probeForFlex(lead, br, fls) {
 
     for (let cdict of proxies) {
         if (cdict.person) continue // TODO::
-        // if (cdict.rdict != 'γλῶττα') continue // RFORM
+        // if (cdict.rdict != 'βάρακος') continue // RFORM
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
-        // log('_cdict', cdict)
-
+        // log('_cdict', cdict.rdict)
 
         if (!cdict.ckeys) continue // βάδην
+
         let ckeys = cdict.ckeys
 
         if (daglead) ckeys = cdict.ckeys.filter(ckey=> ckey.lead == daglead || !ckey.lead) // или нет lead - простые глаголы + внешний префикс - ἀνακοσμέω - κοσμέω
