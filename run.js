@@ -37,17 +37,22 @@ async function run(verbose) {
         return
     }
 
-    // log('_CHS', chains.length)
-    await addTrns(chains)
     // log('_CHS', chains)
+
+    await addTrns(chains)
+    // log('_run chains', chains)
 
     for (let chain of chains) {
         if (!verbose) chain = muteChain(chain)
+        // log('_CHAIN', chain)
         for (let cdict of chain.cdicts) {
             log('\n_rdict:', cdict.rdict, '_pos:', cdict.pos, '_morphs:', cdict.morphs)
-            if (verbose) {
-                log('_trn:', cdict.trn.wkt[0])
+            if (chain.indecl) log('_indecl')
+
+            if (verbose && cdict.trn) {
+                log('_trn:', cdict.trn.wkt)
                 log('_trn_dbs:', _.keys(cdict.trn))
+                log('_cdict:', cdict)
             }
         }
 
@@ -58,25 +63,18 @@ async function run(verbose) {
 
         if (verbose && chain.rels) {
             let rels = chain.rels.map(dict=> dict.rdict)
-            log('_rels:', rels)
+            log('_rels:', rels.length)
         }
 
 
     }
 }
 
-function muteChain(chain) {
-    chain.cfls = 'cfls'
-    chain.trns = 'trns'
-    chain.rels = 'rels'
-    return chain
-}
-
 async function addTrns(chains) {
     let dictkeys = []
     for (let chain of chains) {
-        if (chain.indecl) continue
-        let cdictkeys = chain.rels.map(cdict=> cdict.dict)
+        // if (chain.indecl) continue
+        let cdictkeys = chain.cdicts.map(cdict=> cdict.dict)
         dictkeys.push(...cdictkeys)
     }
 
@@ -85,12 +83,11 @@ async function addTrns(chains) {
 
     let trnsdicts = await getDicts(dictkeys)
     // log('_TRNS_tdicts', tdicts.length)
-    let trns_rdicts = trnsdicts.map(cdict=> cdict.rdict)
+    // let trns_rdicts = trnsdicts.map(cdict=> cdict.rdict)
     // log('_TRNS_trdicts', trns_rdicts)
 
     for (let chain of chains) {
-        // if (chain.indecl) continue
-        for (let cdict of chain.rels) {
+        for (let cdict of []) { // chain.rels
             cdict.trn = {}
             let tdicts = trnsdicts.filter(tdict=> tdict.dict == cdict.dict && tdict.rdict == cdict.rdict && tdict.pos == cdict.pos)
             // cdict.trns = tdict.trns
@@ -108,5 +105,11 @@ async function addTrns(chains) {
             }
         }
     }
+}
 
+function muteChain(chain) {
+    chain.cfls = 'cfls'
+    // chain.trns = 'trns'
+    chain.rels = 'rels'
+    return chain
 }

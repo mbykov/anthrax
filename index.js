@@ -5,7 +5,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, aug2vow, stresses, checkOddStress } from './lib/utils.js'
-import { createDBs, getFlexes, getDicts, getNests } from './lib/remote.js'
+import { createDBs, getFlexes, getDicts, getNests, getInds } from './lib/remote.js'
 import { enclitic } from './lib/enclitic.js'
 import { prettyIndecl, prettyName, prettyVerb } from './lib/utils.js'
 import Debug from 'debug'
@@ -38,15 +38,15 @@ export async function anthrax(wf) {
     // await createDBs(dnames)
 
     let chains = []
-    let termdicts = await getIndecls(wf)
-    // log('_INDS', termdicts.length)
-    if (termdicts.length) {
-        let termchain = makeTermChain(wf, termdicts)
-        chains.push(termchain)
+    let dag = await parseDAG(wf)
+
+    let idicts = await getInds(dag.cwf)
+    // log('_INDECLS', idicts)
+    if (idicts.length) {
+        let ichain = makeTermChain(wf, idicts)
+        chains.push(ichain)
     }
 
-    let dag = await parseDAG(wf)
-    if (!dag) return chains
     // log('_DAG', _.keys(dag))
     // ======================== ἀνακύκλωσις
     // pref - есть, а в WKT слово - νακυκλ -без префикса
@@ -125,17 +125,15 @@ function proxyByLead(lead, dicts) {
             cdict.test_pref = true
             // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить, // TODO: сделано?
 
-        } else if (lead) { // lead.aug can be ''
+        } else { // if (lead) // lead.aug can be ''
             // log('____lead aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
             if (cdict.prefix) continue
             if (lead.aug == cdict.aug) proxies.push(cdict)
+            else if (lead.aug == 'ἠ' && cdict.aug == 'ἀ') proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
             else if (!lead.aug && !cdict.aug) proxies.push(cdict)
             cdict.test_cdict_aug = true
-
-            // log('____xxxxxxxxxxxxxxxxxxxxxxxxxxxx_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, 'proxy', cdict.proxy)
         }
         // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_prefix', cdict.prefix)
-        // if (cdict.rdict == 'εἰλύω') log('_C', cdict)
     }
     return proxies
 }
@@ -153,15 +151,14 @@ function probeForFlex(lead, br, fls) {
     let stem = (compound) ? br.tail : br.head
 
     let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
-    // log('___br.head', br.head, mainrdicts)
+    o('___br.head Mainrdicts', br.head, mainrdicts)
     // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
 
     let proxies = (compound) ? proxyByConnector(br.con, maindicts) : proxyByLead(lead, maindicts)
-    // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
-    if (!proxies.length) return []
-
     let proxy_rdicts = proxies.map(cdict=> cdict.rdict)
-    // log('_p_roxies_rdicts:', br.head, 'rdicts:', proxy_rdicts)
+    o('_p_roxies_rdicts:', br.head, 'rdicts:', proxy_rdicts, '_lead', lead)
+
+    if (!proxies.length) return []
 
     let daglead = ''
     if (lead.pref) {
@@ -179,6 +176,7 @@ function probeForFlex(lead, br, fls) {
     // log('_fls', fls.length)
 
     fls = fls.filter(flex=> {
+        // return true
         if (daglead) return flex.lead == daglead
         else return !flex.lead
     })
@@ -198,6 +196,7 @@ function probeForFlex(lead, br, fls) {
 
     for (let cdict of proxies) {
         if (cdict.person) continue // TODO::
+        // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
         // if (cdict.rdict != 'βάρακος') continue // RFORM
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
@@ -212,7 +211,7 @@ function probeForFlex(lead, br, fls) {
 
         if (!ckeys.length) continue
 
-        // log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
+        o('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
 
         // participles - есть stype3: 'άουσα-άον', нет keys
         // log('_CKEYS', cdict.rdict, cdict.rstress)
@@ -220,17 +219,21 @@ function probeForFlex(lead, br, fls) {
         let cfls = []
         if (cdict.name) {
             for (let flex of nfls) {
-                if (cdict.rstress != flex.rstress) continue // различить γλῶττα / φάττα - разные ударения
+                // if (cdict.rstress != flex.rstress) continue // различить γλῶττα / φάττα - разные ударения
+
                 // log('_rstress', cdict.rdict, cdict.rstress, flex.rstress, flex.term)
                 // log('_f', cdict.rdict, cdict.stypes, flex.stype, flex.term, '_key', flex.key)
+                // if (flex.adverb) log('_FADV', flex)
 
                 for (let ckey of ckeys) {
                     // if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
-                    if (ckey.stype != flex.stype) continue
-                    if (ckey.gend != flex.gend) continue
+                    if (!flex.adverb) {
+                        if (ckey.stype != flex.stype) continue
+                        if (ckey.gend != flex.gend) continue
+                    }
                     if (!ckey.keys.includes(flex.key)) continue
                     cfls.push(flex)
-                    // log('_F_Name_OK', flex.diarform, flex.lead)
+                    // log('_F_Name_OK', flex)
                 }
 
                 // if (flex.adverb || ckeys.includes(flex.key)) cfls.push(flex)
@@ -608,21 +611,9 @@ async function getIndecls(wf) {
 }
 
 function makeTermChain(wf, termcdicts) {
-    let termchain = {dict: wf, indecl: true}
-    let cdicts = []
-    let rdictgroups = _.groupBy(termcdicts, 'rdict') // indecl vs irreg на самом деле
-    for (let rdict in rdictgroups) {
-        let gcdicts = rdictgroups[rdict]
-        let wkt = gcdicts.find(cdict=> cdict.dname == 'wkt') || gcdicts[0]
-        if (!wkt) continue
-        wkt.trn = {}
-        for (let dict of gcdicts) {
-            wkt.trn[dict.dname] = dict.trns
-        }
-        delete wkt.trns
-        cdicts.push(wkt)
-    }
-    termchain.cdicts = cdicts
+    let termchain = {dict: wf, indecl: true, rels: [], scheme: []} // TODO: scheme тут ьожет быть - astem-term
+    // parseMorph(termcdicts)
+    termchain.cdicts = termcdicts
     return termchain
 }
 

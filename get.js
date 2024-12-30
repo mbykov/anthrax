@@ -33,12 +33,12 @@ async function getDicts (stem) {
     log('_getDicts_', stem)
     try {
         let doc = await db.get(stem, {include_docs: true});
-        // log('_get_doc_', doc)
+        log('_doc_', doc)
         let docs = doc.docs
         for (let doc of docs) {
             // if (doc.rdict != 'νύξ') continue
-            doc.ckeys = doc.ckeys.length
-            log('_get_docs_', doc)
+            if (doc.ckeys) doc.ckeys = doc.ckeys.length // indecls have no ckeys
+            log('_get_doc_', doc)
         }
     } catch (err) {
         console.log('_not_found');
