@@ -8,10 +8,11 @@ import path  from 'path'
 import {oxia, comb, plain, strip} from 'orthos'
 
 let stem = process.argv.slice(2)[0] //  'ἀργυρῷ' // ἡγέομαι
-
 stem = comb(stem)
 
 let dname = process.argv.slice(3)[0] || 'wkt'
+
+// let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
 log('_STEM', stem) // γανακτ ; δεικν ;
 // let heads = [stem]
@@ -38,7 +39,7 @@ async function getDicts (stem) {
         for (let doc of docs) {
             // if (doc.rdict != 'νύξ') continue
             if (doc.ckeys) doc.ckeys = doc.ckeys.length // indecls have no ckeys
-            log('_get_doc_', doc)
+            // log('_get_doc_', doc)
         }
     } catch (err) {
         console.log('_not_found');

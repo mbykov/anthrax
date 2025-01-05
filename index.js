@@ -123,23 +123,26 @@ function proxyByLead(lead, dicts) {
             if (!cdict.prefix) proxies.push(cdict)  // составной chain с префиксом
             else if (lead.pref == cdict.prefix.pref) proxies.push(cdict)
             cdict.test_pref = true
+            // log('_lead_pref', cdict.rdict, 'lead.pref:',lead.pref, 'cdict.prefix.pref', cdict.prefix?.pref)
             // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить, // TODO: сделано?
 
         } else { // if (lead) // lead.aug can be ''
             // log('____lead aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
             if (cdict.prefix) continue
+            // proxies.push(cdict)
             if (lead.aug == cdict.aug) proxies.push(cdict)
             else if (lead.aug == 'ἠ' && cdict.aug == 'ἀ') proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
+            else if (lead.aug == 'ἐ' && !cdict.aug) proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
             else if (!lead.aug && !cdict.aug) proxies.push(cdict)
             cdict.test_cdict_aug = true
         }
-        // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_prefix', cdict.prefix)
+        // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_aug', lead.aug)
     }
     return proxies
 }
 
 function probeForFlex(lead, br, fls) {
-    // log('_____________fls', lead, br.head, br.headdicts.length)
+    // log('_____________p_robeForFlex', lead, '_head', br.head, '_con', br.con, br.headdicts.length)
     if (br.taildicts.length && !br.headdicts.length) return []
     if (!br.taildicts.length && br.con) return []
 
@@ -151,43 +154,38 @@ function probeForFlex(lead, br, fls) {
     let stem = (compound) ? br.tail : br.head
 
     let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
-    o('___br.head Mainrdicts', br.head, mainrdicts)
+    // log('___br.head Mainrdicts', br.head, mainrdicts)
     // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
 
-    let proxies = (compound) ? proxyByConnector(br.con, maindicts) : proxyByLead(lead, maindicts)
-    let proxy_rdicts = proxies.map(cdict=> cdict.rdict)
-    o('_p_roxies_rdicts:', br.head, 'rdicts:', proxy_rdicts, '_lead', lead)
+    // let proxies = (compound) ? proxyByConnector(br.con, maindicts) : proxyByLead(lead, maindicts)
+    let proxies = maindicts
+    let rproxies = proxies.map(cdict=> cdict.rdict)
+    // log('_p_roxies_rdicts:', compound, br.head, 'rdicts:', rproxies, '_aug', lead.aug, '_pref', lead.pref)
 
     if (!proxies.length) return []
 
-    let daglead = ''
-    if (lead.pref) {
-        // log('______________LEAD PREF', cdict.rdict, lead)
-        // TODO: тут пока непонятно, flex.aug <-> lead.con
-        daglead = lead.con
-    } else if (lead && lead.aug) {
-        daglead = lead.aug
-        // log('_LEAD AUG', lead)
-        // log('______________LEAD AUG cdict.rdict:', cdict.rdict, 'cdict.aug', cdict.aug, 'lead', lead.aug, cdict.aug == lead.aug)
-    }
-
-    // log('_lead', lead)
-    // log('_daglead', daglead)
     // log('_fls', fls.length)
-
     fls = fls.filter(flex=> {
-        // return true
-        if (daglead) return flex.lead == daglead
-        else return !flex.lead
+        return true
+        if (lead.pref) {
+            flex.con == lead.con
+        } else {
+            flex.aug == lead.aug
+        }
     })
+
+    if (!fls.length) return []
+
 
     let nfls = fls.filter(flex=> flex.name)
     let advfls = fls.filter(flex=> flex.adverb)
     let vfls = fls.filter(flex=> flex.verb)
     // let pfls = fls.filter(flex=> flex.part)
 
-    // log('_fls', fls.length)
-    if (!fls.length) return []
+    // log('_lead', br.head, lead)
+    // log('_fls', br.head, fls.length)
+    // log('_vfls', br.head, vfls.length)
+
     // log('_fls', fls.length)
     // TODO: αἴθων - Αἴθων - оба nouns ; nest неверно считает cstype ; а makeWKT неверно считает tgen
 
@@ -197,7 +195,7 @@ function probeForFlex(lead, br, fls) {
     for (let cdict of proxies) {
         if (cdict.person) continue // TODO::
         // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
-        // if (cdict.rdict != 'βάρακος') continue // RFORM
+        // if (cdict.rdict != 'σπείρω') continue // RFORM ; βάρακος
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
         // log('_cdict', cdict.rdict)
@@ -205,13 +203,23 @@ function probeForFlex(lead, br, fls) {
         if (!cdict.ckeys) continue // βάδην
 
         let ckeys = cdict.ckeys
-
-        if (daglead) ckeys = cdict.ckeys.filter(ckey=> ckey.lead == daglead || !ckey.lead) // или нет lead - простые глаголы + внешний префикс - ἀνακοσμέω - κοσμέω
-        // else ckeys = cdict.ckeys.filter(ckey=> !ckey.lead)
-
+        ckeys = cdict.ckeys.filter(ckey=> {
+            let ok = true
+            if (lead.pref) { // короткие, с тем же стемом
+                if (!ckey.prefix) ok = false // TODO: aug должен соответствовать con
+                if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.prefix.con !== lead.con)) ok = false
+            } else { // длинные, целые
+                if (ckey.prefix) ok = false
+                if (ckey.aug !== lead.aug) ok = false
+            }
+            // if (ok) log('________ckeys lead ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
+            return ok
+        })
+        cdict.ckeys = ckeys
+        // log('_CKEYS', cdict.rdict, cdict.ckeys)
         if (!ckeys.length) continue
 
-        o('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
+        // log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
 
         // participles - есть stype3: 'άουσα-άον', нет keys
         // log('_CKEYS', cdict.rdict, cdict.rstress)
@@ -248,13 +256,14 @@ function probeForFlex(lead, br, fls) {
                 // log('_F', flex.tense)
                 // cfls.push(flex)
                 for (let ckey of ckeys) {
-                    if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
-                    // if (ckey.lead != flex.lead) continue
+                    // if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
+                    if (ckey.lead != flex.lead) continue
                     if (ckey.stype != flex.stype) continue
                     if (ckey.tense != flex.tense) continue
-                    if (ckey.keys.includes(flex.key)) cfls.push(flex)
-                    // cfls.push(flex)
-                    // if (ckey.keys.includes(flex.key)) log('_F_OK', ckeys.length, cdict.rdict, flex.tense, flex)
+                    if (!ckey.keys.includes(flex.key)) continue
+                    cfls.push(flex)
+                    ckey.ok = true
+                    // log('_F_Verb_OK', flex.tense)
                 }
             }
         }
@@ -262,20 +271,17 @@ function probeForFlex(lead, br, fls) {
         if (!cfls.length) continue
         cdict.cfls = cfls
 
+        let okckeys = cdict.ckeys.filter(ckey=> ckey.ok)
+        // log('__OKCK', cdict.rdict, cdict.stem, okckeys)
+        cdict.ckeys = okckeys
+
         // log('probe_ok', cdict.pos, cdict.rdict, cdict.stem,  '_cfls:', cdict.cfls.length)
 
         stemdicts.push(cdict)
-        // let probeFLS = {cdict.dict, cdicts, rels: maindicts, term: br.term}
 
-        // if (compound && br.headdicts.length) {
-        //     let hrdicts = br.headdicts.map(cdict=> cdict.rdict)
-        //     probeFLS.hrdicts = hrdicts
-        //     probeFLS.hdicts = br.headdicts
-        //     probeFLS.head = br.head
-        //     if (br.con) probeFLS.con = br.con
-        // }
-        // brchains.push(probeFLS) // COMPOUND
     } // proxy cdict
+
+    // log('__________________LEAD', lead)
 
     if (!stemdicts.length) return []
 
@@ -291,8 +297,11 @@ function probeForFlex(lead, br, fls) {
         if (probe.verb) probeFLS.verb = true
         else probeFLS.name = true
 
-        let scheme = parseScheme(lead, probe, br.term)
+        // log('_BR-lead', lead)
+        // log('_BR', br.head, br.con, br.tail)
+        let scheme = parseScheme(lead, probe, br)
         probeFLS.scheme = scheme
+
         parseMorph(cdicts)
 
         // log('_XXXXXXXXXXXXXXXXX probeFLS', probeFLS)
@@ -305,30 +314,6 @@ function probeForFlex(lead, br, fls) {
     // log('_XXXXXXXXXXXXXXXXXx', brchains.length)
     // return []
     return brchains
-}
-
-function makeVars(cdict) {
-    let vars = []
-    for (let stype of cdict.stypes) {
-        if (stype == 'ω') stype = 'ω-ω'
-        // if (cdict.rdict == 'ἀντιβάλλω') log('_stype', stype) // ἀβίοτος
-
-        for (let gend in nameKey[stype]) {
-            let keys = nameKey[stype][gend]
-            let variant = {stype, gend, keys}
-            vars.push(variant)
-        }
-
-        for (let tense in verbKey[stype]) {
-            let keys = verbKey[stype][tense]
-            let variant = {stype, tense, keys}
-            // log('_make vars tense', cdict.rdict, '_tense', tense, keys)
-            vars.push(variant)
-        }
-        // log('_make vars', cdict.rdict, '_stype', stype, vars.length)
-    }
-    // log('_MAKE VARS', cdict.rdict, vars)
-    return vars
 }
 
 function cleanChain(chain) {
@@ -369,46 +354,26 @@ function parseMorph(cdicts) {
     }
 }
 
-
-function parseScheme(lead, probe, term) {
+function parseScheme(lead, probe, br) {
     let scheme = []
-    let schemobj = []
-    let prefix, aug, stem
     // если cdict уже имеет префикс, то это полная форма, с коротким стемом
     // а может быть, что noun имеет prefix, а adjective или verb - нет? Кажется, может. И что будет? Это нужно проверять при заливке Nest
-
     if (lead.pref) {
-        if (probe.prefix) {
-            stem = [probe.prefix.pref, probe.prefix.con, probe.stem].join('')
-            // scheme.push(stem)
-            scheme.push({seg: stem, dict: probe.dict, stem: true})
-            // schemobj.stem = stem
-        } else {
-            let pref = [lead.pref, lead.con].join('')
-            // scheme.push(pref)
-            // scheme.push(probe.stem)
-            scheme.push({seg: pref, dict: lead.pref, pref: true})
-            scheme.push({seg: probe.stem, dict: probe.dict, stem: true})
-            // schemobj.pref = pref
-            // schemobj.stem = probe.stem
-        }
-    } else if (lead) {
-        if (probe.aug) stem = [probe.aug, probe.stem].join('')
-        else stem = probe.stem
-        // scheme.push(stem)
-        scheme.push({seg: stem, dict: probe.dict, stem: true})
-        schemobj.stem = stem
+        // log('_______________________P', lead)
+        let segs = []
+        segs.push(lead.pref)
+        if (lead.con) segs.push(lead.con)
+        segs.push(probe.stem)
+        let seg = segs.join('')
+        scheme.push({seg, dict: probe.dict, stem: true})
     } else {
-        log('_NO_LEAD', lead)
-        scheme.push('__kukuku_no_lead_убрать') // TODO:
+        // log('_______________________NO PPP', br.head)
+        scheme.push({seg: br.head, dict: br.head, pref: true})
+        if (br.con )scheme.push({seg: br.con, con: true})
+        scheme.push({seg: br.tail, dict: probe.dict, stem: true})
     }
-    scheme.push({seg: term, dict: term, term: true})
-    // schemobj.term = term
-
-    // brchain.scheme = scheme
-    // brchain.schemobj = schemobj
-    // brchain.schemestr = scheme.join('-')
-
+    scheme.push({seg: br.term, dict: br.term, term: true})
+    // log('_SCHEME', scheme)
     return scheme
 }
 
@@ -598,16 +563,6 @@ function removeVowelEnd(wf) {
     let end = wf[wf.length-1]
     if (vowels.includes(end)) wf = wf.slice(0, -1)
     return wf
-}
-
-async function getIndecls(wf) {
-    let cwf = oxia(comb(wf))
-    // log('_______________________________________________WF', wf, cwf)
-    let keys = [cwf]
-    let termcdicts = await getDicts(keys)
-    // log('_______________________________________________WF', wf, termcdicts)
-    termcdicts = termcdicts.filter(dict=> dict.indecl || dict.irreg)
-    return termcdicts
 }
 
 function makeTermChain(wf, termcdicts) {

@@ -46,7 +46,13 @@ async function run(verbose) {
         if (!verbose) chain = muteChain(chain)
         // log('_CHAIN', chain)
         for (let cdict of chain.cdicts) {
-            log('\n_rdict:', cdict.rdict, '_pos:', cdict.pos, '_morphs:', cdict.morphs)
+
+            let pos = 'xxx'
+            if (cdict.verb) pos = 'verb'
+            else if (cdict.name && cdict.adj) pos = 'adj'
+            else if (cdict.name) pos = 'noun'
+
+            log('\n_rdict:', cdict.rdict, '_pos:', pos, '_morphs:', cdict.morphs)
             if (chain.indecl) log('_indecl')
 
             if (verbose && cdict.trn) {
@@ -56,7 +62,7 @@ async function run(verbose) {
             }
         }
 
-        if (chain.scheme) { // TODO: это indecls
+        if (chain.scheme) { // TODO: indecls ?
             let scheme = chain.scheme.map(segment=> segment.seg).join('-')
             log('_scheme:', scheme)
         }
