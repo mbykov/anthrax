@@ -4,10 +4,10 @@ import path  from 'path'
 import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
-import { scrape, vowels, getStress, parseAug, aug2vow, stresses, checkOddStress } from './lib/utils.js'
+import { scrape, vowels, getStress, parseAug, stresses, checkOddStress } from './lib/utils.js'
 import { createDBs, getFlexes, getDicts, getNests, getInds } from './lib/remote.js'
 import { enclitic } from './lib/enclitic.js'
-import { prettyIndecl, prettyName, prettyVerb } from './lib/utils.js'
+import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
 
 // KEYS
@@ -147,6 +147,8 @@ function probeForFlex(lead, br, fls) {
     if (!br.taildicts.length && br.con) return []
 
     let compound = !!br.taildicts.length && !!br.headdicts.length
+    if (compound) return []
+
     let maindicts = (compound) ? br.taildicts : br.headdicts
     // log('___compound', compound, 'lead:', lead)
     // log('___maindicts', maindicts.length)
@@ -154,13 +156,21 @@ function probeForFlex(lead, br, fls) {
     let stem = (compound) ? br.tail : br.head
 
     let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
-    // log('___br.head Mainrdicts', br.head, mainrdicts)
-    // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
+    log('___br.head Mainrdicts', br.head, mainrdicts)
 
+    // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
     // let proxies = (compound) ? proxyByConnector(br.con, maindicts) : proxyByLead(lead, maindicts)
+
+    // let proxies = maindicts.filter(cdict=> {
+        // if (lead.pref && cdict.prefix) return true
+    // })
+
     let proxies = maindicts
     let rproxies = proxies.map(cdict=> cdict.rdict)
-    // log('_p_roxies_rdicts:', compound, br.head, 'rdicts:', rproxies, '_aug', lead.aug, '_pref', lead.pref)
+
+    log('_a_lead:', lead)
+    log('_a_br:', 'compound', compound, 'head', br.head, 'tail:', br.tail)
+    log('_a_proxies_rdicts:', 'compound', compound, 'rdicts:', rproxies)
 
     if (!proxies.length) return []
 
@@ -175,7 +185,6 @@ function probeForFlex(lead, br, fls) {
     })
 
     if (!fls.length) return []
-
 
     let nfls = fls.filter(flex=> flex.name)
     let advfls = fls.filter(flex=> flex.adverb)
@@ -195,44 +204,66 @@ function probeForFlex(lead, br, fls) {
     for (let cdict of proxies) {
         if (cdict.person) continue // TODO::
         // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
-        // if (cdict.rdict != 'σπείρω') continue // RFORM ; βάρακος
+
+        if (cdict.rdict != 'παρακρύπτω') continue // RFORM ; βάρακος
+
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
         // log('_cdict', cdict.rdict)
 
         if (!cdict.ckeys) continue // βάδην
 
+        // =======================================================================================================================
+        // παρακρύπτω παρέκρυπτον - закомментировал prefix παρέκ
+        // HERE - что делать? maindicts вычисляются уже с использование lead.pref, то есть неверно
+        // =======================================================================================================================
+
+        // log('_B_CURPREF', cdict.rdict, cdict.psize)
+        // let curpref = guessPrefix(cdict.rdict, cdict.psize)
+        // log('_CURPREF', '_L', lead)
+
+        for (let ckey of cdict.ckeys) {
+            // log('_K', cdict.rdict, ckey.tense, ckey.con, ckey.prefix.con, '_L', lead.con)
+        }
+
         let ckeys = cdict.ckeys
         ckeys = cdict.ckeys.filter(ckey=> {
             let ok = true
-            if (lead.pref) { // короткие, с тем же стемом
-                if (!ckey.prefix) ok = false // TODO: aug должен соответствовать con
-                if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.prefix.con !== lead.con)) ok = false
-            } else { // длинные, целые
+            // =======================================================================================================
+            // здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον
+            // =======================================================================================================
+            if (lead.pref) { // wf with prefs, с тем же стемом
+                if (!ckey.prefix && ckey.bad) ok = false // должен быть prefix, но его нет
+                else if (!ckey.prefix) ok = true // shorts // TODO: aug ~ connector
+                // both prefs, regulars:
+                if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.con !== lead.con)) ok = false
+                // if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.prefix.con !== lead.con)) ok = false
+                // log('_xxxxx', cdict.rdict, ckey.prefix?.pref)
+            } else { // целые, без префикса
                 if (ckey.prefix) ok = false
-                if (ckey.aug !== lead.aug) ok = false
+                // if (ckey.bad) ok = false // так я все bads убил, не верно
+                else if (ckey.aug !== lead.aug) ok = false
             }
             // if (ok) log('________ckeys lead ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
             return ok
         })
+
+        // let xkeys = ckeys.filter(ckey=> ckey.tense == 'pres.act.inf')
+        // log('_X KEYS', cdict.rdict, cdict.stem, xkeys)
+        // ckeys = cdict.ckeys
+
+        // let tenses = cdict.ckeys.map(ckey=> ckey.tense)
+        // log('_CKEYS', cdict.rdict, tenses)
+
         cdict.ckeys = ckeys
-        // log('_CKEYS', cdict.rdict, cdict.ckeys)
         if (!ckeys.length) continue
 
-        // log('____probe', cdict.rdict, cdict.stem, cdict.pos, 'fls', fls.length) // , cdict.stypes
-
-        // participles - есть stype3: 'άουσα-άον', нет keys
-        // log('_CKEYS', cdict.rdict, cdict.rstress)
+        // log('____probe', cdict.rdict, cdict.stem, 'fls', fls.length, lead) // , cdict.stypes
 
         let cfls = []
         if (cdict.name) {
             for (let flex of nfls) {
                 // if (cdict.rstress != flex.rstress) continue // различить γλῶττα / φάττα - разные ударения
-
-                // log('_rstress', cdict.rdict, cdict.rstress, flex.rstress, flex.term)
-                // log('_f', cdict.rdict, cdict.stypes, flex.stype, flex.term, '_key', flex.key)
-                // if (flex.adverb) log('_FADV', flex)
-
                 for (let ckey of ckeys) {
                     // if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
                     if (!flex.adverb) {
@@ -243,7 +274,6 @@ function probeForFlex(lead, br, fls) {
                     cfls.push(flex)
                     // log('_F_Name_OK', flex)
                 }
-
                 // if (flex.adverb || ckeys.includes(flex.key)) cfls.push(flex)
             }
             for (let flex of advfls) {
@@ -252,6 +282,7 @@ function probeForFlex(lead, br, fls) {
                 cfls.push(flex)
             }
         } else if (cdict.verb) {
+            // log('_C', cdict.rdict)
             for (let flex of vfls) {
                 // log('_F', flex.tense)
                 // cfls.push(flex)
@@ -263,7 +294,7 @@ function probeForFlex(lead, br, fls) {
                     if (!ckey.keys.includes(flex.key)) continue
                     cfls.push(flex)
                     ckey.ok = true
-                    // log('_F_Verb_OK', flex.tense)
+                    // log('_F_Verb_OK', cdict.rdict, flex.tense)
                 }
             }
         }
@@ -359,15 +390,21 @@ function parseScheme(lead, probe, br) {
     // если cdict уже имеет префикс, то это полная форма, с коротким стемом
     // а может быть, что noun имеет prefix, а adjective или verb - нет? Кажется, может. И что будет? Это нужно проверять при заливке Nest
     if (lead.pref) {
-        // log('_______________________P', lead)
-        let segs = []
-        segs.push(lead.pref)
-        if (lead.con) segs.push(lead.con)
-        segs.push(probe.stem)
-        let seg = segs.join('')
-        scheme.push({seg, dict: probe.dict, stem: true})
+        // log('_______________________P', probe.rdict, probe.prefix)
+        if (probe.prefix) {
+            let segs = []
+            segs.push(lead.pref)
+            if (lead.con) segs.push(lead.con)
+            segs.push(probe.stem)
+            let seg = segs.join('')
+            scheme.push({seg, dict: probe.dict, stem: true})
+        } else {
+            scheme.push({seg: lead.pref, dict: lead.pref, pref: true})
+            if (lead.con) scheme.push({seg: lead.con, con: true})
+            scheme.push({seg: probe.stem, dict: probe.dict, stem: true})
+        }
     } else {
-        // log('_______________________NO PPP', br.head)
+        // log('_______________________NO P', probe.rdict, br.head)
         scheme.push({seg: br.head, dict: br.head, pref: true})
         if (br.con )scheme.push({seg: br.con, con: true})
         scheme.push({seg: br.tail, dict: probe.dict, stem: true})
@@ -520,7 +557,6 @@ function parsePrefSeg(pcwf) {
 }
 
 // ====================================
-
 
 function parsePrefix(pcwf) {
     let prefstr = '', re
