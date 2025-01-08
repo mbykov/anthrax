@@ -54,19 +54,19 @@ export async function anthrax(wf) {
     // false prefix: ἡμέραι
 
     let leads = []
-    let leadPref = parsePrefSeg(dag.pcwf)
-    if (leadPref) leads.push(leadPref)
-    // log('___leadPref', leadPref)
-    d(leadPref) // '_PREF tail',
+    let leadPrefs = parsePrefSeg(dag.pcwf)
+    if (leadPrefs) leads.push(...leadPrefs)
 
-    // pref = null
+    // log('_leadPrefs', leadPrefs)
+    //  { pref: 'προσαν', con: 'α', tail: 'μιμνησκω' }
+
     // ἀνακύκλωσις - pref = null // ==== значит, надо оба варианта, пока в словаре все слова точно не будут обработаны на префиксы - ἀνακύκλησις
     // или просто подождать DVR, LSJ, там есть - κλῆσις
-
     let leadAug = parseAug(dag.pcwf)
     if (leadAug) leads.push(leadAug)
-    // log('____leadAug', leadAug)
-    d(leadAug) // '_AUG tail',
+
+    // log('_leads', leads)
+    // return []
 
     for (let lead of leads) {
         let brchains = await main(dag, lead)
@@ -87,6 +87,7 @@ export async function anthrax(wf) {
 
 async function main(dag, lead) {
     let ptail = lead.tail
+
     let headtails = parseHeadTails(dag, ptail)
     // log('_headtails', ptail, headtails)
     let dictbreaks = await parseDictBreaks(headtails, dag.termflex)
@@ -106,48 +107,13 @@ async function main(dag, lead) {
     return chains
 }
 
-function proxyByConnector(con, dicts) {
-    let proxies = []
-    for (let cdict of dicts) {
-        if (con != cdict.aug) continue // соответствие Second Component и BR
-    }
-    return []
-    return proxies
-}
-
-function proxyByLead(lead, dicts) {
-    let proxies = []
-    for (let cdict of dicts) {
-        if (lead.pref) {
-            // if (cdict.aug) continue
-            if (!cdict.prefix) proxies.push(cdict)  // составной chain с префиксом
-            else if (lead.pref == cdict.prefix.pref) proxies.push(cdict)
-            cdict.test_pref = true
-            // log('_lead_pref', cdict.rdict, 'lead.pref:',lead.pref, 'cdict.prefix.pref', cdict.prefix?.pref)
-            // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить, // TODO: сделано?
-
-        } else { // if (lead) // lead.aug can be ''
-            // log('____lead aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
-            if (cdict.prefix) continue
-            // proxies.push(cdict)
-            if (lead.aug == cdict.aug) proxies.push(cdict)
-            else if (lead.aug == 'ἠ' && cdict.aug == 'ἀ') proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
-            else if (lead.aug == 'ἐ' && !cdict.aug) proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
-            else if (!lead.aug && !cdict.aug) proxies.push(cdict)
-            cdict.test_cdict_aug = true
-        }
-        // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_aug', lead.aug)
-    }
-    return proxies
-}
-
 function probeForFlex(lead, br, fls) {
     // log('_____________p_robeForFlex', lead, '_head', br.head, '_con', br.con, br.headdicts.length)
     if (br.taildicts.length && !br.headdicts.length) return []
     if (!br.taildicts.length && br.con) return []
 
     let compound = !!br.taildicts.length && !!br.headdicts.length
-    if (compound) return []
+    // if (compound) return []
 
     let maindicts = (compound) ? br.taildicts : br.headdicts
     // log('___compound', compound, 'lead:', lead)
@@ -156,7 +122,7 @@ function probeForFlex(lead, br, fls) {
     let stem = (compound) ? br.tail : br.head
 
     let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
-    log('___br.head Mainrdicts', br.head, mainrdicts)
+    // log('_M br.head Mainrdicts', br.head, mainrdicts)
 
     // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
     // let proxies = (compound) ? proxyByConnector(br.con, maindicts) : proxyByLead(lead, maindicts)
@@ -168,9 +134,9 @@ function probeForFlex(lead, br, fls) {
     let proxies = maindicts
     let rproxies = proxies.map(cdict=> cdict.rdict)
 
-    log('_a_lead:', lead)
-    log('_a_br:', 'compound', compound, 'head', br.head, 'tail:', br.tail)
-    log('_a_proxies_rdicts:', 'compound', compound, 'rdicts:', rproxies)
+    // log('_a_lead:', lead)
+    // log('_a_br:', 'compound', compound, 'head', br.head, 'tail:', br.tail)
+    // log('_a_proxies_rdicts:', 'compound', compound, 'rdicts:', rproxies)
 
     if (!proxies.length) return []
 
@@ -205,7 +171,7 @@ function probeForFlex(lead, br, fls) {
         if (cdict.person) continue // TODO::
         // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
 
-        if (cdict.rdict != 'παρακρύπτω') continue // RFORM ; βάρακος
+        // if (cdict.rdict != 'παρακρύπτω') continue // RFORM ; βάρακος
 
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
@@ -222,13 +188,18 @@ function probeForFlex(lead, br, fls) {
         // let curpref = guessPrefix(cdict.rdict, cdict.psize)
         // log('_CURPREF', '_L', lead)
 
+        // if (!cdict.name) continue // NAME
+
         for (let ckey of cdict.ckeys) {
             // log('_K', cdict.rdict, ckey.tense, ckey.con, ckey.prefix.con, '_L', lead.con)
+            // log('_CK', cdict.rdict, cdict.ckeys, '_L', lead.aug)
         }
 
+        // log('____probe_0', cdict.rdict, cdict.stem, 'fls', fls.length, lead) // , cdict.stypes
         let ckeys = cdict.ckeys
         ckeys = cdict.ckeys.filter(ckey=> {
             let ok = true
+            // return ok
             // =======================================================================================================
             // здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον
             // =======================================================================================================
@@ -238,13 +209,14 @@ function probeForFlex(lead, br, fls) {
                 // both prefs, regulars:
                 if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.con !== lead.con)) ok = false
                 // if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.prefix.con !== lead.con)) ok = false
-                // log('_xxxxx', cdict.rdict, ckey.prefix?.pref)
+                // log('________ckeys lead pref', cdict.rdict, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref)
             } else { // целые, без префикса
                 if (ckey.prefix) ok = false
                 // if (ckey.bad) ok = false // так я все bads убил, не верно
                 else if (ckey.aug !== lead.aug) ok = false
+                // log('________ckeys aug ok: ', ok, cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug)
             }
-            // if (ok) log('________ckeys lead ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
+            // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
             return ok
         })
 
@@ -505,8 +477,6 @@ function parseHeadTail(stub, term) {
         if (stresses.includes(stress)) term = term.slice(1)
 
         let ht = {head, con, tail, term}
-        // if (lead.typeaug) ht.typeaug = true, ht.aug = lead.aug
-        // else if (lead.typepref) ht.typepref = true, ht.prefix = lead.prefix, ht.con = lead.con
         pairs.push(ht)
     }
     return pairs
@@ -541,32 +511,52 @@ async function parseDAG(wf) {
         let termfls = dag.fls.filter(flex=> flex.term == term)
         dag.termflex[term] = termfls
     }
-
-
     return dag
 }
 
+// просто, если часть префикса начинается с гласной, добавить тонкое придыхание. Пока на густое забить. И выяснить, если-ли вообще приставки с густым?
 function parsePrefSeg(pcwf) {
-    let pref_ = parsePrefix(pcwf)
-    if (!pref_) return // {pref: '', con: '', tail: ''}
-    let pref = pref_.replace(/-/g, '')
-    let repref = new RegExp('^' + pref)
-    let atail = pcwf.replace(repref, '')
-    let { con, tail } = removeVowelBeg(atail)
-    return {pref, con, tail}
+    let prefraw = parsePrefix(pcwf)
+    if (!prefraw) return // {pref: '', con: '', tail: ''}
+
+    let pparts = prefraw.split('-')
+    let psize = pparts.length
+
+    let psegs = []
+    let pref = pparts.join('')
+    while (pparts.length) {
+        // log('__pref', pref)
+        let pseg = {pprefs: []}
+        let parts = _.clone(pparts)
+        if (parts.length < psize) pseg.pprefs = parts
+        pseg.pref = pref
+        let ppref = pseg.pprefs.join('')
+        let repref = new RegExp('^' + ppref + pref)
+        let atail = pcwf.replace(repref, '')
+        let { con, tail } = removeVowelBeg(atail)
+        pseg.con = con
+        pseg.tail = tail
+
+        pref = pparts.pop()
+        if (!pseg.pprefs.length) delete pseg.pprefs
+        psegs.push(pseg)
+    }
+
+    return psegs
+}
+
+function parsePrefix(pcwf) {
+    let prefraw = '', re
+    for (let pref of preflist) {
+        re = new RegExp('^' + pref.replace(/-/g, ''))
+        if (!re.test(pcwf)) continue
+        // log('_pre', pref)
+        if (prefraw.length < pref.length) prefraw = pref
+    }
+    return prefraw
 }
 
 // ====================================
-
-function parsePrefix(pcwf) {
-    let prefstr = '', re
-    for (let pref of preflist) {
-      re = new RegExp('^' + pref.replace(/-/g, ''))
-        if (!re.test(pcwf)) continue
-        if (prefstr.length < pref.length) prefstr = pref
-    }
-    return prefstr
-}
 
 function findConnector(pstr) {
   let vow = pstr[0]
@@ -644,4 +634,39 @@ async function addTrns(chains) {
         }
     }
 
+}
+
+function proxyByConnector(con, dicts) {
+    let proxies = []
+    for (let cdict of dicts) {
+        if (con != cdict.aug) continue // соответствие Second Component и BR
+    }
+    return []
+    return proxies
+}
+
+function proxyByLead(lead, dicts) {
+    let proxies = []
+    for (let cdict of dicts) {
+        if (lead.pref) {
+            // if (cdict.aug) continue
+            if (!cdict.prefix) proxies.push(cdict)  // составной chain с префиксом
+            else if (lead.pref == cdict.prefix.pref) proxies.push(cdict)
+            cdict.test_pref = true
+            // log('_lead_pref', cdict.rdict, 'lead.pref:',lead.pref, 'cdict.prefix.pref', cdict.prefix?.pref)
+            // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить, // TODO: сделано?
+
+        } else { // if (lead) // lead.aug can be ''
+            // log('____lead aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
+            if (cdict.prefix) continue
+            // proxies.push(cdict)
+            if (lead.aug == cdict.aug) proxies.push(cdict)
+            else if (lead.aug == 'ἠ' && cdict.aug == 'ἀ') proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
+            else if (lead.aug == 'ἐ' && !cdict.aug) proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
+            else if (!lead.aug && !cdict.aug) proxies.push(cdict)
+            cdict.test_cdict_aug = true
+        }
+        // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_aug', lead.aug)
+    }
+    return proxies
 }

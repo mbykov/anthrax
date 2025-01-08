@@ -53,13 +53,9 @@ async function run(verbose) {
             else if (cdict.name) pos = 'noun'
 
             log('\n_rdict:', cdict.rdict, '_pos:', pos, '_morphs:', cdict.morphs)
+            if (verbose) log('_cdict', cdict)
             if (chain.indecl) log('_indecl')
 
-            if (verbose && cdict.trn) {
-                log('_trn:', cdict.trn.wkt)
-                log('_trn_dbs:', _.keys(cdict.trn))
-                log('_cdict:', cdict)
-            }
         }
 
         if (chain.scheme) { // TODO: indecls ?
