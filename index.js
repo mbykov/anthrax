@@ -6,7 +6,7 @@ import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, stresses, checkOddStress } from './lib/utils.js'
 import { createDBs, getFlexes, getDicts, getNests, getInds } from './lib/remote.js'
-import { enclitic } from './lib/enclitic.js'
+// import { enclitic } from './lib/enclitic.js'
 import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
 
@@ -171,7 +171,7 @@ function probeForFlex(lead, br, fls) {
         if (cdict.person) continue // TODO::
         // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
 
-        // if (cdict.rdict != 'παρακρύπτω') continue // RFORM ; βάρακος
+        // if (cdict.rdict != 'κονία') continue // RFORM ; βάρακος ; παρακρύπτω
 
         // if (cdict.stem != 'γλαυξ') continue
         // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
@@ -203,18 +203,19 @@ function probeForFlex(lead, br, fls) {
             // =======================================================================================================
             // здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον
             // =======================================================================================================
-            if (lead.pref) { // wf with prefs, с тем же стемом
+            if (lead.pref) { // wf with prefs, с тем же стемом, сборная с префиксом здесь, ее не должно быть в lead.aug
                 if (!ckey.prefix && ckey.bad) ok = false // должен быть prefix, но его нет
-                else if (!ckey.prefix) ok = true // shorts // TODO: aug ~ connector
-                // both prefs, regulars:
                 if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.con !== lead.con)) ok = false
+                else if (!ckey.prefix && ckey.aug !== lead.pref) ok = false
                 // if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.prefix.con !== lead.con)) ok = false
-                // log('________ckeys lead pref', cdict.rdict, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref)
+                // if (ok) log('________ckeys lead pref', cdict.rdict, ok, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref, 'ckey.aug', ckey.aug)
+                // ok = false
             } else { // целые, без префикса
                 if (ckey.prefix) ok = false
                 // if (ckey.bad) ok = false // так я все bads убил, не верно
                 else if (ckey.aug !== lead.aug) ok = false
-                // log('________ckeys aug ok: ', ok, cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug)
+                // if (ok) log('________ckeys aug ok:', cdict.rdict, ok, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug)
+                // ok = false
             }
             // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
             return ok
@@ -225,12 +226,12 @@ function probeForFlex(lead, br, fls) {
         // ckeys = cdict.ckeys
 
         // let tenses = cdict.ckeys.map(ckey=> ckey.tense)
-        // log('_CKEYS', cdict.rdict, tenses)
+        // log('_CKEYS', cdict.rdict, ckeys.length)
 
         cdict.ckeys = ckeys
         if (!ckeys.length) continue
 
-        // log('____probe', cdict.rdict, cdict.stem, 'fls', fls.length, lead) // , cdict.stypes
+        // log('____probe', cdict.rdict, cdict.stem, 'fls', fls.length, '_lead', lead, '_ckeys', cdict.ckeys.length) // , cdict.stypes
 
         let cfls = []
         if (cdict.name) {
@@ -276,7 +277,7 @@ function probeForFlex(lead, br, fls) {
 
         let okckeys = cdict.ckeys.filter(ckey=> ckey.ok)
         // log('__OKCK', cdict.rdict, cdict.stem, okckeys)
-        cdict.ckeys = okckeys
+        // cdict.ckeys = okckeys
 
         // log('probe_ok', cdict.pos, cdict.rdict, cdict.stem,  '_cfls:', cdict.cfls.length)
 
@@ -525,7 +526,7 @@ function parsePrefSeg(pcwf) {
     let psegs = []
     let pref = pparts.join('')
     while (pparts.length) {
-        // log('__pref', pref)
+        // log('__p_ref', pref)
         let pseg = {pprefs: []}
         let parts = _.clone(pparts)
         if (parts.length < psize) pseg.pprefs = parts

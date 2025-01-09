@@ -28,14 +28,20 @@ async function run(verbose) {
     dnames.push('nest')
     await createDBs(dnames)
 
+    // проверка на greek - хоть один символ
+    // клик на слове - получить три - до, клик, после
+    // enclitics
 
-    // TODO: отденьно - сначала indecl-DB
+
+    // TODO: отденльно - сначала indecl-DB
     let chains = await anthrax(wordform)
 
     if (!chains.length) {
         log('no result')
         return
     }
+
+    if (!chains.length > 2) log('________________________________too many chains', chains.length)
 
     // log('_CHS', chains)
 
@@ -96,7 +102,9 @@ async function addTrns(chains) {
             for (let tdict of tdicts) {
                 cdict.trn[tdict.dname] = tdict.trns
             }
+            delete cdict.trns
         }
+        
         for (let cdict of chain.cdicts) {
             cdict.trn = {}
             // log('____________________________c', cdict.rdict, cdict.dname)
@@ -105,6 +113,7 @@ async function addTrns(chains) {
                 // log('____________________________c_t', tdict.dname, tdict.trns)
                 cdict.trn[tdict.dname] = tdict.trns
             }
+            delete cdict.trns
         }
     }
 }
