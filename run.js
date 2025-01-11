@@ -52,16 +52,16 @@ async function run(verbose) {
         // log('_CHAIN', chain)
         if (chain.scheme) { // TODO: indecls ?
             let scheme = chain.scheme.map(segment=> segment.seg).join('-')
-            log('\n_chain.scheme:', chain.scheme)
+            if (verbose) log('\n_chain.scheme:', chain.scheme)
             log('_scheme:', scheme)
         }
 
         for (let cdict of chain.cdicts) {
             if (chain.indecl) log('_indecl:')
             let pos = posByCdict(cdict)
-            log('_rdict:', cdict.rdict, '_pos:', pos)
+            log('_rdict:', cdict.rdict, cdict.stem, '_pos:', pos)
             log('_morphs:', cdict.morphs)
-            if (verbose) log('_cdict', cdict)
+            // if (verbose) log('_cdict', cdict)
         }
 
         if (verbose && chain.rels) {

@@ -57,6 +57,7 @@ export async function anthrax(wf) {
     let leadPrefs = parsePrefSeg(dag.pcwf)
     if (leadPrefs) leads.push(...leadPrefs)
 
+
     // log('_leadPrefs', leadPrefs)
     //  { pref: 'προσαν', con: 'α', tail: 'μιμνησκω' }
 
@@ -65,6 +66,7 @@ export async function anthrax(wf) {
     let leadAug = parseAug(dag.pcwf)
     if (leadAug) leads.push(leadAug)
 
+    leads = parseLeads(dag.pcwf)
     // log('_leads', leads)
     // return []
 
@@ -78,15 +80,57 @@ export async function anthrax(wf) {
         chains = chains.filter(chain=> chain.cdict.stem.length > 1)
     }
 
-    // πολυμαθίη νόον ἔχειν οὐ διδάσκει
-    // let cdicts = dicts.filter(dict=> dict.dict == chain.cdict.dict && dict.pos == chain.cdict.pos)
-
     return chains
 }
 
+// εξαναλισκω ; συγκαθαιρεω
+function parseLeads(pcwf) {
+    let leads = []
+    let prefraw = parsePrefix(pcwf)
+    if (!prefraw) return // {pref: '', con: '', tail: ''}
+    let pparts = prefraw.split('-')
+    let psize = pparts.length
+    // log('_PPPPP', prefraw, pparts)
+
+    let alead = parseAug(pcwf)
+    leads.push(alead)
+
+    let tail = pcwf
+    let con = ''
+    let ppref = ''
+    let atail = ''
+    for (let pref of pparts) {
+        // log('_pref', pref)
+        // if (pref == 'αν') pref = 'ἀν'
+        let plead = {ppref, pref}
+        let repref = new RegExp('^' + pref)
+        // plead.a_tail = atail
+        // plead.tail_b = tail
+        atail = atail ? atail.replace(repref, '') : tail.replace(repref, '')
+        // plead.atail = atail
+        // log('______________________T', tail, atail)
+        // alead = parseAug(atail)
+        // leads.push(alead)
+        let ct = removeVowelBeg(atail)
+        tail = ct.tail
+        if (ct.con) plead.con = ct.con
+        plead.tail = tail
+        ppref = pref
+        if (plead.pref == 'αν') plead.pref = 'ἀν'
+        leads.push(plead)
+
+    }
+    // let repref = new RegExp('^' + ppref + pref)
+    // let atail = pcwf.replace(repref, '')
+    // let { con, tail } = removeVowelBeg(atail)
+
+    // log('___lds_', leads)
+    return leads
+}
+
+// πολυμαθίη νόον ἔχειν οὐ διδάσκει // polumathih
 async function main(dag, lead) {
     let ptail = lead.tail
-
     let headtails = parseHeadTails(dag, ptail)
     // log('_headtails', ptail, headtails)
     let dictbreaks = await parseDictBreaks(headtails, dag.termflex)
@@ -137,8 +181,8 @@ function filterProxies(lead, maindicts) {
             if (lead.pref) { // wf with prefs, с тем же стемом, сборная с префиксом здесь, ее не должно быть в lead.aug
                 if (!ckey.prefix && ckey.bad) ok = false // должен быть prefix, но его нет
                 if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.con !== lead.con)) ok = false
-                else if (!ckey.prefix && strip(ckey.aug) !== lead.con) ok = false
-                // log('________ckeys lead pref', cdict.rdict, ok, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref, lead.con, 'ckey.aug', ckey.aug)
+                else if (!ckey.prefix && ckey.aug && strip(ckey.aug) !== lead.con) ok = false // ἀναβαίνω
+                // log('________ckeys lead pref', cdict.rdict, 'ok:', ok, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref, lead.con, 'ckey.aug', ckey.aug)
                 // ok = false
             } else { // целые, без префикса
                 if (ckey.prefix) ok = false
@@ -212,15 +256,12 @@ function probeForFLS(proxies, fls) {
 function breakForChain(lead, br, fls) {
     let maindicts = filterMainDicts(br)
     if (!maindicts.length) return []
-    log('_maindicts', br.head, maindicts.length)
+    // log('_maindicts _head:', br.head, '_tail:', br.tail, maindicts.length, lead)
 
     let proxies = filterProxies(lead, maindicts)
-    if (!proxies.length) return []
-    let rproxies = proxies.map(cdict=> cdict.rdict)
-    // log('_a_rproxies:', br.head, rproxies)
 
     // log('_a_lead:', lead)
-    // log('_a_br:', 'compound', compound, 'head', br.head, 'tail:', br.tail)
+    // log('_a_br:', 'head', br.head, 'tail:', br.tail) // 'compound', compound,
     // log('_a_fls', fls.length)
 
     // TODO: αἴθων - Αἴθων - оба nouns ; nest неверно считает cstype ; а makeWKT неверно считает tgen
@@ -234,14 +275,19 @@ function breakForChain(lead, br, fls) {
 
     // ἀμφιβάλλω ; αἱρέω ; STEMS: γλαυξ
     // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
-    // proxies = proxies.filter(cdict=> cdict.stem == 'ρ') // aireo
     // proxies = proxies.filter(cdict=> cdict.name) // aireo
+    // proxies = proxies.filter(cdict=> cdict.stem == 'βαιν')
+
+    if (!proxies.length) return []
+    let rproxies = proxies.map(cdict=> cdict.rdict)
+    // log('_a_r_proxies:', br.head, lead, rproxies)
+
 
     let stemdicts = probeForFLS(proxies, fls)
     if (!stemdicts.length) return []
     let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
 
-    log('__________________LEAD', lead, rstemdicts)
+    // log('__________________LEAD', lead, rstemdicts) // SHOW
 
     let brchains = []
     let dictgroups = _.groupBy(stemdicts, 'dict')  // общий stem, term - разные cdict.dict, verb/name, -> и chains ; noun / adj - вместе
@@ -452,6 +498,12 @@ async function parseDAG(wf) {
 }
 
 // просто, если часть префикса начинается с гласной, добавить тонкое придыхание. Пока на густое забить. И выяснить, если-ли вообще приставки с густым?
+// συγκαθ-αιρεω
+// συγ-καθ-αιρεω
+// ἐξαν-αλίσκω
+// ἐξ-αν-αλίσκω
+// ἐξ-α-ναλίσκω
+
 function parsePrefSeg(pcwf) {
     let prefraw = parsePrefix(pcwf)
     if (!prefraw) return // {pref: '', con: '', tail: ''}
