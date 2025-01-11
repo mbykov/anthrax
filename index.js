@@ -80,7 +80,6 @@ export async function anthrax(wf) {
 
     // πολυμαθίη νόον ἔχειν οὐ διδάσκει
     // let cdicts = dicts.filter(dict=> dict.dict == chain.cdict.dict && dict.pos == chain.cdict.pos)
-    // await addTrns(chains)
 
     return chains
 }
@@ -93,21 +92,21 @@ async function main(dag, lead) {
     let dictbreaks = await parseDictBreaks(headtails, dag.termflex)
     // log('_dictbreaks', dictbreaks)
 
-    let br_strs = dictbreaks.map(br=> ['_head:', br.head, br.term].join(' - '))
-    // log('_br_strs', lead.aug, br_strs)
+    // let br_strs = dictbreaks.map(br=> ['_head:', br.head, br.term].join(' - '))
+    // log('_br_strs', br_strs)
 
     let chains = []
     for (let br of dictbreaks) {
         let fls = dag.termflex[br.term]
         if (!fls) continue
-        let brchains = probeForFlex(lead, br, fls)
+        let brchains = breakForChain(lead, br, fls)
         chains.push(...brchains)
     }
 
     return chains
 }
 
-function probeForFlex(lead, br, fls) {
+function filterMainDicts(br) {
     // log('_____________p_robeForFlex', lead, '_head', br.head, '_con', br.con, br.headdicts.length)
     if (br.taildicts.length && !br.headdicts.length) return []
     if (!br.taildicts.length && br.con) return []
@@ -122,82 +121,14 @@ function probeForFlex(lead, br, fls) {
     let stem = (compound) ? br.tail : br.head
 
     let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
-    // log('_M br.head Mainrdicts', br.head, mainrdicts)
+    // log('_Main Rdicts br.head', br.head, mainrdicts)
+    return maindicts
+}
 
-    // log('_br', br.head, br.hsize, 'con', br.con,  '_tail:', br.tail, br.tsize, '_term:', br.term, 'compound', compound)
-    // let proxies = (compound) ? proxyByConnector(br.con, maindicts) : proxyByLead(lead, maindicts)
-
-    // let proxies = maindicts.filter(cdict=> {
-        // if (lead.pref && cdict.prefix) return true
-    // })
-
-    let proxies = maindicts
-    let rproxies = proxies.map(cdict=> cdict.rdict)
-
-    // log('_a_lead:', lead)
-    // log('_a_br:', 'compound', compound, 'head', br.head, 'tail:', br.tail)
-    // log('_a_proxies_rdicts:', 'compound', compound, 'rdicts:', rproxies)
-
-    if (!proxies.length) return []
-
-    // log('_fls', fls.length)
-    fls = fls.filter(flex=> {
-        return true
-        if (lead.pref) {
-            flex.con == lead.con
-        } else {
-            flex.aug == lead.aug
-        }
-    })
-
-    if (!fls.length) return []
-
-    let nfls = fls.filter(flex=> flex.name)
-    let advfls = fls.filter(flex=> flex.adverb)
-    let vfls = fls.filter(flex=> flex.verb)
-    // let pfls = fls.filter(flex=> flex.part)
-
-    // log('_lead', br.head, lead)
-    // log('_fls', br.head, fls.length)
-    // log('_vfls', br.head, vfls.length)
-
-    // log('_fls', fls.length)
-    // TODO: αἴθων - Αἴθων - оба nouns ; nest неверно считает cstype ; а makeWKT неверно считает tgen
-
-    let brchains = []
-    let stemdicts = []
-
-    for (let cdict of proxies) {
-        if (cdict.person) continue // TODO::
-        // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
-
-        // if (cdict.rdict != 'κονία') continue // RFORM ; βάρακος ; παρακρύπτω
-
-        // if (cdict.stem != 'γλαυξ') continue
-        // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
-        // log('_cdict', cdict.rdict)
-
-        if (!cdict.ckeys) continue // βάδην
-
-        // =======================================================================================================================
-        // παρακρύπτω παρέκρυπτον - закомментировал prefix παρέκ
-        // HERE - что делать? maindicts вычисляются уже с использование lead.pref, то есть неверно
-        // =======================================================================================================================
-
-        // log('_B_CURPREF', cdict.rdict, cdict.psize)
-        // let curpref = guessPrefix(cdict.rdict, cdict.psize)
-        // log('_CURPREF', '_L', lead)
-
-        // if (!cdict.name) continue // NAME
-
-        for (let ckey of cdict.ckeys) {
-            // log('_K', cdict.rdict, ckey.tense, ckey.con, ckey.prefix.con, '_L', lead.con)
-            // log('_CK', cdict.rdict, cdict.ckeys, '_L', lead.aug)
-        }
-
-        // log('____probe_0', cdict.rdict, cdict.stem, 'fls', fls.length, lead) // , cdict.stypes
-        let ckeys = cdict.ckeys
-        ckeys = cdict.ckeys.filter(ckey=> {
+function filterProxies(lead, maindicts) {
+    let proxies = []
+    for (let cdict of maindicts) {
+        cdict.ckeys = cdict.ckeys.filter(ckey=> {
             let ok = true
             // return ok
             // =======================================================================================================
@@ -206,9 +137,8 @@ function probeForFlex(lead, br, fls) {
             if (lead.pref) { // wf with prefs, с тем же стемом, сборная с префиксом здесь, ее не должно быть в lead.aug
                 if (!ckey.prefix && ckey.bad) ok = false // должен быть prefix, но его нет
                 if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.con !== lead.con)) ok = false
-                else if (!ckey.prefix && ckey.aug !== lead.pref) ok = false
-                // if (ckey.prefix && (ckey.prefix.pref !== lead.pref || ckey.prefix.con !== lead.con)) ok = false
-                // if (ok) log('________ckeys lead pref', cdict.rdict, ok, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref, 'ckey.aug', ckey.aug)
+                else if (!ckey.prefix && strip(ckey.aug) !== lead.con) ok = false
+                // log('________ckeys lead pref', cdict.rdict, ok, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref, lead.con, 'ckey.aug', ckey.aug)
                 // ok = false
             } else { // целые, без префикса
                 if (ckey.prefix) ok = false
@@ -220,24 +150,22 @@ function probeForFlex(lead, br, fls) {
             // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
             return ok
         })
+        if (cdict.ckeys.length) proxies.push(cdict)
+    }
+    return proxies
+}
 
-        // let xkeys = ckeys.filter(ckey=> ckey.tense == 'pres.act.inf')
-        // log('_X KEYS', cdict.rdict, cdict.stem, xkeys)
-        // ckeys = cdict.ckeys
-
-        // let tenses = cdict.ckeys.map(ckey=> ckey.tense)
-        // log('_CKEYS', cdict.rdict, ckeys.length)
-
-        cdict.ckeys = ckeys
-        if (!ckeys.length) continue
-
-        // log('____probe', cdict.rdict, cdict.stem, 'fls', fls.length, '_lead', lead, '_ckeys', cdict.ckeys.length) // , cdict.stypes
-
+function probeForFLS(proxies, fls) {
+    let stemdicts = []
+    for (let cdict of proxies) {
+        // log('____probe', cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
         let cfls = []
         if (cdict.name) {
-            for (let flex of nfls) {
+            // log('_N', cdict.rdict)
+            for (let flex of fls) {
+                if (!flex.name) continue
                 // if (cdict.rstress != flex.rstress) continue // различить γλῶττα / φάττα - разные ударения
-                for (let ckey of ckeys) {
+                for (let ckey of cdict.ckeys) {
                     // if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
                     if (!flex.adverb) {
                         if (ckey.stype != flex.stype) continue
@@ -249,24 +177,25 @@ function probeForFlex(lead, br, fls) {
                 }
                 // if (flex.adverb || ckeys.includes(flex.key)) cfls.push(flex)
             }
-            for (let flex of advfls) {
+            for (let flex of fls) {
+                if (!flex.adverb) continue
                 let keys = cdict.var?.[flex.stype] //  || nameKey[flex.stype] ??
                 if (!keys) continue
                 cfls.push(flex)
             }
         } else if (cdict.verb) {
-            // log('_C', cdict.rdict)
-            for (let flex of vfls) {
+            // log('_V', cdict.rdict)
+            for (let flex of fls) {
+                if (!flex.verb) continue
                 // log('_F', flex.tense)
                 // cfls.push(flex)
-                for (let ckey of ckeys) {
+                for (let ckey of cdict.ckeys) {
                     // if (!ckey.keys) log('_no_ckeys', cdict.rdict) // TODO:
-                    if (ckey.lead != flex.lead) continue
+                    // if (ckey.lead != flex.lead) continue
                     if (ckey.stype != flex.stype) continue
                     if (ckey.tense != flex.tense) continue
                     if (!ckey.keys.includes(flex.key)) continue
                     cfls.push(flex)
-                    ckey.ok = true
                     // log('_F_Verb_OK', cdict.rdict, flex.tense)
                 }
             }
@@ -274,21 +203,47 @@ function probeForFlex(lead, br, fls) {
 
         if (!cfls.length) continue
         cdict.cfls = cfls
-
-        let okckeys = cdict.ckeys.filter(ckey=> ckey.ok)
-        // log('__OKCK', cdict.rdict, cdict.stem, okckeys)
-        // cdict.ckeys = okckeys
-
-        // log('probe_ok', cdict.pos, cdict.rdict, cdict.stem,  '_cfls:', cdict.cfls.length)
-
         stemdicts.push(cdict)
 
     } // proxy cdict
+    return stemdicts
+}
 
-    // log('__________________LEAD', lead)
+function breakForChain(lead, br, fls) {
+    let maindicts = filterMainDicts(br)
+    if (!maindicts.length) return []
+    log('_maindicts', br.head, maindicts.length)
 
+    let proxies = filterProxies(lead, maindicts)
+    if (!proxies.length) return []
+    let rproxies = proxies.map(cdict=> cdict.rdict)
+    // log('_a_rproxies:', br.head, rproxies)
+
+    // log('_a_lead:', lead)
+    // log('_a_br:', 'compound', compound, 'head', br.head, 'tail:', br.tail)
+    // log('_a_fls', fls.length)
+
+    // TODO: αἴθων - Αἴθων - оба nouns ; nest неверно считает cstype ; а makeWKT неверно считает tgen
+    // RFORM
+    // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
+    // =======================================================================================================================
+    // παρακρύπτω παρέκρυπτον - закомментировал prefix παρέκ
+    // HERE - что делать? maindicts вычисляются уже с использование lead.pref, то есть неверно
+    // =======================================================================================================================
+    // if (!cdict.ckeys) continue // βάδην
+
+    // ἀμφιβάλλω ; αἱρέω ; STEMS: γλαυξ
+    // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
+    // proxies = proxies.filter(cdict=> cdict.stem == 'ρ') // aireo
+    // proxies = proxies.filter(cdict=> cdict.name) // aireo
+
+    let stemdicts = probeForFLS(proxies, fls)
     if (!stemdicts.length) return []
+    let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
 
+    log('__________________LEAD', lead, rstemdicts)
+
+    let brchains = []
     let dictgroups = _.groupBy(stemdicts, 'dict')  // общий stem, term - разные cdict.dict, verb/name, -> и chains ; noun / adj - вместе
 
     for (let dict in dictgroups) {
@@ -308,6 +263,7 @@ function probeForFlex(lead, br, fls) {
 
         parseMorph(cdicts)
 
+        // cleanChain(probeFLS)
         // log('_XXXXXXXXXXXXXXXXX probeFLS', probeFLS)
         brchains.push(probeFLS)
     }
@@ -362,8 +318,14 @@ function parseScheme(lead, probe, br) {
     let scheme = []
     // если cdict уже имеет префикс, то это полная форма, с коротким стемом
     // а может быть, что noun имеет prefix, а adjective или verb - нет? Кажется, может. И что будет? Это нужно проверять при заливке Nest
+    if (lead.pprefs) {
+        for (let ppref of lead.pprefs) {
+            let pprefseg = {seg: ppref, dict: ppref, ppref: true}
+            scheme.push(pprefseg)
+        }
+    }
     if (lead.pref) {
-        // log('_______________________P', probe.rdict, probe.prefix)
+        // log('_______________________scheme', probe.rdict, 'probe.prefix', !!probe.prefix, lead)
         if (probe.prefix) {
             let segs = []
             segs.push(lead.pref)
@@ -419,32 +381,6 @@ async function parseDictBreaks(headtails) {
         ht.tsize = taildicts.length
     }
     return headtails
-}
-
-function filterVerb(variant, vfls) {
-    let cfls = []
-    // log('____VER', variant.tense)
-    for (let flex of vfls) {
-        // log('____flex', flex.gend, variant.gend)
-        if (variant.stype != flex.stype) continue
-        if (variant.tense != flex.tense) continue
-        if (!variant.keys.includes(flex.key)) continue
-        cfls.push(flex)
-    }
-    // log('____cfls ok', cfls.length)
-    // return vfls
-    return cfls
-}
-
-function filterName(variant, nfls) {
-    let cfls = []
-    for (let flex of nfls) {
-        if (variant.gend != flex.gend) continue
-        if (!variant.keys.includes(flex.key)) continue
-        cfls.push(flex)
-    }
-    // log('____cfls ok', cfls.length)
-    return cfls
 }
 
 function parseHeadTail(stub, term) {
@@ -597,77 +533,4 @@ function makeTermChain(wf, termcdicts) {
     // parseMorph(termcdicts)
     termchain.cdicts = termcdicts
     return termchain
-}
-
-
-async function addTrns(chains) {
-    let dictkeys = []
-    for (let chain of chains) {
-        if (chain.indecl) continue
-        let cdictkeys = chain.rels.map(cdict=> cdict.dict)
-        dictkeys.push(...cdictkeys)
-    }
-
-    dictkeys = _.uniq(dictkeys)
-    // log('_TRNS_dictkeys', dictkeys)
-
-    let trnsdicts = await getDicts(dictkeys)
-    // log('_TRNS_tdicts', tdicts.length)
-    let trns_rdicts = trnsdicts.map(cdict=> cdict.rdict)
-    // log('_TRNS_trdicts', trns_rdicts)
-
-    for (let chain of chains) {
-        if (chain.indecl) continue
-        for (let cdict of chain.rels) {
-            cdict.trn = {}
-            let tdicts = trnsdicts.filter(tdict=> tdict.dict == cdict.dict && tdict.rdict == cdict.rdict && tdict.pos == cdict.pos)
-            // cdict.trns = tdict.trns
-            for (let tdict of tdicts) {
-                cdict.trn[tdict.dname] = tdict.trns
-            }
-        }
-        for (let cdict of chain.cdicts) {
-            cdict.trn = {}
-            let tdicts = trnsdicts.filter(tdict=> tdict.dict == cdict.dict && tdict.rdict == cdict.rdict && tdict.pos == cdict.pos)
-            for (let tdict of tdicts) {
-                cdict.trn[tdict.dname] = tdict.trns
-            }
-        }
-    }
-
-}
-
-function proxyByConnector(con, dicts) {
-    let proxies = []
-    for (let cdict of dicts) {
-        if (con != cdict.aug) continue // соответствие Second Component и BR
-    }
-    return []
-    return proxies
-}
-
-function proxyByLead(lead, dicts) {
-    let proxies = []
-    for (let cdict of dicts) {
-        if (lead.pref) {
-            // if (cdict.aug) continue
-            if (!cdict.prefix) proxies.push(cdict)  // составной chain с префиксом
-            else if (lead.pref == cdict.prefix.pref) proxies.push(cdict)
-            cdict.test_pref = true
-            // log('_lead_pref', cdict.rdict, 'lead.pref:',lead.pref, 'cdict.prefix.pref', cdict.prefix?.pref)
-            // в имперфекте con должен быть сильный, ἀμφιβάλλω - если коннектор 'ι', то имперфект отбросить, // TODO: сделано?
-
-        } else { // if (lead) // lead.aug can be ''
-            // log('____lead aug_', cdict.rdict, 'l_aug', lead.aug, 'c_aug', cdict.aug, lead.aug == cdict.aug, '_prefix', cdict.prefix)
-            if (cdict.prefix) continue
-            // proxies.push(cdict)
-            if (lead.aug == cdict.aug) proxies.push(cdict)
-            else if (lead.aug == 'ἠ' && cdict.aug == 'ἀ') proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
-            else if (lead.aug == 'ἐ' && !cdict.aug) proxies.push(cdict) // imperfects // должен быть полный метод, все случаи
-            else if (!lead.aug && !cdict.aug) proxies.push(cdict)
-            cdict.test_cdict_aug = true
-        }
-        // log('____xxxxxxxxxxxxxxxxx_', cdict.rdict, '_aug', lead.aug)
-    }
-    return proxies
 }

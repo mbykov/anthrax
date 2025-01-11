@@ -33,7 +33,7 @@ async function run(verbose) {
     // enclitics
 
 
-    // TODO: отденльно - сначала indecl-DB
+    // TODO: отдельно - сначала indecl-DB
     let chains = await anthrax(wordform)
 
     if (!chains.length) {
@@ -43,30 +43,25 @@ async function run(verbose) {
 
     if (!chains.length > 2) log('________________________________too many chains', chains.length)
 
-    // log('_CHS', chains)
+    // log('_CHAINS', chains)
 
     await addTrns(chains)
-    // log('_run chains', chains)
 
     for (let chain of chains) {
         if (!verbose) chain = muteChain(chain)
         // log('_CHAIN', chain)
-        for (let cdict of chain.cdicts) {
-
-            let pos = 'xxx'
-            if (cdict.verb) pos = 'verb'
-            else if (cdict.name && cdict.adj) pos = 'adj'
-            else if (cdict.name) pos = 'noun'
-
-            log('\n_rdict:', cdict.rdict, '_pos:', pos, '_morphs:', cdict.morphs)
-            if (verbose) log('_cdict', cdict)
-            if (chain.indecl) log('_indecl')
-
-        }
-
         if (chain.scheme) { // TODO: indecls ?
             let scheme = chain.scheme.map(segment=> segment.seg).join('-')
+            log('\n_chain.scheme:', chain.scheme)
             log('_scheme:', scheme)
+        }
+
+        for (let cdict of chain.cdicts) {
+            if (chain.indecl) log('_indecl:')
+            let pos = posByCdict(cdict)
+            log('_rdict:', cdict.rdict, '_pos:', pos)
+            log('_morphs:', cdict.morphs)
+            if (verbose) log('_cdict', cdict)
         }
 
         if (verbose && chain.rels) {
@@ -76,6 +71,14 @@ async function run(verbose) {
 
 
     }
+}
+
+function posByCdict(cdict) {
+    let pos = ''
+    if (cdict.verb) pos = 'verb'
+    else if (cdict.name && cdict.adj) pos = 'adj'
+    else if (cdict.name) pos = 'noun'
+    return pos
 }
 
 async function addTrns(chains) {
@@ -104,7 +107,7 @@ async function addTrns(chains) {
             }
             delete cdict.trns
         }
-        
+
         for (let cdict of chain.cdicts) {
             cdict.trn = {}
             // log('____________________________c', cdict.rdict, cdict.dname)
