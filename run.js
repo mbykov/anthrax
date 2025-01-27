@@ -2,7 +2,7 @@
 
 import _  from 'lodash'
 import { anthrax } from './index.js'
-import { prettyIndecl, prettyFLS } from './lib/utils.js'
+import { cleanString, prettyIndecl, prettyFLS } from './lib/utils.js'
 
 import Debug from 'debug'
 const d = Debug('dicts')
@@ -31,7 +31,9 @@ async function run(verbose) {
     // проверка на greek - хоть один символ
     // клик на слове - получить три - до, клик, после
     // enclitics
-
+    log('____________________________', wordform)
+    wordform = cleanString(wordform)
+    log('____________________________', wordform)
 
     // TODO: отдельно - сначала indecl-DB
     let chains = await anthrax(wordform)
@@ -45,31 +47,31 @@ async function run(verbose) {
 
     // log('_CHAINS', chains)
 
-    await addTrns(chains)
+    // await addTrns(chains)
 
+    let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
+    if (verbose) log('\n___schemes:', schemes.sort().join('; '))
     for (let chain of chains) {
         if (!verbose) chain = muteChain(chain)
         // log('_CHAIN', chain)
         if (chain.scheme) { // TODO: indecls ?
             let scheme = chain.scheme.map(segment=> segment.seg).join('-')
-            if (verbose) log('\n_chain.scheme:', chain.scheme)
+            if (verbose) log('\chain.scheme:', chain.scheme)
             log('_scheme:', scheme)
         }
 
         for (let cdict of chain.cdicts) {
             if (chain.indecl) log('_indecl:')
             let pos = posByCdict(cdict)
-            log('_rdict:', cdict.rdict, cdict.stem, '_pos:', pos)
+            log('_rdict:', cdict.rdict, cdict.stem, '_pos:', pos, '_pref', !!cdict.prefix)
             log('_morphs:', cdict.morphs)
-            // if (verbose) log('_cdict', cdict)
+            if (verbose) log('_TRN', cdict.trn)
         }
 
         if (verbose && chain.rels) {
             let rels = chain.rels.map(dict=> dict.rdict)
             log('_rels:', rels.length)
         }
-
-
     }
 }
 
