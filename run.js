@@ -7,7 +7,7 @@ import { cleanString, prettyIndecl, prettyFLS } from './lib/utils.js'
 import Debug from 'debug'
 const d = Debug('dicts')
 
-import { createDBs, getFlexes, getDicts, getNests } from './lib/remote.js'
+import { createDBs, getFlexes, getDicts, getNests, getTrns } from './lib/remote.js'
 
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
@@ -16,7 +16,7 @@ let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
 const log = console.log
 
 let dnames
-let dbdefaults = ['wkt', 'bbh', 'lsj'] // , 'lsj' , 'bbl'
+let dbdefaults = ['wkt', 'bbh', 'lsj', 'dvr'] // , 'lsj' , 'bbl'
 
 // check greek TODO:
 if (!wordform) log('no wordform')
@@ -31,9 +31,7 @@ async function run(verbose) {
     // проверка на greek - хоть один символ
     // клик на слове - получить три - до, клик, после
     // enclitics
-    log('____________________________', wordform)
     wordform = cleanString(wordform)
-    log('____________________________', wordform)
 
     // TODO: отдельно - сначала indecl-DB
     let chains = await anthrax(wordform)
@@ -45,12 +43,30 @@ async function run(verbose) {
 
     if (!chains.length > 2) log('________________________________too many chains', chains.length)
 
-    // log('_CHAINS', chains)
-
     // await addTrns(chains)
+    let cdicts = _.flatten(chains.map(chain=> chain.cdicts))
+    log('____cdicts', cdicts)
+    let trnsdicts = await getTrns(cdicts)
+    // log('____TRNS', trnsdicts.length)
+
+    for (let chain of chains) {
+        for (let cdict of chain.cdicts) {
+            // let pos = posByCdict(cdict)
+            cdict.trn = {}
+            let tdicts = trnsdicts.filter(tdict=> tdict.dict == cdict.dict && tdict.rdict == cdict.rdict && tdict.pos == cdict.pos)
+            for (let tdict of tdicts) {
+                // log('____tdict.dname', tdict.dname)
+                cdict.trn[tdict.dname] = tdict.trns
+            }
+            delete cdict.trns
+        }
+    }
+
+    // log('_CHAINS', chains)
 
     let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
     if (verbose) log('\n___schemes:', schemes.sort().join('; '))
+
     for (let chain of chains) {
         if (!verbose) chain = muteChain(chain)
         // log('_CHAIN', chain)
@@ -73,6 +89,7 @@ async function run(verbose) {
             log('_rels:', rels.length)
         }
     }
+
 }
 
 function posByCdict(cdict) {

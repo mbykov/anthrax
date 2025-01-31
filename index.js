@@ -5,7 +5,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, stresses, checkOddStress } from './lib/utils.js'
-import { createDBs, getFlexes, getDicts, getNests, getInds, fillTrns } from './lib/remote.js'
+import { createDBs, getFlexes, getDicts, getNests, getInds } from './lib/remote.js'
 // import { enclitic } from './lib/enclitic.js'
 import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
@@ -35,6 +35,9 @@ const h = Debug('scheme')
 export async function anthrax(wf) {
     if (!wf) return []
 
+    log('_ANTHRAX WF', wf)
+    wf = wf.split('?')[0]
+ 
     let chains = []
     let dag = await parseDAG(wf)
 
@@ -67,18 +70,6 @@ export async function anthrax(wf) {
     let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
     h('\n_SCHEMES:', schemes.sort().join('; '))
 
-    let cdicts = _.flatten(chains.map(chain=> chain.cdicts))
-    let trnsdicts = await fillTrns(cdicts)
-    for (let chain of chains) {
-        for (let cdict of chain.cdicts) {
-            cdict.trn = {}
-            let tdicts = trnsdicts.filter(tdict=> tdict.dict == cdict.dict && tdict.rdict == cdict.rdict && tdict.pos == cdict.pos)
-            for (let tdict of tdicts) {
-                cdict.trn[tdict.dname] = tdict.trns
-            }
-            delete cdict.trns
-        }
-    }
     return chains
 }
 
@@ -166,7 +157,7 @@ async function main(dag, lead) {
 }
 
 function filterMainDicts(br) {
-    // log('_____________filterMainDicts', lead, '_head', br.head, '_con', br.con, br.headdicts.length)
+    // log('_____________filterMainDicts', '_head', br.head, '_con', br.con, br.headdicts.length)
     if (br.taildicts.length && !br.headdicts.length) return []
     if (!br.taildicts.length && br.con) return []
 
