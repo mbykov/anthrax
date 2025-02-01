@@ -5,7 +5,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, stresses, checkOddStress } from './lib/utils.js'
-import { createDBs, getFlexes, getDicts, getNests, getInds } from './lib/remote.js'
+import { createDBs, getFlexes, getNests, getInds } from './lib/remote.js'
 // import { enclitic } from './lib/enclitic.js'
 import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
@@ -37,7 +37,7 @@ export async function anthrax(wf) {
 
     log('_ANTHRAX WF', wf)
     wf = wf.split('?')[0]
- 
+
     let chains = []
     let dag = await parseDAG(wf)
 
