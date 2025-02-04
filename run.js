@@ -41,14 +41,14 @@ async function run(verbose) {
     if (!chains.length > 2) log('________________________________too many chains', chains.length)
 
     let cdicts = _.flatten(chains.map(chain=> chain.cdicts))
-    log('____cdicts', cdicts)
+    // log('____cdicts', cdicts)
 
     let dictkeys = cdicts.map(cdict=> cdict.dict)
     dictkeys = _.uniq(dictkeys)
 
     let testdnames = ['wkt', 'dvr']
     let trnsdicts = await getTrns(dictkeys, testdnames)
-    log('____TRNS', trnsdicts.length)
+    // log('____TRNS', trnsdicts.length)
 
     for (let chain of chains) {
         for (let cdict of chain.cdicts) {
@@ -63,12 +63,12 @@ async function run(verbose) {
         }
     }
 
-    // log('_CHAINS', chains)
+    // log('_CHAINS.cdicts', chains[0].cdicts)
 
-    let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
-    if (verbose) log('\n___schemes:', schemes.sort().join('; '))
+    // let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
+    // if (verbose) log('\n___schemes:', schemes.sort().join('; '))
 
-    for (let chain of chains) {
+    for (let chain of []) { // chains
         if (!verbose) chain = muteChain(chain)
         // log('_CHAIN', chain)
         if (chain.scheme) { // TODO: indecls ?

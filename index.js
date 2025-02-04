@@ -26,17 +26,37 @@ const b = Debug('break')
 const n = Debug('chain')
 const f = Debug('filter')
 const c = Debug('compound')
-const o = Debug('probe')
 const h = Debug('scheme')
 
 // let dag = {}
 // log('_ANTHRAX START')
 
+// εξαναλισκω ; συγκαθαιρεω ; προκαταλαμβάνω
+// {pref: '', con: '', tail: ''}
+function parseLeads(pcwf) {
+    let leads = []
+    let augLead = parseAug(pcwf)
+    leads.push(augLead)
+    let prefraw = parsePrefix(pcwf)
+    if (!prefraw) return leads
+
+    let pref = prefraw.replace(/-/g, '')
+    let prefs = prefraw.split(/-/)
+    prefs.push(pref)
+    let prefLead = {pref, prefs, prefraw}
+    let repref = new RegExp('^' + pref)
+    let atail = pcwf.replace(repref, '')
+    let prefct = removeVowelBeg(atail)
+    prefLead.con = prefct.con
+    prefLead.tail = prefct.tail
+    leads.push(prefLead)
+    return leads
+}
+
 export async function anthrax(wf) {
     if (!wf) return []
-
-    log('_ANTHRAX WF', wf)
-    wf = wf.split('?')[0]
+    // log('_ANTHRAX WF', wf)
+    // wf = wf.split('?')[0]
 
     let chains = []
     let dag = await parseDAG(wf)
@@ -50,7 +70,6 @@ export async function anthrax(wf) {
 
     // ======================== ἀνακύκλωσις
     // pref - есть, а в WKT слово - νακυκλ -без префикса
-
     // false prefix: ἡμέραι
     // // ἀνακύκλωσις - pref = null // ==== значит, надо оба варианта, пока в словаре все слова точно не будут обработаны на префиксы - ἀνακύκλησις
 
@@ -58,6 +77,7 @@ export async function anthrax(wf) {
     d('_LEADS', leads)
 
     for (let lead of leads) {
+        // log('_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLEAD', lead)
         let brchains = await main(dag, lead)
         chains.push(...brchains)
     }
@@ -67,63 +87,11 @@ export async function anthrax(wf) {
         chains = chains.filter(chain=> chain.cdict.stem.length > 1)
     }
 
-    let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
-    h('\n_SCHEMES:', schemes.sort().join('; '))
+    // let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
+    // h('\n_SCHEMES:', schemes.sort().join('; '))
 
-    return chains
-}
-
-// εξαναλισκω ; συγκαθαιρεω
-function parseLeads(pcwf) {
-    let leads = []
-    let prefraw = parsePrefix(pcwf)
-    if (!prefraw) {
-        let augLead = parseAug(pcwf)
-        leads.push(augLead)
-        return leads
-    }
-
-    // {pref: '', con: '', tail: ''}
-    let pparts = prefraw.split('-')
-    let psize = pparts.length
-
-    let tail = pcwf
-    let con = ''
-    // let ppref = ''
-    let ps = []
-    let atail = ''
-    // let plead = {ps: []}
-    for (let pref of pparts) {
-        // if (pref == 'αν') pref = 'ἀν'
-        let plead = {}
-        plead.ps = _.clone(ps)
-        plead.pref = pref
-        let before = tail
-        let repref = new RegExp('^' + pref)
-        // plead.a_tail = atail
-        // plead.tail_b = tail
-        // atail = atail ? atail.replace(repref, '') : tail.replace(repref, '')
-        atail = tail.replace(repref, '')
-        // plead.atail = atail
-        tail = atail
-        ps.push(pref)
-
-        // if (plead.pref == 'αν') plead.pref = 'ἀν' // <<<<<<<<<<<<<<<<<<<<<, HERE // ἐξαναλίσκω
-        let pct = removeVowelBeg(atail)
-        plead.con = pct.con
-        plead.tail = pct.tail
-        leads.push(plead)
-
-        let alead = {ps: plead.ps}
-        let act = removeVowelBeg(before)
-        alead.aug = act.con
-        alead.tail = act.tail
-        leads.push(alead)
-    }
-
-    h('_leads_', leads)
-    // return []
-    return leads
+    return []
+    // return chains
 }
 
 // πολυμαθίη νόον ἔχειν οὐ διδάσκει // polumathih
@@ -131,33 +99,94 @@ async function main(dag, lead) {
     let ptail = lead.tail
     let headtails = parseHeadTails(dag, ptail)
     headtails = headtails.filter(ht=> !ht.tail) // only heads, compounds killed // προσκομίζω - προσεκόμιζε // появляется лишний результат
-    // log('_headtails_lead', lead)
     // log('_headtails', ptail, 'lead_pref', !!lead.pref,  headtails)
     let dictbreaks = await parseDictBreaks(headtails, dag.termflex)
+    if (!dictbreaks.length) return []
+    // log('_real_lead', lead)
     // log('_dictbreaks', dictbreaks)
 
     let br_strs = dictbreaks.map(br=> ['_head:', br.head, br.term].join(' - '))
     // log('_br_strs', br_strs)
 
     let chains = []
+    //
     for (let br of dictbreaks) {
         let fls = dag.termflex[br.term]
-        // filterFLS, test
-        // fls = fls.filter(flex=> {
-        //     let ok = true
-        //     // if (lead.con && !flex.con && !flex.aug) ok = false
-        //     return ok
-        // })
+        // filterFLS ???
         if (!fls) continue
-        let brchains = breakForChain(lead, br, fls)
-        chains.push(...brchains)
+        log('_================= br.head', br.head, '_hsize', br.hsize, '_fls', fls.length)
+
+        // farrels, head or tail
+        let maindicts = mainDicts(br)
+        if (!maindicts.length) return []
+        // log('_maindicts _head:', br.head, '_tail:', br.tail, maindicts.length, lead)
+        let main_rdicts = maindicts.map(cdict=> cdict.rdict)
+        log('_main_rdicts:', main_rdicts)
+
+        let proxies = proxyByLead(lead, maindicts)
+        if (!proxies.length) return []
+        let proxies_rdicts = proxies.map(cdict=> cdict.rdict)
+        log('__proxies_rdicts:', proxies_rdicts)
+
+        let stemdicts = dictByFLS(proxies, fls)
+        if (!stemdicts.length) return []
+        let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
+        log('__rstemdicts', rstemdicts) // SHOW
+
+        for (let cdict of stemdicts) {
+            cdict.morphs = parseMorph(cdict)
+            delete cdict.cfls
+            delete cdict.ckeys
+        }
+
+        let rcdicts = stemdicts.map(dict=> dict.rdict)
+        let rels = []
+        let morels = []
+        for (let dict of maindicts) {
+            if (dict.proxy) rels.push(dict.rdict)
+            else morels.push(dict.rdict)
+        }
+
+        let chain = {rcdicts, stem: br.head, cdicts: stemdicts, rels, morels, term: br.term}
+        chain.schemes = parseSchemes(lead, stemdicts, br.term)
+        chains.push(chain)
     }
 
+    // log('_index_chains', chains)
     return chains
 }
 
-function filterMainDicts(br) {
-    // log('_____________filterMainDicts', '_head', br.head, '_con', br.con, br.headdicts.length)
+function parseSchemes(lead, cdicts, term) {
+    let schemes = []
+    // let prefs = lead.prefs.slice(0, -1).reverse()
+    let prefs = lead.prefraw.split('-').reverse()
+    let lastpref = prefs[0] // reverse!
+    log('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
+    for (let cdict of cdicts) {
+        let scheme = []
+        let pdict = plain(cdict.dict)
+        let reterm = new RegExp(term + '$')
+        pdict = pdict.replace(reterm, '')
+        lead.prefs.pop()
+        scheme.push({seg: pdict, tail: true})
+        for (let pref of prefs) {
+            let repref = new RegExp(pref)
+            if (repref.test(pdict)) continue
+            if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, con: true})
+            scheme.unshift({seg: pref, pref: true})
+            let segtail = scheme.find(seg=> seg.tail)
+            segtail.seg = pdict
+        }
+        scheme.push({seg: term, term: true})
+        schemes.push(scheme)
+        log('_S', pdict, scheme)
+    }
+
+    return schemes
+}
+
+function mainDicts(br) {
+    // log('_____________mainDicts', '_head', br.head, '_con', br.con, br.headdicts.length)
     if (br.taildicts.length && !br.headdicts.length) return []
     if (!br.taildicts.length && br.con) return []
 
@@ -170,50 +199,58 @@ function filterMainDicts(br) {
     if (!maindicts.length) return []
     let stem = (compound) ? br.tail : br.head
 
-    let mainrdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
-    // log('_Main Rdicts br.head', br.head, mainrdicts)
+    // let main_rdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
+    // d('_main r_dicts br.head', br.head, main_rdicts)
     return maindicts
 }
 
-function filterProxies(lead, maindicts) {
+// =======================================================================================================
+// здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον ???
+// =======================================================================================================
+function proxyByLead(lead, maindicts) {
     // log('_______________________________________________________________________F PR')
+    let main_rdicts = maindicts.map(cdict=> cdict.rdict)
+    // log('_______________________________________________________________________main_rdicts', main_rdicts)
+    // log('_ckey_lead__________________________________:', lead)
     let proxies = []
     for (let cdict of maindicts) {
         // if (cdict.stem != 'λισκ') continue
-        // if (cdict.rdict != 'προσκομίζω') continue
-        // =======================================================================================================
-        // здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον ???
-        // =======================================================================================================
+        // if (cdict.rdict != 'προκαταλαμβάνω') continue
+        // if (cdict.rdict != 'καταλαμβάνω') continue
+        // log('_ckey_rdict________:', cdict.rdict, cdict.prefix)
+
         cdict.ckeys = cdict.ckeys.filter(ckey=> {
+            // log('_ckey_prefix', ckey.con, ckey.prefix?.pref, ckey.prefix?.con)
             let ok = true
             // return ok
-
             if (lead.pref) { // wf with prefs, с тем же стемом, сборная с префиксом здесь, ее не должно быть в lead.aug
                 if (!ckey.prefix && ckey.bad) ok = false // должен быть prefix, но его нет
-                if (ckey.prefix && ckey.con && (strip(ckey.prefix.pref) !== strip(lead.pref) || ckey.con !== lead.con)) ok = false
+                // if (ckey.prefix && ckey.con && (strip(ckey.prefix.pref) !== strip(lead.pref) || ckey.con !== lead.con)) ok = false
+                if (ckey.prefix && ckey.con && (!lead.prefs.includes(strip(ckey.prefix.pref)) || ckey.con !== lead.con)) ok = false // προκαταλαμβάνω
                 else if (ckey.prefix && !ckey.con && (strip(ckey.prefix.pref) !== strip(lead.pref))) ok = false
                 else if (!ckey.prefix && ckey.aug && strip(ckey.aug) !== lead.con) ok = false // ἀναβαίνω ; διαβάλλω
-                // log('__ckeys lead pref', cdict.rdict, 'ok:', ok, 'ckey.prefix?.pref', ckey.prefix?.pref, 'lead_pref', lead.pref, 'lead.con', lead.con, 'ckey.con', ckey.con, 'ckey.aug', ckey.aug)
             } else { // целые, без префикса
                 if (ckey.prefix) ok = false
                 // if (ckey.bad) ok = false // так я все bads убил, не верно
                 else if (ckey.aug !== lead.aug) ok = false
-                // if (ok) log('________ckeys aug ok:', cdict.rdict, ok, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug)
+                // if (ok) log('________ckeys aug ok:', cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug, ckey)
             }
             // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
             return ok
         })
-        if (cdict.ckeys.length) proxies.push(cdict)
+
+        if (cdict.ckeys.length) proxies.push(cdict), cdict.proxy = true
     }
 
     let rproxies = proxies.map(cdict=> cdict.rdict)
-    d('_r_proxies:', lead, rproxies)
+    // d('_r_proxies:', lead, rproxies)
+    // log('_proxies:', lead, proxies)
 
-    // proxies = []
+    // return []
     return proxies
 }
 
-function probeForFLS(proxies, fls) {
+function dictByFLS(proxies, fls) {
     let stemdicts = []
     for (let cdict of proxies) {
         // log('____probe', cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
@@ -266,6 +303,9 @@ function probeForFLS(proxies, fls) {
                     // log('_F_Verb_OK', cdict.rdict, flex.tense)
                 }
             }
+        } else {
+            log('_name or verb', cdict)
+            throw new Error()
         }
 
         if (!cfls.length) continue
@@ -276,64 +316,16 @@ function probeForFLS(proxies, fls) {
     return stemdicts
 }
 
-function breakForChain(lead, br, fls) {
-    let maindicts = filterMainDicts(br)
-    if (!maindicts.length) return []
-    // log('_maindicts _head:', br.head, '_tail:', br.tail, maindicts.length, lead)
-
-    let proxies = filterProxies(lead, maindicts)
-
-    // log('_a_lead:', lead)
-    // log('_a_br:', 'head', br.head, 'tail:', br.tail) // 'compound', compound,
-    // log('_a_fls', fls.length)
-
-    // TODO: αἴθων - Αἴθων - оба nouns ; nest неверно считает cstype ; а makeWKT неверно считает tgen
-    // RFORM
-    // ============= NB: Λυκάων - есть в noun и person. совпадают и rdict и dict, и путаются. Нужен аккурантый person: true
-    // =======================================================================================================================
-    // παρακρύπτω παρέκρυπτον - закомментировал prefix παρέκ
-    // HERE - что делать? maindicts вычисляются уже с использование lead.pref, то есть неверно
-    // =======================================================================================================================
-    // if (!cdict.ckeys) continue // βάδην
-
-    // ἀμφιβάλλω ; αἱρέω ; STEMS: γλαυξ
-    // proxies = proxies.filter(cdict=> cdict.rdict == 'ἀμφιβάλλω') // amfiballo
-    // proxies = proxies.filter(cdict=> cdict.name) // aireo
-    // proxies = proxies.filter(cdict=> cdict.stem == 'βαιν')
-
-    if (!proxies.length) return []
-    // let rproxies = proxies.map(cdict=> cdict.rdict)
-    // log('_r_proxies:', br.head, lead, rproxies)
-
-
-    let stemdicts = probeForFLS(proxies, fls)
-    if (!stemdicts.length) return []
-    let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
-
-    // log('__________________lead', lead, rstemdicts) // SHOW
-
+function chainForBreak(stemdicts, rels, term) {
     let brchains = []
     let dictgroups = _.groupBy(stemdicts, 'dict')  // общий stem, term - разные cdict.dict, verb/name, -> и chains ; noun / adj - вместе
 
     for (let dict in dictgroups) { // не может быть один dict, и разные name / verb
         let cdicts = dictgroups[dict]
+        if (!cdicts.length) log('_NO_P_ROBE_DICT___!!!', dict)
 
-        let probe = cdicts[0] // определить pos и scheme  // ἀντιδιαβάλλω
-        if (!probe) log('_NO_P_ROBE_DICT___!!!', dict, maindicts.length, cdicts)
-
-        let probeFLS = {dict, cdicts, rels: maindicts, term: br.term}
-        if (probe.verb) probeFLS.verb = true
-        else probeFLS.name = true
-
-        // log('_BR-lead', lead)
-        // log('_BR', br.head, br.con, br.tail)
-        let scheme = parseScheme(lead, probe, br)
-        probeFLS.scheme = scheme
-
-        parseMorph(cdicts)
-
-        // cleanChain(probeFLS)
-        // log('_XXXXXXXXXXXXXXXXX probeFLS', probeFLS)
+        let probeFLS = {dict, cdicts, rels, term}
+        parseMorphs(cdicts)
         brchains.push(probeFLS)
     }
 
@@ -375,7 +367,14 @@ function cleanChain(chain) {
     }
 }
 
-function parseMorph(cdicts) {
+function parseMorph(cdict) {
+    let morphs = []
+    if (cdict.name) morphs = prettyName(cdict.cfls)
+    else if (cdict.verb) morphs = prettyVerb(cdict.cfls)
+    return morphs
+}
+
+function parseMorphs(cdicts) {
     let morphs = []
     for (let cdict of cdicts) {
         if (cdict.name) morphs = prettyName(cdict.cfls)
@@ -442,8 +441,9 @@ async function parseDictBreaks(headtails) {
     psblstems = _.uniq(_.compact(psblstems))
     // let dicts = await findDicts(psblstems)
     let dicts = await getNests(psblstems)
-    // log('_dicts', dicts.length)
+    // log('_dicts_psblstems', dicts.length)
 
+    let real_headtails = []
     for (let ht of headtails) {
         let headdicts = dicts.filter(dict=> dict.stem == ht.head)
         let taildicts = dicts.filter(dict=> dict.stem == ht.tail)
@@ -451,8 +451,10 @@ async function parseDictBreaks(headtails) {
         ht.taildicts = taildicts
         ht.hsize = headdicts.length
         ht.tsize = taildicts.length
+        // пока без second component
+        if (ht.hsize) real_headtails.push(ht)
     }
-    return headtails
+    return real_headtails
 }
 
 function parseHeadTail(stub, term) {
@@ -600,7 +602,59 @@ function removeVowelEnd(wf) {
 
 function makeTermChain(wf, termcdicts) {
     let termchain = {dict: wf, indecl: true, rels: [], scheme: []} // TODO: scheme тут ьожет быть - astem-term
-    // parseMorph(termcdicts)
+    // parseMorphs(termcdicts)
     termchain.cdicts = termcdicts
     return termchain
+}
+
+function parseLeads_old_full(pcwf) {
+    let leads = []
+    let prefraw = parsePrefix(pcwf)
+    if (!prefraw) {
+        let augLead = parseAug(pcwf)
+        leads.push(augLead)
+        return leads
+    }
+
+    // {pref: '', con: '', tail: ''}
+    let pparts = prefraw.split('-')
+    let psize = pparts.length
+
+    let tail = pcwf
+    let con = ''
+    // let ppref = ''
+    let ps = []
+    let atail = ''
+    // let plead = {ps: []}
+    for (let pref of pparts) {
+        // if (pref == 'αν') pref = 'ἀν'
+        let plead = {}
+        plead.ps = _.clone(ps)
+        plead.pref = pref
+        let before = tail
+        let repref = new RegExp('^' + pref)
+        // plead.a_tail = atail
+        // plead.tail_b = tail
+        // atail = atail ? atail.replace(repref, '') : tail.replace(repref, '')
+        atail = tail.replace(repref, '')
+        // plead.atail = atail
+        tail = atail
+        ps.push(pref)
+
+        // if (plead.pref == 'αν') plead.pref = 'ἀν' // <<<<<<<<<<<<<<<<<<<<<, HERE // ἐξαναλίσκω
+        let pct = removeVowelBeg(atail)
+        plead.con = pct.con
+        plead.tail = pct.tail
+        leads.push(plead)
+
+        let alead = {ps: plead.ps}
+        let act = removeVowelBeg(before)
+        alead.aug = act.con
+        alead.tail = act.tail
+        leads.push(alead)
+    }
+
+    // log('_leads_', leads)
+    // return []
+    return leads
 }
