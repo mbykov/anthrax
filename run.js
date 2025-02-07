@@ -50,7 +50,7 @@ async function run(verbose) {
     let trnsdicts = await getTrns(dictkeys, testdnames)
     // log('____TRNS', trnsdicts.length)
 
-    for (let chain of chains) {
+    for (let chain of []) { // chains
         for (let cdict of chain.cdicts) {
             // let pos = posByCdict(cdict)
             // cdict.trn = {}
@@ -63,26 +63,27 @@ async function run(verbose) {
         }
     }
 
-    // log('_CHAINS.cdicts', chains[0].cdicts)
+    // log('_CHAINS', chains)
 
     // let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
     // if (verbose) log('\n___schemes:', schemes.sort().join('; '))
 
-    for (let chain of []) { // chains
+    for (let chain of chains) { //
         if (!verbose) chain = muteChain(chain)
         // log('_CHAIN', chain)
-        if (chain.scheme) { // TODO: indecls ?
-            let scheme = chain.scheme.map(segment=> segment.seg).join('-')
-            if (verbose) log('\chain.scheme:', chain.scheme)
-            log('_scheme:', scheme)
-        }
 
         for (let cdict of chain.cdicts) {
             if (chain.indecl) log('_indecl:')
-            let pos = posByCdict(cdict)
-            log('_rdict:', cdict.rdict, cdict.stem, '_pos:', pos, '_pref', !!cdict.prefix)
+            // let pos = posByCdict(cdict)
+            if (cdict.scheme) {
+                let scheme = cdict.scheme.map(segment=> segment.seg).join('-')
+                log('\n_scheme:', scheme)
+            } else {
+                log('\n_no_scheme:')
+            }
+            log('_rdict:', cdict.rdict, cdict.stem, '_pos:', cdict.pos, '_pref', !!cdict.prefix)
             log('_morphs:', cdict.morphs)
-            // if (verbose) log('_TRN', cdict.trn)
+            if (verbose) log('_TRN_0', cdict.trns)
         }
 
         if (verbose && chain.rels) {
@@ -105,5 +106,6 @@ function muteChain(chain) {
     chain.cfls = 'cfls'
     // chain.trns = 'trns'
     chain.rels = 'rels'
+    chain.morels = 'morels'
     return chain
 }

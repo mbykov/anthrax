@@ -21,12 +21,12 @@ import { verbKey } from '../parse-dicts/WKT/wkt-keys/key-verb.js'
 import { preflist } from './lib/prefix/preflist.js'
 import { prefDocList } from '../prefslist/dst/prefDocList.js'
 
-const d = Debug('lead')
-const b = Debug('break')
+const dd = Debug('lead')
+const pp = Debug('proxy')
 const n = Debug('chain')
-const f = Debug('filter')
+const ff = Debug('filter')
 const c = Debug('compound')
-const h = Debug('scheme')
+const ss = Debug('scheme')
 
 // let dag = {}
 // log('_ANTHRAX START')
@@ -61,6 +61,7 @@ export async function anthrax(wf) {
     let chains = []
     let dag = await parseDAG(wf)
 
+    // неизменяемые, indecls, включая irregs, уже имеют trns, в отличие от nests
     let idicts = await getInds(dag.cwf)
     // log('_INDECLS', idicts)
     if (idicts.length) {
@@ -74,7 +75,7 @@ export async function anthrax(wf) {
     // // ἀνακύκλωσις - pref = null // ==== значит, надо оба варианта, пока в словаре все слова точно не будут обработаны на префиксы - ἀνακύκλησις
 
     let leads = parseLeads(dag.pcwf)
-    d('_LEADS', leads)
+    dd('_LEADS', leads)
 
     for (let lead of leads) {
         // log('_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLEAD', lead)
@@ -87,11 +88,8 @@ export async function anthrax(wf) {
         chains = chains.filter(chain=> chain.cdict.stem.length > 1)
     }
 
-    // let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
-    // h('\n_SCHEMES:', schemes.sort().join('; '))
-
-    return []
-    // return chains
+    // return []
+    return chains
 }
 
 // πολυμαθίη νόον ἔχειν οὐ διδάσκει // polumathih
@@ -114,27 +112,28 @@ async function main(dag, lead) {
         let fls = dag.termflex[br.term]
         // filterFLS ???
         if (!fls) continue
-        log('_================= br.head', br.head, '_hsize', br.hsize, '_fls', fls.length)
+        pp('_================= br.head', br.head, '_hsize', br.hsize, '_fls', fls.length)
 
         // farrels, head or tail
         let maindicts = mainDicts(br)
-        if (!maindicts.length) return []
+        if (!maindicts.length) continue
         // log('_maindicts _head:', br.head, '_tail:', br.tail, maindicts.length, lead)
         let main_rdicts = maindicts.map(cdict=> cdict.rdict)
-        log('_main_rdicts:', main_rdicts)
+        pp('_main_rdicts:', main_rdicts)
 
         let proxies = proxyByLead(lead, maindicts)
-        if (!proxies.length) return []
+        if (!proxies.length) continue
         let proxies_rdicts = proxies.map(cdict=> cdict.rdict)
-        log('__proxies_rdicts:', proxies_rdicts)
+        pp('__proxies_rdicts:', proxies_rdicts)
 
         let stemdicts = dictByFLS(proxies, fls)
-        if (!stemdicts.length) return []
+        if (!stemdicts.length) continue
         let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
-        log('__rstemdicts', rstemdicts) // SHOW
+        pp('__rstemdicts', rstemdicts) // SHOW
 
         for (let cdict of stemdicts) {
             cdict.morphs = parseMorph(cdict)
+            cdict.scheme = parseScheme(lead, cdict, br.term)
             delete cdict.cfls
             delete cdict.ckeys
         }
@@ -148,7 +147,7 @@ async function main(dag, lead) {
         }
 
         let chain = {rcdicts, stem: br.head, cdicts: stemdicts, rels, morels, term: br.term}
-        chain.schemes = parseSchemes(lead, stemdicts, br.term)
+        // chain.schemes = parseSchemes(lead, stemdicts, br.term)
         chains.push(chain)
     }
 
@@ -156,12 +155,40 @@ async function main(dag, lead) {
     return chains
 }
 
-function parseSchemes(lead, cdicts, term) {
-    let schemes = []
-    // let prefs = lead.prefs.slice(0, -1).reverse()
+function parseScheme(lead, cdict, term) {
+    let scheme = []
+    if (!lead.pref) {
+        if (lead.aug) scheme.push({seg: lead.aug, aug: true})
+        scheme.push({seg: cdict.stem, stem: true})
+        scheme.push({seg: term, term: true})
+        return scheme
+    }
     let prefs = lead.prefraw.split('-').reverse()
     let lastpref = prefs[0] // reverse!
-    log('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
+    ss('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
+    let pdict = plain(cdict.dict)
+    let reterm = new RegExp(term + '$')
+    pdict = pdict.replace(reterm, '')
+    lead.prefs.pop()
+    scheme.push({seg: pdict, tail: true})
+    for (let pref of prefs) {
+        let repref = new RegExp(pref)
+        if (repref.test(pdict)) continue
+        if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, con: true})
+        scheme.unshift({seg: pref, pref: true})
+        let segtail = scheme.find(seg=> seg.tail)
+        segtail.seg = pdict
+    }
+    scheme.push({seg: term, term: true})
+    ss('_scheme', pdict, scheme)
+    return scheme
+}
+
+function parseSchemes(lead, cdicts, term) {
+    let schemes = []
+    let prefs = lead.prefraw.split('-').reverse()
+    let lastpref = prefs[0] // reverse!
+    ss('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
     for (let cdict of cdicts) {
         let scheme = []
         let pdict = plain(cdict.dict)
@@ -179,7 +206,7 @@ function parseSchemes(lead, cdicts, term) {
         }
         scheme.push({seg: term, term: true})
         schemes.push(scheme)
-        log('_S', pdict, scheme)
+        ss('_scheme', pdict, scheme)
     }
 
     return schemes
@@ -208,16 +235,13 @@ function mainDicts(br) {
 // здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον ???
 // =======================================================================================================
 function proxyByLead(lead, maindicts) {
-    // log('_______________________________________________________________________F PR')
-    let main_rdicts = maindicts.map(cdict=> cdict.rdict)
-    // log('_______________________________________________________________________main_rdicts', main_rdicts)
-    // log('_ckey_lead__________________________________:', lead)
     let proxies = []
     for (let cdict of maindicts) {
         // if (cdict.stem != 'λισκ') continue
         // if (cdict.rdict != 'προκαταλαμβάνω') continue
-        // if (cdict.rdict != 'καταλαμβάνω') continue
         // log('_ckey_rdict________:', cdict.rdict, cdict.prefix)
+
+        if (!cdict.ckeys) log('_!!!!', cdict)
 
         cdict.ckeys = cdict.ckeys.filter(ckey=> {
             // log('_ckey_prefix', ckey.con, ckey.prefix?.pref, ckey.prefix?.con)
@@ -243,8 +267,7 @@ function proxyByLead(lead, maindicts) {
     }
 
     let rproxies = proxies.map(cdict=> cdict.rdict)
-    // d('_r_proxies:', lead, rproxies)
-    // log('_proxies:', lead, proxies)
+    pp('_r_proxies:', lead, rproxies)
 
     // return []
     return proxies
@@ -253,7 +276,7 @@ function proxyByLead(lead, maindicts) {
 function dictByFLS(proxies, fls) {
     let stemdicts = []
     for (let cdict of proxies) {
-        // log('____probe', cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
+        ff('____probe', cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
         let cfls = []
         if (cdict.name) {
             // log('_N', cdict.rdict)
@@ -384,7 +407,7 @@ function parseMorphs(cdicts) {
     }
 }
 
-function parseScheme(lead, probe, br) {
+function parseScheme_(lead, probe, br) {
     let scheme = []
     h('lead', lead)
     h('probe.pdict', probe.rdict, '_stem:', probe.stem)
@@ -465,7 +488,6 @@ function parseHeadTail(stub, term) {
     let con = ''
     let pos = stub.length + 1
     while (pos > 0) {
-        // log('_==========================', stub, head, tail)
         pos--
         head = stub.slice(0, pos)
         if (!head) continue
