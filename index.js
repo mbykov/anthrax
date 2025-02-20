@@ -12,11 +12,7 @@ import Debug from 'debug'
 
 // KEYS
 import { nameKey } from '../parse-dicts/WKT/wkt-keys/key-name.js'
-// import { nounKey } from '../parse-dicts/WKT/wkt-keys/key-noun.js'
-// import { adjKey } from '../parse-dicts/WKT/wkt/wkt-keys/key-adj.js'
 import { verbKey } from '../parse-dicts/WKT/wkt-keys/key-verb.js'
-
-// let nounKey, adjKey, verbKey = {}
 
 import { preflist } from './lib/prefix/preflist.js'
 import { prefDocList } from '../prefslist/dst/prefDocList.js'
@@ -121,6 +117,7 @@ async function main(dag, lead) {
         let main_rdicts = maindicts.map(cdict=> cdict.rdict)
         pp('_main_rdicts:', main_rdicts)
 
+        // == вопрос, что выгоднее - сначала прокси, потом probe-fls, или наоборот?
         let proxies = proxyByLead(lead, maindicts)
         if (!proxies.length) continue
         let proxies_rdicts = proxies.map(cdict=> cdict.rdict)
@@ -237,11 +234,18 @@ function mainDicts(br) {
 function proxyByLead(lead, maindicts) {
     let proxies = []
     for (let cdict of maindicts) {
-        // if (cdict.stem != 'λισκ') continue
+        // if (cdict.stem != 'διοτ') continue
         // if (cdict.rdict != 'προκαταλαμβάνω') continue
         // log('_ckey_rdict________:', cdict.rdict, cdict.prefix)
 
-        if (!cdict.ckeys) log('_!!!!', cdict)
+        // ddd
+        if (!cdict.ckeys) {
+            if (cdict.pos == 'noun') cdict.ckeys = nameKey[cdict.stype]
+            else if (cdict.pos == 'adj') cdict.ckeys = nameKey[cdict.stype3]
+            else if (cdict.pos == 'verb') cdict.ckeys = nameKey[cdict.stype]
+            // log('_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx NO CKEYS BY STYPE ', cdict.rdict, '_pos:', cdict.pos, cdict.stype, nameKey[cdict.stype], '_end')
+        }
+        if (!cdict.ckeys) continue
 
         cdict.ckeys = cdict.ckeys.filter(ckey=> {
             // log('_ckey_prefix', ckey.con, ckey.prefix?.pref, ckey.prefix?.con)
@@ -255,8 +259,13 @@ function proxyByLead(lead, maindicts) {
                 else if (!ckey.prefix && ckey.aug && strip(ckey.aug) !== lead.con) ok = false // ἀναβαίνω ; διαβάλλω
             } else { // целые, без префикса
                 if (ckey.prefix) ok = false
-                // if (ckey.bad) ok = false // так я все bads убил, не верно
-                else if (ckey.aug !== lead.aug) ok = false
+
+                // ἁγνότης ; ἰδιότης, nameKey создан по ἁγνότης, ckey.aug=A, а в lead.aug ἰδιότης - I
+                // вопрос, много-ли лишних значений будет, если я уберу здесь проверку по aug? выглядит она очень уродливо, ckey / flex - это же про окончания
+                // ИЛИ: здесь можно не проверять aug, если ckey вычисляемый (найти пример, где сравнение нужно)
+                // может быть, будет нужно в компаундах
+                // else if (ckey.aug !== lead.aug) ok = false
+
                 // if (ok) log('________ckeys aug ok:', cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug, ckey)
             }
             // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)

@@ -9,7 +9,6 @@ const d = Debug('dicts')
 
 import { createDBs, getFlexes, getNests, getTrns } from './lib/remote.js'
 
-
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
@@ -70,7 +69,7 @@ async function run(verbose) {
 
     for (let chain of chains) { //
         if (!verbose) chain = muteChain(chain)
-        // log('_CHAIN', chain)
+        else log('_CHAIN', chain)
 
         for (let cdict of chain.cdicts) {
             if (chain.indecl) log('_indecl:')
@@ -81,7 +80,7 @@ async function run(verbose) {
             } else {
                 log('\n_no_scheme:')
             }
-            log('_rdict:', cdict.rdict, cdict.stem, '_pos:', cdict.pos, '_pref', !!cdict.prefix)
+            log('_rdict:', cdict.rdict, cdict.stem, cdict.dname, '_pos:', cdict.pos, '_pref', !!cdict.prefix)
             log('_morphs:', cdict.morphs)
             if (verbose) log('_TRN_0', cdict.trns)
         }

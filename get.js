@@ -26,12 +26,12 @@ const dnamepath = path.resolve(dbpath, dname)
 log('_dnamepath ', dnamepath)
 const db = new PouchDB(dnamepath);
 
-stem = comb(stem) // на случай поиска dict, а не stem в словарях
+if (stem == 'info') getInfo(dname)
+else getDicts(stem, dname)
 
-getDicts(stem)
-
-async function getDicts (stem) {
+async function getDicts(stem) {
     log('_getDicts_', stem)
+    stem = comb(stem) // на случай поиска dict, а не stem в словарях
     try {
         let doc = await db.get(stem, {include_docs: true});
         log('_doc_', doc)
@@ -43,6 +43,15 @@ async function getDicts (stem) {
         }
     } catch (err) {
         console.log('_not_found');
+    }
+}
+
+async function getInfo(dname) {
+    try {
+        let info = await db.info();
+        log('_info_', info)
+    } catch (err) {
+        console.log('_no_info', dname);
     }
 
 }
