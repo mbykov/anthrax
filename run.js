@@ -14,8 +14,6 @@ let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
 const log = console.log
 
-// let dnames
-
 // check greek TODO:
 if (!wordform) log('no wordform')
 else run(verbose)
@@ -30,49 +28,44 @@ async function run(verbose) {
     wordform = cleanString(wordform)
 
     // TODO: отдельно - сначала indecl-DB
-    let chains = await anthrax(wordform)
+    let conts = await anthrax(wordform)
+    // log('____conts', conts)
 
-    if (!chains.length) {
+    if (!conts.length) {
         log('no result')
         return
     }
 
-    if (!chains.length > 2) log('________________________________too many chains', chains.length)
+    for (let container of conts) {
+        log('_container', container)
+
+        // for (let chain of container.chains) {
+        //     // log('_chain', chain)
+        // }
+    }
+
+
+    return
 
     let cdicts = _.flatten(chains.map(chain=> chain.cdicts))
     // log('____cdicts', cdicts)
 
-    let dictkeys = cdicts.map(cdict=> cdict.dict)
-    dictkeys = _.uniq(dictkeys)
+    let rdicts = cdicts.map(cdict=> cdict.rdict)
+    rdicts = _.uniq(rdicts)
+    // log('____rdicts', rdicts)
 
-    let testdnames = ['wkt', 'dvr']
-    let trnsdicts = await getTrns(dictkeys, testdnames)
-    // log('____TRNS', trnsdicts.length)
-
-    for (let chain of []) { // chains
-        for (let cdict of chain.cdicts) {
-            // let pos = posByCdict(cdict)
-            // cdict.trn = {}
-            let tdicts = trnsdicts.filter(tdict=> tdict.dict == cdict.dict && tdict.rdict == cdict.rdict && tdict.pos == cdict.pos)
-            for (let tdict of tdicts) {
-                // log('____tdict.dname', tdict.dname)
-                // cdict.trn[tdict.dname] = tdict.trns
-            }
-            delete cdict.trns
-        }
-    }
-
-    // log('_CHAINS', chains)
-
-    // let schemes = chains.map(chain=> chain.scheme.map(segment=> segment.seg).join('-'))
-    // if (verbose) log('\n___schemes:', schemes.sort().join('; '))
+    let testdnames = ['wkt', 'dvr', 'lsj', 'bbl'] // , 'gram'
+    let trnsdicts = await getTrns(rdicts, testdnames)
+    let rtrns = trnsdicts.map(cdict=> cdict.rdict)
+    // console.log('____rtrns', rtrns)
 
     for (let chain of chains) { //
-        if (!verbose) chain = muteChain(chain)
-        else log('_CHAIN', chain)
+
+        if (verbose) muteChain(chain)
+        if (verbose) log('_CHAIN', chain)
 
         for (let cdict of chain.cdicts) {
-            if (chain.indecl) log('_indecl:')
+            if (chain.indecl) log('_indecl:', cdict)
             // let pos = posByCdict(cdict)
             if (cdict.scheme) {
                 let scheme = cdict.scheme.map(segment=> segment.seg).join('-')
@@ -82,15 +75,8 @@ async function run(verbose) {
             }
             log('_rdict:', cdict.rdict, cdict.stem, cdict.dname, '_pos:', cdict.pos, '_pref', !!cdict.prefix)
             log('_morphs:', cdict.morphs)
-            if (verbose) log('_TRN_0', cdict.trns)
-        }
-
-        if (verbose && chain.rels) {
-            let rels = chain.rels.map(dict=> dict.rdict)
-            log('_rels:', rels.length)
         }
     }
-
 }
 
 function posByCdict(cdict) {
@@ -102,9 +88,7 @@ function posByCdict(cdict) {
 }
 
 function muteChain(chain) {
-    chain.cfls = 'cfls'
-    // chain.trns = 'trns'
-    chain.rels = 'rels'
-    chain.morels = 'morels'
-    return chain
+    if (chain.indecl) return
+    chain.rels = chain.rels.length
+    chain.morels = chain.morels.length
 }

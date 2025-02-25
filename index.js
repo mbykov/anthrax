@@ -5,7 +5,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, stresses, checkOddStress } from './lib/utils.js'
-import { createDBs, getFlexes, getNests, getInds } from './lib/remote.js'
+import { createDBs, getFlexes, getNests, getIndecls } from './lib/remote.js'
 // import { enclitic } from './lib/enclitic.js'
 import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
@@ -58,11 +58,15 @@ export async function anthrax(wf) {
     let dag = await parseDAG(wf)
 
     // неизменяемые, indecls, включая irregs, уже имеют trns, в отличие от nests
-    let idicts = await getInds(dag.cwf)
+    // let idicts = await getInds(dag.cwf)
     // log('_INDECLS', idicts)
+    let testdnames = ['wkt', 'dvr', 'lsj']
+    let idicts = await getIndecls(dag.cwf, testdnames)
+    // log('_INDECLS_I', idicts)
     if (idicts.length) {
+        dag.idicts = idicts.length
         let ichain = makeTermChain(wf, idicts)
-        chains.push(ichain)
+        // chains.push(ichain)
     }
 
     // ======================== ἀνακύκλωσις
@@ -79,9 +83,44 @@ export async function anthrax(wf) {
         chains.push(...brchains)
     }
 
+    // TODO: == объединить, когда обраружу indecl в гнездах
+    if (idicts.length) {
+        let igroups = _.groupBy(idicts, 'dict')
+        let cidicts = []
+        for (let dict in igroups) { // str
+            let cdict = {dict, trns: []}
+            for (let idict of igroups[dict]) {
+                if (!cdict.rdict) cdict.rdict = idict.rdict
+                if (!cdict.rdict) cdict.rdict = idict.rdict
+                if (!cdict.fls) cdict.fls = idict.fls
+                let trn = {dname: idict.dname, trns: idict.trns}
+                cdict.trns.push(trn)
+                cdict.morphs = []
+            }
+            cidicts.push(cdict)
+        }
+        log('_c_idicts', cidicts)
+
+        let ichains = []
+        for (let idict of cidicts) {
+            log('_T', idict)
+            let ichain = {rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
+            ichains.push(ichain)
+        }
+        let ridicts = cidicts.map(dict=> dict.rdict)
+        let icontainer = {rdicts: ridicts, indecl: true, chains: ichains, rels: [], morels: [], schemes: []}
+        chains.push(icontainer)
+    }
+
+    // best, еще раз ? могут они появиться, если br.head ограничен? Проверить br.tail
     // отбросить короткие стемы ; ἡμέρα
-    if (chains.length > 1 && false) {
-        chains = chains.filter(chain=> chain.cdict.stem.length > 1)
+    // тут можно заранее, есди есть indecls, в nest сразу выбирать стемы длиннее 1
+    if (chains.length > 1) {
+        chains = chains.filter(chain=> chain.indecl || chain.stem.length > 1)
+        if (chains.length > 1) {
+            log('_too_many_chains', wf, chains)
+            // throw new Error()
+        }
     }
 
     // return []
@@ -93,7 +132,9 @@ async function main(dag, lead) {
     let ptail = lead.tail
     let headtails = parseHeadTails(dag, ptail)
     headtails = headtails.filter(ht=> !ht.tail) // only heads, compounds killed // προσκομίζω - προσεκόμιζε // появляется лишний результат
-    // log('_headtails', ptail, 'lead_pref', !!lead.pref,  headtails)
+    dd('_headtails', ptail, 'lead_pref', !!lead.pref,  headtails)
+    // best - если есть indecls, то только длинные стемы
+    if (dag.idicts) headtails = headtails.filter(ht=> ht.head.length > 1)
     let dictbreaks = await parseDictBreaks(headtails, dag.termflex)
     if (!dictbreaks.length) return []
     // log('_real_lead', lead)
@@ -127,6 +168,7 @@ async function main(dag, lead) {
         if (!stemdicts.length) continue
         let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
         pp('__rstemdicts', rstemdicts) // SHOW
+        // log('__rstemdicts', rstemdicts) // SHOW
 
         for (let cdict of stemdicts) {
             cdict.morphs = parseMorph(cdict)
@@ -135,7 +177,10 @@ async function main(dag, lead) {
             delete cdict.ckeys
         }
 
-        let rcdicts = stemdicts.map(dict=> dict.rdict)
+        stemdicts = _.sortBy(stemdicts, [function(cdict) { return cdict.rdict.length; }]).reverse()
+
+        let rdicts = stemdicts.map(dict=> dict.rdict)
+
         let rels = []
         let morels = []
         for (let dict of maindicts) {
@@ -143,9 +188,22 @@ async function main(dag, lead) {
             else morels.push(dict.rdict)
         }
 
-        let chain = {rcdicts, stem: br.head, cdicts: stemdicts, rels, morels, term: br.term}
+        // let chain = {rcdicts, stem: br.head, cdicts: stemdicts, rels, morels, term: br.term}
         // chain.schemes = parseSchemes(lead, stemdicts, br.term)
-        chains.push(chain)
+
+        let container = {rdicts, stem: br.head, rels, morels, chains: []}
+        // let jsons = stemdicts.map(cdict=> JSON.stringify(cdict.scheme))
+        // jsons = _.uniq(jsons)
+        // container.schemes = jsons.map(json=> JSON.parse(json))
+        container.schemes = stemdicts.map(cdict=> cdict.scheme)
+
+        for (let cdict of stemdicts) {
+            let schm = cdict.scheme.map(segment=> segment.seg).join('-')
+            let chain = {rdict: cdict.rdict, cdict, morphs: cdict.morphs, scheme: cdict.scheme, schm}
+            container.chains.push(chain)
+        }
+
+        chains.push(container)
     }
 
     // log('_index_chains', chains)
@@ -471,7 +529,7 @@ async function parseDictBreaks(headtails) {
     psblstems.push(...headtails.map(ht=> ht.head))
     psblstems.push(...headtails.map(ht=> ht.tail))
     psblstems = _.uniq(_.compact(psblstems))
-    // let dicts = await findDicts(psblstems)
+
     let dicts = await getNests(psblstems)
     // log('_dicts_psblstems', dicts.length)
 
