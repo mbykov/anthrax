@@ -163,12 +163,13 @@ async function main(dag, lead) {
         if (!proxies.length) continue
         let proxies_rdicts = proxies.map(cdict=> cdict.rdict)
         pp('__proxies_rdicts:', proxies_rdicts)
+        // log('__proxies_rdicts:', br.head, proxies_rdicts)
 
         let stemdicts = dictByFLS(proxies, fls)
         if (!stemdicts.length) continue
         let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
         pp('__rstemdicts', rstemdicts) // SHOW
-        // log('__rstemdicts', rstemdicts) // SHOW
+        // log('__rstemdicts', br.head, rstemdicts) // SHOW
 
         for (let cdict of stemdicts) {
             cdict.morphs = parseMorph(cdict)
@@ -208,6 +209,210 @@ async function main(dag, lead) {
 
     // log('_index_chains', chains)
     return chains
+}
+
+function mainDicts(br) {
+    // log('_____________mainDicts', '_head', br.head, '_con', br.con, br.headdicts.length)
+    if (br.taildicts.length && !br.headdicts.length) return []
+    if (!br.taildicts.length && br.con) return []
+
+    let compound = !!br.taildicts.length && !!br.headdicts.length
+    // if (compound) return []
+
+    let maindicts = (compound) ? br.taildicts : br.headdicts
+    // log('___compound', compound, 'lead:', lead)
+    // log('___maindicts', maindicts.length)
+    if (!maindicts.length) return []
+    let stem = (compound) ? br.tail : br.head
+
+    // let main_rdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
+    // d('_main r_dicts br.head', br.head, main_rdicts)
+    return maindicts
+}
+
+// =======================================================================================================
+// здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον ???
+// =======================================================================================================
+function proxyByLead(lead, maindicts) {
+    let proxies = []
+    for (let cdict of maindicts) {
+        // if (cdict.stem != 'διοτ') continue
+        // if (cdict.rdict != 'ὄκλασμα') continue
+        if (!cdict.ckeys) {
+            if (cdict.pos == 'noun') cdict.ckeys = nameKey[cdict.stype]
+            else if (cdict.pos == 'adj') cdict.ckeys = nameKey[cdict.stype3]
+            else if (cdict.pos == 'verb') cdict.ckeys = nameKey[cdict.stype]
+            // log('_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx NO CKEYS BY STYPE ', cdict.rdict, '_pos:', cdict.pos, cdict.stype, nameKey[cdict.stype], '_end')
+        }
+
+        // if (!cdict.ckeys) log('_no_ckeys', cdict.rdict)
+        if (!cdict.ckeys) continue
+
+        if (cdict.pos != 'verb') {
+            if (cdict.aug === lead.aug) {
+                cdict.proxy = true
+                proxies.push(cdict)
+            }
+            // log('_ckey_rdict________:', cdict.rdict, cdict.ckeys.length,  '_lead.aug', lead.aug, cdict.pos, cdict.aug)
+        } else {
+            cdict.ckeys = cdict.ckeys.filter(ckey=> {
+                if (cdict.pos != 'verb') return true
+                // log('_ckey_prefix', ckey.con, ckey.prefix?.pref, ckey.prefix?.con)
+                let ok = true
+                // return ok
+                if (lead.pref) { // wf with prefs, с тем же стемом, сборная с префиксом здесь, ее не должно быть в lead.aug
+                    if (!ckey.prefix && ckey.bad) ok = false // должен быть prefix, но его нет
+                    // if (ckey.prefix && ckey.con && (strip(ckey.prefix.pref) !== strip(lead.pref) || ckey.con !== lead.con)) ok = false
+                    if (ckey.prefix && ckey.con && (!lead.prefs.includes(strip(ckey.prefix.pref)) || ckey.con !== lead.con)) ok = false // προκαταλαμβάνω
+                    else if (ckey.prefix && !ckey.con && (strip(ckey.prefix.pref) !== strip(lead.pref))) ok = false
+                    else if (!ckey.prefix && ckey.aug && strip(ckey.aug) !== lead.con) ok = false // ἀναβαίνω ; διαβάλλω
+                } else { // целые, без префикса
+                    if (ckey.prefix) ok = false
+
+                    // ἁγνότης ; ἰδιότης, nameKey создан по ἁγνότης, ckey.aug=A, а в lead.aug ἰδιότης - I
+                    // вопрос, много-ли лишних значений будет, если я уберу здесь проверку по aug? выглядит она очень уродливо, ckey / flex - это же про окончания
+                    // ИЛИ: здесь можно не проверять aug, если ckey вычисляемый (найти пример, где сравнение нужно)
+                    // может быть, будет нужно в компаундах
+                    else if (ckey.aug !== lead.aug) ok = false
+
+                    // if (ok) log('________ckeys aug ok:', cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug, ckey)
+                }
+                // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
+                return ok
+            })
+
+            if (cdict.ckeys.length) proxies.push(cdict), cdict.proxy = true
+        }
+    }
+
+    let rproxies = proxies.map(cdict=> cdict.rdict)
+    pp('_r_proxies:', lead, rproxies)
+    // log('_r_proxies:', lead, rproxies)
+
+    // return []
+    return proxies
+}
+
+function dictByFLS(proxies, fls) {
+    let stemdicts = []
+    for (let cdict of proxies) {
+        ff('____probe', cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
+        let cfls = []
+        if (cdict.name) {
+            // log('_N', cdict.rdict, fls.length, cdict.ckeys.length)
+            // if (cdict.rdict != 'κλάσμα') continue //FFF
+            for (let flex of fls) {
+                if (!flex.name) continue
+                // log('_n_flex', flex.name, flex.stype)
+                // if (cdict.rstress != flex.rstress) continue // различить γλῶττα / φάττα - разные ударения
+                for (let ckey of cdict.ckeys) {
+                    // log('_name_ckey', cdict.rdict) // TODO:
+                    // if (!flex.adverb) {
+                    //     if (ckey.stype != flex.stype) continue
+                    //     if (ckey.gend != flex.gend) continue
+                    // }
+                    if (!ckey.keys.includes(flex.key)) continue
+                    cfls.push(flex)
+                    // log('_F_Name_OK', flex)
+                }
+                // if (flex.adverb || ckeys.includes(flex.key)) cfls.push(flex)
+            }
+            for (let flex of fls) {
+                if (!flex.adverb) continue
+                let keys = cdict.var?.[flex.stype] //  || nameKey[flex.stype] ??
+                if (!keys) continue
+                cfls.push(flex)
+            }
+        } else if (cdict.verb) {
+            // log('_V', cdict.rdict)
+            for (let flex of fls) {
+                if (!flex.verb) continue
+                // log('_F', flex.tense)
+                // cfls.push(flex)
+                for (let ckey of cdict.ckeys) {
+                    // log('_ckey.lead', ckey.con, 'flex.lead', flex.con)
+                    // if (!flex.con) continue
+                    // if (ckey.con && ckey.con !== flex.con) continue
+                    // else if (ckey.aug && ckey.aug !== flex.aug) continue
+                    // else if (!!ckey.con !== !!flex.con) continue
+                    // else if (!!ckey.aug !== !!flex.aug) continue
+
+                    // // log('_ckey.con', ckey.con, 'flex.con', flex.con)
+                    // // log('_ckey.aug', ckey.aug, 'flex.con', flex.aug)
+
+                    if (ckey.stype != flex.stype) continue
+                    if (ckey.tense != flex.tense) continue
+                    if (!ckey.keys.includes(flex.key)) continue
+                    cfls.push(flex)
+                    // log('_F_Verb_OK', cdict.rdict, flex.tense)
+                }
+            }
+        } else {
+            log('_name or verb', cdict)
+            throw new Error()
+        }
+
+        if (!cfls.length) continue
+        cdict.cfls = cfls
+        stemdicts.push(cdict)
+
+    } // proxy cdict
+    return stemdicts
+}
+
+// function chainForBreak(stemdicts, rels, term) {
+//     let brchains = []
+//     let dictgroups = _.groupBy(stemdicts, 'dict')  // общий stem, term - разные cdict.dict, verb/name, -> и chains ; noun / adj - вместе
+//     for (let dict in dictgroups) { // не может быть один dict, и разные name / verb
+//         let cdicts = dictgroups[dict]
+//         if (!cdicts.length) log('_NO_P_ROBE_DICT___!!!', dict)
+//         let probeFLS = {dict, cdicts, rels, term}
+//         parseMorphs(cdicts)
+//         brchains.push(probeFLS)
+//     }
+//     for (let probeFLS of brchains) {
+//         cleanChain(probeFLS)
+//     }
+//     // log('_XXXXXXXXXXXXXXXXXx', brchains.length)
+//     // return []
+//     return brchains
+// }
+
+function cleanChain(chain) {
+    for (let cdict of chain.cdicts) {
+        delete cdict.vars
+        delete cdict.cfls
+        // delete cdict.stem
+        // delete cdict.astem
+        // delete cdict.aug
+        delete cdict.keys
+        delete cdict.proxy
+        delete cdict.dname
+        delete cdict.raw
+        delete cdict.compound
+        delete cdict.cstype
+        // cdict.sprefix = JSON.stringify(cdict.prefix)
+    }
+    for (let cdict of chain.rels) {
+        delete cdict.vars
+        delete cdict.cfls
+        // delete cdict.stem
+        // delete cdict.astem
+        // delete cdict.aug
+        delete cdict.keys
+        delete cdict.proxy
+        delete cdict.dname
+        delete cdict.raw
+        delete cdict.compound
+        delete cdict.cstype
+    }
+}
+
+function parseMorph(cdict) {
+    let morphs = []
+    if (cdict.name) morphs = prettyName(cdict.cfls)
+    else if (cdict.verb) morphs = prettyVerb(cdict.cfls)
+    return morphs
 }
 
 function parseScheme(lead, cdict, term) {
@@ -265,203 +470,6 @@ function parseSchemes(lead, cdicts, term) {
     }
 
     return schemes
-}
-
-function mainDicts(br) {
-    // log('_____________mainDicts', '_head', br.head, '_con', br.con, br.headdicts.length)
-    if (br.taildicts.length && !br.headdicts.length) return []
-    if (!br.taildicts.length && br.con) return []
-
-    let compound = !!br.taildicts.length && !!br.headdicts.length
-    // if (compound) return []
-
-    let maindicts = (compound) ? br.taildicts : br.headdicts
-    // log('___compound', compound, 'lead:', lead)
-    // log('___maindicts', maindicts.length)
-    if (!maindicts.length) return []
-    let stem = (compound) ? br.tail : br.head
-
-    // let main_rdicts = _.uniq(maindicts.map(cdict=> cdict.rdict))
-    // d('_main r_dicts br.head', br.head, main_rdicts)
-    return maindicts
-}
-
-// =======================================================================================================
-// здесь есть случай, когда нужно пересчитать lead-prefix в зависимости от cdict: παρακρύπτω / παρέκρυπτον ???
-// =======================================================================================================
-function proxyByLead(lead, maindicts) {
-    let proxies = []
-    for (let cdict of maindicts) {
-        // if (cdict.stem != 'διοτ') continue
-        // if (cdict.rdict != 'προκαταλαμβάνω') continue
-        // log('_ckey_rdict________:', cdict.rdict, cdict.prefix)
-
-        // ddd
-        if (!cdict.ckeys) {
-            if (cdict.pos == 'noun') cdict.ckeys = nameKey[cdict.stype]
-            else if (cdict.pos == 'adj') cdict.ckeys = nameKey[cdict.stype3]
-            else if (cdict.pos == 'verb') cdict.ckeys = nameKey[cdict.stype]
-            // log('_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx NO CKEYS BY STYPE ', cdict.rdict, '_pos:', cdict.pos, cdict.stype, nameKey[cdict.stype], '_end')
-        }
-        if (!cdict.ckeys) continue
-
-        cdict.ckeys = cdict.ckeys.filter(ckey=> {
-            // log('_ckey_prefix', ckey.con, ckey.prefix?.pref, ckey.prefix?.con)
-            let ok = true
-            // return ok
-            if (lead.pref) { // wf with prefs, с тем же стемом, сборная с префиксом здесь, ее не должно быть в lead.aug
-                if (!ckey.prefix && ckey.bad) ok = false // должен быть prefix, но его нет
-                // if (ckey.prefix && ckey.con && (strip(ckey.prefix.pref) !== strip(lead.pref) || ckey.con !== lead.con)) ok = false
-                if (ckey.prefix && ckey.con && (!lead.prefs.includes(strip(ckey.prefix.pref)) || ckey.con !== lead.con)) ok = false // προκαταλαμβάνω
-                else if (ckey.prefix && !ckey.con && (strip(ckey.prefix.pref) !== strip(lead.pref))) ok = false
-                else if (!ckey.prefix && ckey.aug && strip(ckey.aug) !== lead.con) ok = false // ἀναβαίνω ; διαβάλλω
-            } else { // целые, без префикса
-                if (ckey.prefix) ok = false
-
-                // ἁγνότης ; ἰδιότης, nameKey создан по ἁγνότης, ckey.aug=A, а в lead.aug ἰδιότης - I
-                // вопрос, много-ли лишних значений будет, если я уберу здесь проверку по aug? выглядит она очень уродливо, ckey / flex - это же про окончания
-                // ИЛИ: здесь можно не проверять aug, если ckey вычисляемый (найти пример, где сравнение нужно)
-                // может быть, будет нужно в компаундах
-                // else if (ckey.aug !== lead.aug) ok = false
-
-                // if (ok) log('________ckeys aug ok:', cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug, ckey)
-            }
-            // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
-            return ok
-        })
-
-        if (cdict.ckeys.length) proxies.push(cdict), cdict.proxy = true
-    }
-
-    let rproxies = proxies.map(cdict=> cdict.rdict)
-    pp('_r_proxies:', lead, rproxies)
-
-    // return []
-    return proxies
-}
-
-function dictByFLS(proxies, fls) {
-    let stemdicts = []
-    for (let cdict of proxies) {
-        ff('____probe', cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
-        let cfls = []
-        if (cdict.name) {
-            // log('_N', cdict.rdict)
-            for (let flex of fls) {
-                if (!flex.name) continue
-                // log('_n_flex', flex.stype)
-                // if (cdict.rstress != flex.rstress) continue // различить γλῶττα / φάττα - разные ударения
-                for (let ckey of cdict.ckeys) {
-                    // log('_name_ckey', cdict.rdict) // TODO:
-                    if (!flex.adverb) {
-                        if (ckey.stype != flex.stype) continue
-                        if (ckey.gend != flex.gend) continue
-                    }
-                    if (!ckey.keys.includes(flex.key)) continue
-                    cfls.push(flex)
-                    // log('_F_Name_OK', flex)
-                }
-                // if (flex.adverb || ckeys.includes(flex.key)) cfls.push(flex)
-            }
-            for (let flex of fls) {
-                if (!flex.adverb) continue
-                let keys = cdict.var?.[flex.stype] //  || nameKey[flex.stype] ??
-                if (!keys) continue
-                cfls.push(flex)
-            }
-        } else if (cdict.verb) {
-            // log('_V', cdict.rdict)
-            for (let flex of fls) {
-                if (!flex.verb) continue
-                // log('_F', flex.tense)
-                // cfls.push(flex)
-                for (let ckey of cdict.ckeys) {
-                    // log('_ckey.lead', ckey.con, 'flex.lead', flex.con)
-                    // if (!flex.con) continue
-                    // if (ckey.con && ckey.con !== flex.con) continue
-                    // else if (ckey.aug && ckey.aug !== flex.aug) continue
-                    // else if (!!ckey.con !== !!flex.con) continue
-                    // else if (!!ckey.aug !== !!flex.aug) continue
-
-                    // // log('_ckey.con', ckey.con, 'flex.con', flex.con)
-                    // // log('_ckey.aug', ckey.aug, 'flex.con', flex.aug)
-
-                    if (ckey.stype != flex.stype) continue
-                    if (ckey.tense != flex.tense) continue
-                    if (!ckey.keys.includes(flex.key)) continue
-                    cfls.push(flex)
-                    // log('_F_Verb_OK', cdict.rdict, flex.tense)
-                }
-            }
-        } else {
-            log('_name or verb', cdict)
-            throw new Error()
-        }
-
-        if (!cfls.length) continue
-        cdict.cfls = cfls
-        stemdicts.push(cdict)
-
-    } // proxy cdict
-    return stemdicts
-}
-
-function chainForBreak(stemdicts, rels, term) {
-    let brchains = []
-    let dictgroups = _.groupBy(stemdicts, 'dict')  // общий stem, term - разные cdict.dict, verb/name, -> и chains ; noun / adj - вместе
-
-    for (let dict in dictgroups) { // не может быть один dict, и разные name / verb
-        let cdicts = dictgroups[dict]
-        if (!cdicts.length) log('_NO_P_ROBE_DICT___!!!', dict)
-
-        let probeFLS = {dict, cdicts, rels, term}
-        parseMorphs(cdicts)
-        brchains.push(probeFLS)
-    }
-
-    for (let probeFLS of brchains) {
-        cleanChain(probeFLS)
-    }
-    // log('_XXXXXXXXXXXXXXXXXx', brchains.length)
-    // return []
-    return brchains
-}
-
-function cleanChain(chain) {
-    for (let cdict of chain.cdicts) {
-        delete cdict.vars
-        delete cdict.cfls
-        // delete cdict.stem
-        // delete cdict.astem
-        // delete cdict.aug
-        delete cdict.keys
-        delete cdict.proxy
-        delete cdict.dname
-        delete cdict.raw
-        delete cdict.compound
-        delete cdict.cstype
-        // cdict.sprefix = JSON.stringify(cdict.prefix)
-    }
-    for (let cdict of chain.rels) {
-        delete cdict.vars
-        delete cdict.cfls
-        // delete cdict.stem
-        // delete cdict.astem
-        // delete cdict.aug
-        delete cdict.keys
-        delete cdict.proxy
-        delete cdict.dname
-        delete cdict.raw
-        delete cdict.compound
-        delete cdict.cstype
-    }
-}
-
-function parseMorph(cdict) {
-    let morphs = []
-    if (cdict.name) morphs = prettyName(cdict.cfls)
-    else if (cdict.verb) morphs = prettyVerb(cdict.cfls)
-    return morphs
 }
 
 function parseMorphs(cdicts) {
