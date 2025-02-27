@@ -99,11 +99,11 @@ export async function anthrax(wf) {
             }
             cidicts.push(cdict)
         }
-        log('_c_idicts', cidicts)
+        // log('_c_idicts', cidicts)
 
         let ichains = []
         for (let idict of cidicts) {
-            log('_T', idict)
+            // log('_idict', idict)
             let ichain = {rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
             ichains.push(ichain)
         }
@@ -156,7 +156,8 @@ async function main(dag, lead) {
         if (!maindicts.length) continue
         // log('_maindicts _head:', br.head, '_tail:', br.tail, maindicts.length, lead)
         let main_rdicts = maindicts.map(cdict=> cdict.rdict)
-        pp('_main_rdicts:', main_rdicts)
+        pp('_main_rdicts:', br.head, main_rdicts)
+        // log('_main_rdicts:', br.head, main_rdicts)
 
         // == вопрос, что выгоднее - сначала прокси, потом probe-fls, или наоборот?
         let proxies = proxyByLead(lead, maindicts)
@@ -237,7 +238,8 @@ function proxyByLead(lead, maindicts) {
     let proxies = []
     for (let cdict of maindicts) {
         // if (cdict.stem != 'διοτ') continue
-        // if (cdict.rdict != 'ὄκλασμα') continue
+        // if (cdict.rdict != 'βάρακος') continue
+
         if (!cdict.ckeys) {
             if (cdict.pos == 'noun') cdict.ckeys = nameKey[cdict.stype]
             else if (cdict.pos == 'adj') cdict.ckeys = nameKey[cdict.stype3]
@@ -249,10 +251,15 @@ function proxyByLead(lead, maindicts) {
         if (!cdict.ckeys) continue
 
         if (cdict.pos != 'verb') {
-            if (cdict.aug === lead.aug) {
+            if (lead.pref) {
+                if (lead.pref == cdict.prefix?.pref) cdict.proxy = true
+                else if (!cdict.prefix) cdict.proxy = true
+                // if (cdict.proxy) log('_pref', cdict.rdict, cdict.stem, 'l_pref', lead.pref, 'c_pref', cdict.prefix?.pref)
+            } else if (cdict.aug === lead.aug) {
                 cdict.proxy = true
-                proxies.push(cdict)
+                // log('_aug', cdict.rdict, cdict.stem)
             }
+            if (cdict.proxy) proxies.push(cdict)
             // log('_ckey_rdict________:', cdict.rdict, cdict.ckeys.length,  '_lead.aug', lead.aug, cdict.pos, cdict.aug)
         } else {
             cdict.ckeys = cdict.ckeys.filter(ckey=> {
@@ -280,7 +287,6 @@ function proxyByLead(lead, maindicts) {
                 // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
                 return ok
             })
-
             if (cdict.ckeys.length) proxies.push(cdict), cdict.proxy = true
         }
     }
@@ -309,8 +315,8 @@ function dictByFLS(proxies, fls) {
                     // log('_name_ckey', cdict.rdict) // TODO:
                     // if (!flex.adverb) {
                     //     if (ckey.stype != flex.stype) continue
-                    //     if (ckey.gend != flex.gend) continue
                     // }
+                    if (ckey.gend != flex.gend) continue
                     if (!ckey.keys.includes(flex.key)) continue
                     cfls.push(flex)
                     // log('_F_Name_OK', flex)
