@@ -113,10 +113,13 @@ export async function anthrax(wf) {
         }
         // log('_c_idicts', cidicts)
         for (let idict of cidicts) {
-            let nestcont = conts.find(container=> container.wf == idict.rdict)
-            if (!nestcont) log('_no_nest_container_for_idict', wf)
-            let icdict = {indecl: true, rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
-            nestcont.cdicts.push(icdict)
+            let nestcont = conts.find(container=> container.cwf == idict.dict)
+            if (nestcont) {
+                let icdict = {indecl: true, rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
+                nestcont.cdicts.push(icdict)
+            } else {
+                log('_no_nest_container_for_idict', wf)
+            }
         }
     }
 
@@ -191,7 +194,7 @@ async function main(dag, lead) {
         // let chain = {rcdicts, stem: br.head, cdicts: stemdicts, rels, morels, term: br.term}
         // chain.schemes = parseSchemes(lead, stemdicts, br.term)
 
-        let container = {wf: dag.wf, rdicts, stem: br.head, rels, morels, cdicts: []}
+        let container = {cwf: dag.cwf, rdicts, stem: br.head, rels, morels, cdicts: []}
         // let jsons = stemdicts.map(cdict=> JSON.stringify(cdict.scheme))
         // jsons = _.uniq(jsons)
         // container.schemes = jsons.map(json=> JSON.parse(json))
