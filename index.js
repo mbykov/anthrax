@@ -54,7 +54,7 @@ export async function anthrax(wf) {
     // log('_ANTHRAX WF', wf)
     // wf = wf.split('?')[0]
 
-    let chains = []
+    let conts = []
     let dag = await parseDAG(wf)
 
     // неизменяемые, indecls, включая irregs, уже имеют trns, в отличие от nests
@@ -65,8 +65,6 @@ export async function anthrax(wf) {
     // log('_INDECLS_I', idicts)
     if (idicts.length) {
         dag.idicts = idicts.length
-        let ichain = makeTermChain(wf, idicts)
-        // chains.push(ichain)
     }
 
     // ======================== ἀνακύκλωσις
@@ -79,9 +77,21 @@ export async function anthrax(wf) {
 
     for (let lead of leads) {
         // log('_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLEAD', lead)
-        let brchains = await main(dag, lead)
-        chains.push(...brchains)
+        let brconts = await main(dag, lead)
+        conts.push(...brconts)
     }
+
+    // BEST: еще раз (?) могут они появиться, если br.head ограничен? Проверить br.tail
+    // отбросить короткие стемы ; ἡμέρα
+    // тут можно заранее, есди есть indecls, в nest сразу выбирать стемы длиннее 1
+    if (conts.length > 1) {
+        conts = conts.filter(cont=> cont.indecl || cont.stem.length > 1)
+        if (conts.length > 1) {
+            log('_TOO_MANY_CONTS', wf)
+            throw new Error()
+        }
+    }
+
 
     // TODO: == объединить, когда обраружу indecl в гнездах
     if (idicts.length) {
@@ -89,6 +99,7 @@ export async function anthrax(wf) {
         let cidicts = []
         for (let dict in igroups) { // str
             let cdict = {dict, trns: []}
+            // trns из разных dname
             for (let idict of igroups[dict]) {
                 if (!cdict.rdict) cdict.rdict = idict.rdict
                 if (!cdict.rdict) cdict.rdict = idict.rdict
@@ -98,33 +109,19 @@ export async function anthrax(wf) {
                 cdict.morphs = []
             }
             cidicts.push(cdict)
+
         }
         // log('_c_idicts', cidicts)
-
-        let ichains = []
         for (let idict of cidicts) {
-            // log('_idict', idict)
-            let ichain = {rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
-            ichains.push(ichain)
-        }
-        let ridicts = cidicts.map(dict=> dict.rdict)
-        let icontainer = {rdicts: ridicts, indecl: true, chains: ichains, rels: [], morels: [], schemes: []}
-        chains.push(icontainer)
-    }
-
-    // best, еще раз ? могут они появиться, если br.head ограничен? Проверить br.tail
-    // отбросить короткие стемы ; ἡμέρα
-    // тут можно заранее, есди есть indecls, в nest сразу выбирать стемы длиннее 1
-    if (chains.length > 1) {
-        chains = chains.filter(chain=> chain.indecl || chain.stem.length > 1)
-        if (chains.length > 1) {
-            log('_too_many_chains', wf, chains)
-            // throw new Error()
+            let nestcont = conts.find(container=> container.wf == idict.rdict)
+            if (!nestcont) log('_no_nest_container_for_idict', wf)
+            let icdict = {indecl: true, rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
+            nestcont.cdicts.push(icdict)
         }
     }
 
     // return []
-    return chains
+    return conts
 }
 
 // πολυμαθίη νόον ἔχειν οὐ διδάσκει // polumathih
@@ -143,7 +140,7 @@ async function main(dag, lead) {
     let br_strs = dictbreaks.map(br=> ['_head:', br.head, br.term].join(' - '))
     // log('_br_strs', br_strs)
 
-    let chains = []
+    let brconts = []
     //
     for (let br of dictbreaks) {
         let fls = dag.termflex[br.term]
@@ -164,10 +161,11 @@ async function main(dag, lead) {
         if (!proxies.length) continue
         let proxies_rdicts = proxies.map(cdict=> cdict.rdict)
         pp('__proxies_rdicts:', proxies_rdicts)
-        // log('__proxies_rdicts:', br.head, proxies_rdicts)
+        // log('__proxies_rdicts:', br.head, proxies_rdicts, lead.pref)
 
         let stemdicts = dictByFLS(proxies, fls)
         if (!stemdicts.length) continue
+
         let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
         pp('__rstemdicts', rstemdicts) // SHOW
         // log('__rstemdicts', br.head, rstemdicts) // SHOW
@@ -193,7 +191,7 @@ async function main(dag, lead) {
         // let chain = {rcdicts, stem: br.head, cdicts: stemdicts, rels, morels, term: br.term}
         // chain.schemes = parseSchemes(lead, stemdicts, br.term)
 
-        let container = {rdicts, stem: br.head, rels, morels, chains: []}
+        let container = {wf: dag.wf, rdicts, stem: br.head, rels, morels, cdicts: []}
         // let jsons = stemdicts.map(cdict=> JSON.stringify(cdict.scheme))
         // jsons = _.uniq(jsons)
         // container.schemes = jsons.map(json=> JSON.parse(json))
@@ -202,14 +200,13 @@ async function main(dag, lead) {
         for (let cdict of stemdicts) {
             let schm = cdict.scheme.map(segment=> segment.seg).join('-')
             let chain = {rdict: cdict.rdict, cdict, morphs: cdict.morphs, scheme: cdict.scheme, schm}
-            container.chains.push(chain)
+            container.cdicts.push(chain)
         }
 
-        chains.push(container)
+        brconts.push(container)
     }
 
-    // log('_index_chains', chains)
-    return chains
+    return brconts
 }
 
 function mainDicts(br) {
@@ -253,7 +250,7 @@ function proxyByLead(lead, maindicts) {
         if (cdict.pos != 'verb') {
             if (lead.pref) {
                 if (lead.pref == cdict.prefix?.pref) cdict.proxy = true
-                else if (!cdict.prefix) cdict.proxy = true
+                else if (!cdict.prefix && !cdict.aug) cdict.proxy = true //
                 // if (cdict.proxy) log('_pref', cdict.rdict, cdict.stem, 'l_pref', lead.pref, 'c_pref', cdict.prefix?.pref)
             } else if (cdict.aug === lead.aug) {
                 cdict.proxy = true
@@ -365,24 +362,6 @@ function dictByFLS(proxies, fls) {
     } // proxy cdict
     return stemdicts
 }
-
-// function chainForBreak(stemdicts, rels, term) {
-//     let brchains = []
-//     let dictgroups = _.groupBy(stemdicts, 'dict')  // общий stem, term - разные cdict.dict, verb/name, -> и chains ; noun / adj - вместе
-//     for (let dict in dictgroups) { // не может быть один dict, и разные name / verb
-//         let cdicts = dictgroups[dict]
-//         if (!cdicts.length) log('_NO_P_ROBE_DICT___!!!', dict)
-//         let probeFLS = {dict, cdicts, rels, term}
-//         parseMorphs(cdicts)
-//         brchains.push(probeFLS)
-//     }
-//     for (let probeFLS of brchains) {
-//         cleanChain(probeFLS)
-//     }
-//     // log('_XXXXXXXXXXXXXXXXXx', brchains.length)
-//     // return []
-//     return brchains
-// }
 
 function cleanChain(chain) {
     for (let cdict of chain.cdicts) {
