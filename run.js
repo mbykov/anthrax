@@ -44,9 +44,9 @@ async function run(verbose) {
             log('_container', container)
         }
 
-        for (let chain of container.cdicts) {
-            log('_r: rdict', chain.rdict)
-            log('_r: morphs', chain.morphs)
+        for (let cdict of container.cdicts) {
+            log('_r: rdict', cdict.rdict, cdict.pos)
+            log('_r: morphs', cdict.morphs)
         }
         // for (let chain of container.chains) {
         //     // log('_chain', chain)

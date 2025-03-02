@@ -88,7 +88,7 @@ export async function anthrax(wf) {
         conts = conts.filter(cont=> cont.indecl || cont.stem.length > 1)
         if (conts.length > 1) {
             log('_TOO_MANY_CONTS', wf)
-            throw new Error()
+            // throw new Error()
         }
     }
 
@@ -118,7 +118,10 @@ export async function anthrax(wf) {
                 let icdict = {indecl: true, rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
                 nestcont.cdicts.push(icdict)
             } else {
-                log('_no_nest_container_for_idict', wf)
+                // log('_no_nest_container_for_idict', wf, idict)
+                if (!idict.pos) idict.pos = 'indecl'
+                let icontainer = {indecl: true, cwf: dag.cwf, stem: '', rels: [], morels: [], cdicts: [idict]}
+                conts.push(icontainer)
             }
         }
     }
