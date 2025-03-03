@@ -92,8 +92,7 @@ export async function anthrax(wf) {
         }
     }
 
-
-    // TODO: == объединить, когда обраружу indecl в гнездах
+    // TODO: == объединить, когда обнаружу indecl в гнездах
     if (idicts.length) {
         let igroups = _.groupBy(idicts, 'dict')
         let cidicts = []
@@ -175,6 +174,8 @@ async function main(dag, lead) {
         let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
         pp('__rstemdicts', rstemdicts) // SHOW
         // log('__rstemdicts', br.head, rstemdicts) // SHOW
+
+        // continue
 
         for (let cdict of stemdicts) {
             cdict.morphs = parseMorph(cdict)
