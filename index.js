@@ -195,9 +195,6 @@ async function main(dag, lead) {
             else morels.push(dict.rdict)
         }
 
-        // let chain = {rcdicts, stem: br.head, cdicts: stemdicts, rels, morels, term: br.term}
-        // chain.schemes = parseSchemes(lead, stemdicts, br.term)
-
         let container = {cwf: dag.cwf, rdicts, stem: br.head, rels, morels, cdicts: []}
         // let jsons = stemdicts.map(cdict=> JSON.stringify(cdict.scheme))
         // jsons = _.uniq(jsons)
@@ -410,58 +407,33 @@ function parseMorph(cdict) {
 function parseScheme(lead, cdict, term) {
     let scheme = []
     if (!lead.pref) {
-        if (lead.aug) scheme.push({seg: lead.aug, aug: true})
-        scheme.push({seg: cdict.stem, stem: true})
-        scheme.push({seg: term, term: true})
+        if (lead.aug) scheme.push({seg: lead.aug, type: 'aug'})
+        scheme.push({seg: cdict.stem, type: 'dict', dict: cdict.dict})
+        scheme.push({seg: term, type: 'term'})
+        ss('_aug_scheme', scheme)
         return scheme
     }
     let prefs = lead.prefraw.split('-').reverse()
     let lastpref = prefs[0] // reverse!
-    ss('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
+    // ss('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
     let pdict = plain(cdict.dict)
     let reterm = new RegExp(term + '$')
-    pdict = pdict.replace(reterm, '')
+    let stub = cdict.dict.replace(reterm, '')
     lead.prefs.pop()
-    scheme.push({seg: pdict, tail: true})
+    scheme.push({seg: stub, type: 'stem', dict: cdict.dict})
+
     for (let pref of prefs) {
         let repref = new RegExp(pref)
         if (repref.test(pdict)) continue
-        if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, con: true})
-        scheme.unshift({seg: pref, pref: true})
-        let segtail = scheme.find(seg=> seg.tail)
-        segtail.seg = pdict
+        if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, type: 'con'})
+        scheme.unshift({seg: pref, type: 'pref'})
+        // let segstem = scheme.find(seg=> seg.stem)
+        // let stub = cdict.dict
+        // segstem.seg = cdict.stem
     }
-    scheme.push({seg: term, term: true})
+    scheme.push({seg: term, type: 'term'})
     ss('_scheme', pdict, scheme)
     return scheme
-}
-
-function parseSchemes(lead, cdicts, term) {
-    let schemes = []
-    let prefs = lead.prefraw.split('-').reverse()
-    let lastpref = prefs[0] // reverse!
-    ss('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
-    for (let cdict of cdicts) {
-        let scheme = []
-        let pdict = plain(cdict.dict)
-        let reterm = new RegExp(term + '$')
-        pdict = pdict.replace(reterm, '')
-        lead.prefs.pop()
-        scheme.push({seg: pdict, tail: true})
-        for (let pref of prefs) {
-            let repref = new RegExp(pref)
-            if (repref.test(pdict)) continue
-            if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, con: true})
-            scheme.unshift({seg: pref, pref: true})
-            let segtail = scheme.find(seg=> seg.tail)
-            segtail.seg = pdict
-        }
-        scheme.push({seg: term, term: true})
-        schemes.push(scheme)
-        ss('_scheme', pdict, scheme)
-    }
-
-    return schemes
 }
 
 function parseMorphs(cdicts) {
@@ -472,42 +444,6 @@ function parseMorphs(cdicts) {
         cdict.morphs = morphs
         // log('_chain.morphs', cdict.rdict, cdict.morphs)
     }
-}
-
-function parseScheme_(lead, probe, br) {
-    let scheme = []
-    h('lead', lead)
-    h('probe.pdict', probe.rdict, '_stem:', probe.stem)
-    // если cdict уже имеет префикс, то это полная форма, с коротким стемом
-    // а может быть, что noun имеет prefix, а adjective или verb - нет? Кажется, может. И что будет? Это нужно проверять при заливке Nest
-    let pps = lead.ps || []
-    for (let ppref of pps) {
-        let pprefseg = {seg: ppref, dict: ppref, prepref: true}
-        scheme.push(pprefseg)
-    }
-    if (lead.pref) {
-        // log('_______________________scheme', probe.rdict, 'probe.prefix', !!probe.prefix, lead)
-        if (probe.prefix) {
-            let segs = []
-            segs.push(lead.pref)
-            if (lead.con) segs.push(lead.con)
-            segs.push(probe.stem)
-            let seg = segs.join('')
-            scheme.push({seg, dict: probe.dict, stem: true})
-        } else {
-            scheme.push({seg: lead.pref, dict: lead.pref, pref: true})
-            if (lead.con) scheme.push({seg: lead.con, con: true})
-            scheme.push({seg: probe.stem, dict: probe.dict, stem: true})
-        }
-    } else {
-        // log('_______________________AUG', lead, _.keys(probe))
-        let aug = lead.aug
-        if (aug) scheme.push({seg: aug, dict: aug, aug: true})
-        scheme.push({seg: probe.stem, dict: probe.dict, stem: true})
-    }
-    scheme.push({seg: br.term, dict: br.term, term: true})
-    // log('_SCHEME', scheme)
-    return scheme
 }
 
 function parseHeadTails(dag, ptail) {

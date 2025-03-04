@@ -9,6 +9,7 @@
         "./cleanString": "./lib/utils.js",
         "./getTrns": "./lib/remote.js",
         "./preflist": "./lib/prefix/preflist.js",
+        "./prefDocs": "./lib/prefix/prefDocs.js",
         "./prettyFLS": "./lib/utils.js",
         "./prettyName": "./lib/utils.js",
         "./prettyVerb": "./lib/utils.js",
