@@ -8,6 +8,8 @@
         ".": "./index.js",
         "./cleanString": "./lib/utils.js",
         "./getTrns": "./lib/remote.js",
+        "./getDicts": "./lib/remote.js",
+        "./getCacheD": "./lib/remote.js",
         "./preflist": "./lib/prefix/preflist.js",
         "./prefDocs": "./lib/prefix/prefDocs.js",
         "./prettyFLS": "./lib/utils.js",

@@ -37,7 +37,6 @@ async function run(verbose) {
     }
 
     for (let container of conts) {
-
         if (verbose) {
             container.rels = container.rels.length
             container.morels = container.morels.length
@@ -45,12 +44,9 @@ async function run(verbose) {
         }
 
         for (let cdict of container.cdicts) {
-            log('_r: rdict', cdict.rdict, cdict.pos)
+            log('_r: rdict', cdict.rdict, cdict.pos, '_scheme:', cdict.schm)
             log('_r: morphs', cdict.morphs)
         }
-        // for (let chain of container.chains) {
-        //     // log('_chain', chain)
-        // }
     }
 
 

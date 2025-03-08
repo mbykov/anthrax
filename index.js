@@ -100,12 +100,13 @@ export async function anthrax(wf) {
             let cdict = {dict, trns: []}
             // trns из разных dname
             for (let idict of igroups[dict]) {
+                if (!cdict.pos) cdict.pos = idict.pos
                 if (!cdict.rdict) cdict.rdict = idict.rdict
-                if (!cdict.rdict) cdict.rdict = idict.rdict
-                if (!cdict.fls) cdict.fls = idict.fls
-                let trn = {dname: idict.dname, trns: idict.trns}
+                if (!cdict.morphs) cdict.morphs = idict.morphs
+                // if (!cdict.fls) cdict.fls = idict.fls
+                let trn = {dname: idict.dname, strs: idict.trns}
                 cdict.trns.push(trn)
-                cdict.morphs = []
+                log('____idict', idict)
             }
             cidicts.push(cdict)
 
@@ -118,7 +119,8 @@ export async function anthrax(wf) {
                 nestcont.cdicts.push(icdict)
             } else {
                 // log('_no_nest_container_for_idict', wf, idict)
-                if (!idict.pos) idict.pos = 'indecl'
+                if (idict.pos == 'verb' || idict.pos == 'noun' || idict.pos == 'adj' ) idict.pos = 'irreg'
+                else idict.pos = 'indecl'
                 let icontainer = {indecl: true, cwf: dag.cwf, stem: '', rels: [], morels: [], cdicts: [idict]}
                 conts.push(icontainer)
             }
@@ -203,10 +205,13 @@ async function main(dag, lead) {
 
         for (let cdict of stemdicts) {
             let schm = cdict.scheme.map(segment=> segment.seg).join('-')
-            let chain = {rdict: cdict.rdict, cdict, morphs: cdict.morphs, scheme: cdict.scheme, schm}
-            container.cdicts.push(chain)
+            cdict.schm = schm
+            cleanDict(cdict)
+            // let odict = {rdict: cdict.rdict, cdict, morphs: cdict.morphs, scheme: cdict.scheme, schm}
+            container.cdicts.push(cdict)
         }
 
+        // ddd
         brconts.push(container)
     }
 
@@ -367,34 +372,14 @@ function dictByFLS(proxies, fls) {
     return stemdicts
 }
 
-function cleanChain(chain) {
-    for (let cdict of chain.cdicts) {
-        delete cdict.vars
-        delete cdict.cfls
-        // delete cdict.stem
-        // delete cdict.astem
-        // delete cdict.aug
+function cleanDict(cdict) {
         delete cdict.keys
         delete cdict.proxy
         delete cdict.dname
         delete cdict.raw
         delete cdict.compound
         delete cdict.cstype
-        // cdict.sprefix = JSON.stringify(cdict.prefix)
-    }
-    for (let cdict of chain.rels) {
-        delete cdict.vars
-        delete cdict.cfls
-        // delete cdict.stem
-        // delete cdict.astem
-        // delete cdict.aug
-        delete cdict.keys
-        delete cdict.proxy
-        delete cdict.dname
-        delete cdict.raw
-        delete cdict.compound
-        delete cdict.cstype
-    }
+        delete cdict.astem
 }
 
 function parseMorph(cdict) {
@@ -442,7 +427,6 @@ function parseMorphs(cdicts) {
         if (cdict.name) morphs = prettyName(cdict.cfls)
         else if (cdict.verb) morphs = prettyVerb(cdict.cfls)
         cdict.morphs = morphs
-        // log('_chain.morphs', cdict.rdict, cdict.morphs)
     }
 }
 
@@ -623,63 +607,4 @@ function removeVowelEnd(wf) {
     let end = wf[wf.length-1]
     if (vowels.includes(end)) wf = wf.slice(0, -1)
     return wf
-}
-
-function makeTermChain(wf, termcdicts) {
-    let termchain = {dict: wf, indecl: true, rels: [], scheme: []} // TODO: scheme тут ьожет быть - astem-term
-    // parseMorphs(termcdicts)
-    termchain.cdicts = termcdicts
-    return termchain
-}
-
-function parseLeads_old_full(pcwf) {
-    let leads = []
-    let prefraw = parsePrefix(pcwf)
-    if (!prefraw) {
-        let augLead = parseAug(pcwf)
-        leads.push(augLead)
-        return leads
-    }
-
-    // {pref: '', con: '', tail: ''}
-    let pparts = prefraw.split('-')
-    let psize = pparts.length
-
-    let tail = pcwf
-    let con = ''
-    // let ppref = ''
-    let ps = []
-    let atail = ''
-    // let plead = {ps: []}
-    for (let pref of pparts) {
-        // if (pref == 'αν') pref = 'ἀν'
-        let plead = {}
-        plead.ps = _.clone(ps)
-        plead.pref = pref
-        let before = tail
-        let repref = new RegExp('^' + pref)
-        // plead.a_tail = atail
-        // plead.tail_b = tail
-        // atail = atail ? atail.replace(repref, '') : tail.replace(repref, '')
-        atail = tail.replace(repref, '')
-        // plead.atail = atail
-        tail = atail
-        ps.push(pref)
-
-        // if (plead.pref == 'αν') plead.pref = 'ἀν' // <<<<<<<<<<<<<<<<<<<<<, HERE // ἐξαναλίσκω
-        let pct = removeVowelBeg(atail)
-        plead.con = pct.con
-        plead.tail = pct.tail
-        leads.push(plead)
-
-        let alead = {ps: plead.ps}
-        let act = removeVowelBeg(before)
-        alead.aug = act.con
-        alead.tail = act.tail
-        leads.push(alead)
-    }
-
-    // log('_leads_', leads)
-    // return []
-    return leads
 }
