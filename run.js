@@ -3,11 +3,12 @@
 import _  from 'lodash'
 import { anthrax } from './index.js'
 import { cleanString, prettyIndecl, prettyFLS } from './lib/utils.js'
+import {oxia, comb, plain, strip} from 'orthos'
 
 import Debug from 'debug'
 const d = Debug('dicts')
 
-import { createDBs, getFlexes, getNests, getTrns } from './lib/remote.js'
+import { createDBs, getFlexes, getNests, getCacheD, getTrns, getIndecls, getCacheI } from './lib/remote.js'
 
 let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
 let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
@@ -18,18 +19,36 @@ const log = console.log
 if (!wordform) log('no wordform')
 else run(verbose)
 
+let nocache = !!process.env.NO_CACHE
+
+/*
+  - index.js =>
+  - getIndecls / getCacheI
+  - anthrax / cacheA
+  - getCompactedDicts / getCacheD
+  - merge:
+  - conts +
+
+ */
+
+// обнулить Indecls
+//  rm -rf ../pouch-anthrax/cacheI
 
 async function run(verbose) {
     await createDBs()
-
     // проверка на greek - хоть один символ
-    // клик на слове - получить три - до, клик, после
-    // enclitics
     wordform = cleanString(wordform)
+
+    let cwf = comb(wordform)
+    let indecls = await getCacheI(cwf)
+    log('______________________________________indecls', indecls)
+
+
+    return
 
     // TODO: отдельно - сначала indecl-DB
     let conts = await anthrax(wordform)
-    // log('____conts', conts)
+    // log('____conts', conts)b
 
     if (!conts.length) {
         log('no result')
@@ -44,10 +63,24 @@ async function run(verbose) {
         }
 
         for (let cdict of container.cdicts) {
-            log('_r: rdict', cdict.rdict, cdict.pos, '_scheme:', cdict.schm)
+            log('_r: rdict', cdict.rdict, cdict.pos, cdict.stem, '_scheme:', cdict.schm)
             log('_r: morphs', cdict.morphs)
+            log('_r: cdict.dict', cdict)
         }
     }
+
+    if (verbose == 'cache') {
+        // console.log('____run_CDICTS', _.flatten(conts.map(cont=> cont.cdicts)))
+        let dictkeys = _.flatten(conts.map(cont=> cont.cdicts.map(cdict=> cdict.dict)))
+        dictkeys = _.uniq(dictkeys)
+        console.log('____run_dictkeys', dictkeys)
+
+        let cachedicts = await getCacheD(dictkeys)
+        console.log('____run_cachedicts', cachedicts)
+        let rcacheDs = cachedicts.map(cdict=> cdict.rdict)
+        console.log('____run_rcacheDs', rcacheDs)
+    }
+
 
 
     return

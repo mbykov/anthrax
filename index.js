@@ -5,7 +5,7 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, stresses, checkOddStress } from './lib/utils.js'
-import { createDBs, getFlexes, getNests, getIndecls } from './lib/remote.js'
+import { getFlexes, getNests, getIndecls } from './lib/remote.js'
 // import { enclitic } from './lib/enclitic.js'
 import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
@@ -57,12 +57,10 @@ export async function anthrax(wf) {
     let conts = []
     let dag = await parseDAG(wf)
 
-    // неизменяемые, indecls, включая irregs, уже имеют trns, в отличие от nests
-    // let idicts = await getInds(dag.cwf)
-    // log('_INDECLS', idicts)
+    // неизменяемые, indecl, включая irregs, уже имеют trns, в отличие от nests
     let testdnames = ['wkt', 'dvr', 'lsj']
     let idicts = await getIndecls(dag.cwf, testdnames)
-    // log('_INDECLS_I', idicts)
+    // log('_IDICTS_I', idicts)
     if (idicts.length) {
         dag.idicts = idicts.length
     }
@@ -82,12 +80,11 @@ export async function anthrax(wf) {
     }
 
     // BEST: еще раз (?) могут они появиться, если br.head ограничен? Проверить br.tail
-    // отбросить короткие стемы ; ἡμέρα
-    // тут можно заранее, есди есть indecls, в nest сразу выбирать стемы длиннее 1
+    // отбросить короткие стемы ; ἡμέρα ;  τοῦ
     if (conts.length > 1) {
-        conts = conts.filter(cont=> cont.indecl || cont.stem.length > 1)
+        // conts = conts.filter(cont=> cont.indecl || cont.stem.length > 1)
         if (conts.length > 1) {
-            log('_TOO_MANY_CONTS', wf)
+            // log('_TOO_MANY_CONTS', wf)
             // throw new Error()
         }
     }
@@ -106,17 +103,17 @@ export async function anthrax(wf) {
                 // if (!cdict.fls) cdict.fls = idict.fls
                 let trn = {dname: idict.dname, strs: idict.trns}
                 cdict.trns.push(trn)
-                log('____idict', idict)
+                // log('____idict', idict)
             }
             cidicts.push(cdict)
 
         }
         // log('_c_idicts', cidicts)
         for (let idict of cidicts) {
-            let nestcont = conts.find(container=> container.cwf == idict.dict)
-            if (nestcont) {
-                let icdict = {indecl: true, rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
-                nestcont.cdicts.push(icdict)
+            let regcont = conts.find(container=> container.cwf == idict.dict)
+            if (regcont) {
+                // let icdict = {indecl: true, rdict: idict.rdict, cdict: idict, morphs: [], scheme: [], schm: ''}
+                regcont.cdicts.push(idict)
             } else {
                 // log('_no_nest_container_for_idict', wf, idict)
                 if (idict.pos == 'verb' || idict.pos == 'noun' || idict.pos == 'adj' ) idict.pos = 'irreg'
@@ -168,7 +165,7 @@ async function main(dag, lead) {
         if (!proxies.length) continue
         let proxies_rdicts = proxies.map(cdict=> cdict.rdict)
         pp('__proxies_rdicts:', proxies_rdicts)
-        // log('__proxies_rdicts:', br.head, proxies_rdicts, lead.pref)
+        // log('__proxies_rdicts:', br.head, proxies_rdicts, 'lead.pref:', lead.pref)
 
         let stemdicts = dictByFLS(proxies, fls)
         if (!stemdicts.length) continue
@@ -211,6 +208,7 @@ async function main(dag, lead) {
             container.cdicts.push(cdict)
         }
 
+        // log('__container', container.cdicts) // SHOW
         // ddd
         brconts.push(container)
     }
@@ -403,21 +401,23 @@ function parseScheme(lead, cdict, term) {
     // ss('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
     let pdict = plain(cdict.dict)
     let reterm = new RegExp(term + '$')
-    let stub = cdict.dict.replace(reterm, '')
+    // let stub = cdict.dict.replace(reterm, '')
+    // let xxx =_.clone(cdict)
+    // xxx.cfls = 'kuku'
+    // xxx.ckeys = 'kuku'
+    // log('________DDDD_', cdict.dict, cdict.type, term, xxx)
     lead.prefs.pop()
-    scheme.push({seg: stub, type: 'stem', dict: cdict.dict})
+    scheme.push({seg: cdict.stem, type: 'stem', dict: cdict.dict})
 
     for (let pref of prefs) {
         let repref = new RegExp(pref)
         if (repref.test(pdict)) continue
         if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, type: 'con'})
         scheme.unshift({seg: pref, type: 'pref'})
-        // let segstem = scheme.find(seg=> seg.stem)
-        // let stub = cdict.dict
-        // segstem.seg = cdict.stem
     }
     scheme.push({seg: term, type: 'term'})
     ss('_scheme', pdict, scheme)
+    // log('_scheme', pdict, scheme)
     return scheme
 }
 
