@@ -40,18 +40,15 @@ async function run(verbose) {
     wordform = cleanString(wordform)
 
     let cwf = comb(wordform)
-    let indecls = await getCacheI(cwf)
-    log('______________________________________indecls', indecls)
-
-
-    return
+    // let indecls = await getCacheI(cwf)
+    // log('______________________________________indecls', indecls)
 
     // TODO: отдельно - сначала indecl-DB
     let conts = await anthrax(wordform)
-    // log('____conts', conts)b
+    // log('____conts', conts)
 
     if (!conts.length) {
-        log('no result')
+        log('no result conts')
         return
     }
 

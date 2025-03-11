@@ -90,6 +90,7 @@ export async function anthrax(wf) {
     }
 
     // TODO: == объединить, когда обнаружу indecl в гнездах
+    // TODO: совсем убрать, но зачем группа?
     if (idicts.length) {
         let igroups = _.groupBy(idicts, 'dict')
         let cidicts = []
@@ -108,6 +109,7 @@ export async function anthrax(wf) {
             cidicts.push(cdict)
 
         }
+        cidicts = []
         // log('_c_idicts', cidicts)
         for (let idict of cidicts) {
             let regcont = conts.find(container=> container.cwf == idict.dict)
@@ -172,7 +174,7 @@ async function main(dag, lead) {
 
         let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
         pp('__rstemdicts', rstemdicts) // SHOW
-        // log('__rstemdicts', br.head, rstemdicts) // SHOW
+        log('__rstemdicts', br.head, rstemdicts) // SHOW
 
         // continue
 
@@ -242,7 +244,7 @@ function proxyByLead(lead, maindicts) {
     let proxies = []
     for (let cdict of maindicts) {
         // if (cdict.stem != 'διοτ') continue
-        // if (cdict.rdict != 'βάρακος') continue
+        // if (cdict.rdict != 'Αἰγαῖος') continue // βάρακος // BIG FILTER LEAD
 
         if (!cdict.ckeys) {
             if (cdict.pos == 'noun') cdict.ckeys = nameKey[cdict.stype]
@@ -264,7 +266,7 @@ function proxyByLead(lead, maindicts) {
                 // log('_aug', cdict.rdict, cdict.stem)
             }
             if (cdict.proxy) proxies.push(cdict)
-            // log('_ckey_rdict________:', cdict.rdict, cdict.ckeys.length,  '_lead.aug', lead.aug, cdict.pos, cdict.aug)
+            // log('_proxyByLead________:', cdict.proxy, cdict.rdict, cdict.ckeys.length,  '_lead.aug', lead.aug, cdict.pos, 'cdict.aug', cdict.aug)
         } else {
             cdict.ckeys = cdict.ckeys.filter(ckey=> {
                 if (cdict.pos != 'verb') return true
@@ -296,8 +298,8 @@ function proxyByLead(lead, maindicts) {
     }
 
     let rproxies = proxies.map(cdict=> cdict.rdict)
-    pp('_r_proxies:', lead, rproxies)
-    // log('_r_proxies:', lead, rproxies)
+    pp('_r_proxies:', rproxies)
+    // log('_r_proxies:', rproxies)
 
     // return []
     return proxies
@@ -307,10 +309,11 @@ function dictByFLS(proxies, fls) {
     let stemdicts = []
     for (let cdict of proxies) {
         ff('____probe', cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
+        // log('____probe', cdict.name, cdict.rdict, 'stem:', cdict.stem, 'fls', fls.length, '_ckeys', cdict.ckeys.length) // , cdict.stypes
         let cfls = []
         if (cdict.name) {
+            // if (cdict.rdict != 'Αἰγαῖος') continue // BIG FILTER FLS
             // log('_N', cdict.rdict, fls.length, cdict.ckeys.length)
-            // if (cdict.rdict != 'κλάσμα') continue //FFF
             for (let flex of fls) {
                 if (!flex.name) continue
                 // log('_n_flex', flex.name, flex.stype)
