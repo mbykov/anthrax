@@ -8,17 +8,8 @@
         ".": "./index.js",
         "./remote": "./lib/remote.js",
         "./cleanString": "./lib/utils.js",
-        "./getTrns": "./lib/remote.js",
-        "./getDicts": "./lib/remote.js",
-        "./getCacheD": "./lib/remote.js",
         "./preflist": "./lib/prefix/preflist.js",
         "./prefDocs": "./lib/prefix/prefDocs.js",
-        "./prettyFLS": "./lib/utils.js",
-        "./prettyName": "./lib/utils.js",
-        "./prettyVerb": "./lib/utils.js",
-        "./prettyIndecl": "./lib/utils.js",
-        "./createDBs": "./lib/remote.js",
-        "./config": "./lib/config.js"
     },
     "type": "module",
     "scripts": {

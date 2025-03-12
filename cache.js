@@ -2,7 +2,7 @@
 
 import _  from 'lodash'
 import { anthrax } from './index.js'
-import { cleanString, prettyIndecl, prettyFLS } from './lib/utils.js'
+import { cleanString } from './lib/utils.js'
 import {oxia, comb, plain, strip} from 'orthos'
 import fse from 'fs-extra'
 import path  from 'path'
@@ -14,7 +14,7 @@ const d = Debug('dicts')
 const currentdir = process.cwd()
 const dbpath = path.resolve(currentdir, '../pouch-anthrax')
 
-import { createDBs, getFlexes, getNests, getTrns, getIndecls, getCacheD, getCacheI } from './lib/remote.js'
+import { createDBs } from './lib/remote.js'
 
 import { cacheAnthrax } from '@mbykov/anthrax/remote';
 
@@ -25,25 +25,25 @@ const log = console.log
 
 // check greek TODO:
 if (!wf) log('no wordform')
-else runCache(wf)
+else runGetCache(wf)
 
 
 // indecl - ἕνεκα
 // noun - βάρακος
 
-const cacheIpath = path.resolve(dbpath, 'cacheI')
-const cacheApath = path.resolve(dbpath, 'cacheA')
-const cacheDpath = path.resolve(dbpath, 'cacheD')
+// const cacheIpath = path.resolve(dbpath, 'cacheI')
+// const cacheApath = path.resolve(dbpath, 'cacheA')
+// const cacheDpath = path.resolve(dbpath, 'cacheD')
 // fse.emptyDirSync(cacheIpath)
 // fse.emptyDirSync(cacheApath)
 // fse.emptyDirSync(cacheDpath)
 
 console.time("dbcache");
 
-export async function runCache(wf) {
+export async function runGetCache(wf) {
     await createDBs()
     wf = cleanString(wf)
-    let cwf = comb(wf)
+    let cwf = oxia(comb(wf))
     // enclitic:::
 
     let conts = await cacheAnthrax(cwf)

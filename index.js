@@ -380,6 +380,7 @@ function cleanDict(cdict) {
         delete cdict.raw
         delete cdict.compound
         delete cdict.cstype
+        delete cdict.stype
         delete cdict.astem
 }
 
