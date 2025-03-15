@@ -43,16 +43,16 @@ async function run(verbose) {
     }
 
     for (let container of conts) {
-        if (verbose) {
-            container.rels = container.rels.length
-            container.morels = container.morels.length
-            log('_container', container)
-        }
-
         for (let cdict of container.cdicts) {
             log('_r: rdict', cdict.rdict, cdict.pos, cdict.stem, '_scheme:', cdict.schm)
             log('_r: morphs', cdict.morphs)
-            log('_r: cdict.dict', cdict)
+            if (verbose) {
+                container.rels = container.rels.length
+                container.morels = container.morels.length
+                // log('_container', container)
+                log('_r: cdict', cdict)
+                log('_trns', cdict.trns)
+            }
         }
     }
 

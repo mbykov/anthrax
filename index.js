@@ -174,7 +174,7 @@ async function main(dag, lead) {
 
         let rstemdicts = stemdicts.map(cdict=> cdict.rdict)
         pp('__rstemdicts', rstemdicts) // SHOW
-        log('__rstemdicts', br.head, rstemdicts) // SHOW
+        // log('__rstemdicts', br.head, rstemdicts) // SHOW
 
         // continue
 
@@ -247,13 +247,10 @@ function proxyByLead(lead, maindicts) {
         // if (cdict.rdict != 'Αἰγαῖος') continue // βάρακος // BIG FILTER LEAD
 
         if (!cdict.ckeys) {
-            if (cdict.pos == 'noun') cdict.ckeys = nameKey[cdict.stype]
-            else if (cdict.pos == 'adj') cdict.ckeys = nameKey[cdict.stype3]
-            else if (cdict.pos == 'verb') cdict.ckeys = nameKey[cdict.stype]
-            // log('_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx NO CKEYS BY STYPE ', cdict.rdict, '_pos:', cdict.pos, cdict.stype, nameKey[cdict.stype], '_end')
+            cdict.ckeys = nameKey[cdict.stype]
+            cdict.by_key = true
         }
 
-        // if (!cdict.ckeys) log('_no_ckeys', cdict.rdict)
         if (!cdict.ckeys) continue
 
         if (cdict.pos != 'verb') {

@@ -8,8 +8,11 @@
         ".": "./index.js",
         "./remote": "./lib/remote.js",
         "./cleanString": "./lib/utils.js",
+        "./utils": "./lib/utils.js",
+        "./getCacheD": "./lib/remote.js",
         "./preflist": "./lib/prefix/preflist.js",
         "./prefDocs": "./lib/prefix/prefDocs.js",
+        "./createDBs_": "./lib/remote.js"
     },
     "type": "module",
     "scripts": {

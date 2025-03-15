@@ -20,6 +20,7 @@ import { cacheAnthrax } from '@mbykov/anthrax/remote';
 
 let wf = process.argv.slice(2)[0] //  'ἀργυρῷ'
 // let nocache = !!process.env.NO_CACHE
+let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
 const log = console.log
 
@@ -48,7 +49,18 @@ export async function runGetCache(wf) {
 
     let conts = await cacheAnthrax(cwf)
 
-    console.log('_RESULT_anthrax', conts)
-
+    for (let container of conts) {
+        for (let cdict of container.cdicts) {
+            log('_r: rdict', cdict.rdict, cdict.pos, cdict.stem, '_scheme:', cdict.schm)
+            log('_r: morphs', cdict.morphs)
+            if (verbose) {
+                container.rels = container.rels.length
+                container.morels = container.morels.length
+                // log('_container', container)
+                log('_r: cdict', cdict)
+                log('_trns', cdict.trns)
+            }
+        }
+    }
     console.timeEnd("dbcache")
 }
