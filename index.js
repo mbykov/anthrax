@@ -199,7 +199,6 @@ async function main(dag, lead) {
         let container = {cwf: dag.cwf, rdicts, stem: br.head, rels, morels, cdicts: []}
         // let jsons = stemdicts.map(cdict=> JSON.stringify(cdict.scheme))
         // jsons = _.uniq(jsons)
-        // container.schemes = jsons.map(json=> JSON.parse(json))
         container.schemes = stemdicts.map(cdict=> cdict.scheme)
 
         for (let cdict of stemdicts) {
@@ -244,7 +243,8 @@ function proxyByLead(lead, maindicts) {
     let proxies = []
     for (let cdict of maindicts) {
         // if (cdict.stem != 'διοτ') continue
-        // if (cdict.rdict != 'Αἰγαῖος') continue // βάρακος // BIG FILTER LEAD
+        // if (cdict.rdict != 'Ἄγαρος') continue // βάρακος // BIG FILTER LEAD ; Αἰγαῖος
+        // log('_proxy by lead', cdict.rdict, cdict.pos)
 
         if (!cdict.ckeys) {
             cdict.ckeys = nameKey[cdict.stype]
@@ -254,6 +254,7 @@ function proxyByLead(lead, maindicts) {
         if (!cdict.ckeys) continue
 
         if (cdict.pos != 'verb') {
+            // log('_proxy by lead aug', cdict.aug,  lead.aug)
             if (lead.pref) {
                 if (lead.pref == cdict.prefix?.pref) cdict.proxy = true
                 else if (!cdict.prefix && !cdict.aug) cdict.proxy = true //
@@ -284,8 +285,7 @@ function proxyByLead(lead, maindicts) {
                     // ИЛИ: здесь можно не проверять aug, если ckey вычисляемый (найти пример, где сравнение нужно)
                     // может быть, будет нужно в компаундах
                     else if (ckey.aug !== lead.aug) ok = false
-
-                    // if (ok) log('________ckeys aug ok:', cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug, ckey)
+                    // log('________ckeys aug ok:', cdict.rdict, 'ckey.aug', ckey.aug, 'lead_aug', lead.aug)
                 }
                 // if (ok) log('________ckeys lead aug ', cdict.rdict, 'lead_pref', lead.pref, 'ckey.prefix', ckey.prefix)
                 return ok
@@ -395,30 +395,34 @@ function parseScheme(lead, cdict, term) {
         scheme.push({seg: cdict.stem, type: 'dict', dict: cdict.dict})
         scheme.push({seg: term, type: 'term'})
         ss('_aug_scheme', scheme)
+        // log('___________________FFFFFFFF____________aug', fstem)
         return scheme
     }
     let prefs = lead.prefraw.split('-').reverse()
     let lastpref = prefs[0] // reverse!
-    // ss('____SCHEMES_lead___', lead, '_prefs', prefs, lastpref)
-    let pdict = plain(cdict.dict)
+
+    let pdict = strip(cdict.dict)
     let reterm = new RegExp(term + '$')
-    // let stub = cdict.dict.replace(reterm, '')
-    // let xxx =_.clone(cdict)
-    // xxx.cfls = 'kuku'
-    // xxx.ckeys = 'kuku'
-    // log('________DDDD_', cdict.dict, cdict.type, term, xxx)
     lead.prefs.pop()
-    scheme.push({seg: cdict.stem, type: 'stem', dict: cdict.dict})
+
+    let retype = new RegExp(term + '$')
+    let fstem = cdict.dict.replace(retype, '')
+    fstem = strip(fstem)
+    // if (cdict.aug) fstem = fstem.replace(cdict.aug, '')
+    // log('___________________FFFFFFFF', fstem, cdict.stem, 'pdict', pdict)
+    // if (!lead.pref) fstem = cdict.stem
+
+    scheme.push({seg: fstem, type: 'stem', dict: cdict.dict})
 
     for (let pref of prefs) {
         let repref = new RegExp(pref)
         if (repref.test(pdict)) continue
+        // log('____ppppref', pdict, pref)
         if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, type: 'con'})
         scheme.unshift({seg: pref, type: 'pref'})
     }
     scheme.push({seg: term, type: 'term'})
     ss('_scheme', pdict, scheme)
-    // log('_scheme', pdict, scheme)
     return scheme
 }
 
