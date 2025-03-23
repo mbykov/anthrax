@@ -394,10 +394,10 @@ function parseScheme(lead, cdict, term) {
     let scheme = []
     if (!lead.pref) {
         if (lead.aug) scheme.push({seg: lead.aug, type: 'aug'})
-        scheme.push({seg: cdict.stem, type: 'dict', dict: cdict.dict})
+        scheme.push({seg: cdict.stem, type: 'stem', dict: cdict.dict})
         scheme.push({seg: term, type: 'term'})
         ss('_aug_scheme', scheme)
-        // log('___________________FFFFFFFF____________aug', fstem)
+        // log('___________________SCHEME____________aug', scheme)
         return scheme
     }
     let prefs = lead.prefraw.split('-').reverse()
@@ -407,24 +407,26 @@ function parseScheme(lead, cdict, term) {
     let reterm = new RegExp(term + '$')
     lead.prefs.pop()
 
-    let retype = new RegExp(term + '$')
-    let fstem = cdict.dict.replace(retype, '')
-    fstem = strip(fstem)
-    // if (cdict.aug) fstem = fstem.replace(cdict.aug, '')
-    // log('___________________FFFFFFFF', fstem, cdict.stem, 'pdict', pdict)
-    // if (!lead.pref) fstem = cdict.stem
-
-    scheme.push({seg: fstem, type: 'stem', dict: cdict.dict})
+    // log('___________________LEAD', pdict, lead.pref)
+    let stemseg = {seg: cdict.stem, type: 'stem', dict: cdict.dict}
+    scheme.push(stemseg)
 
     for (let pref of prefs) {
         let repref = new RegExp(pref)
-        if (repref.test(pdict)) continue
-        // log('____ppppref', pdict, pref)
+
+        if (repref.test(pdict)) {
+            let apref = pref
+            if (lead.con) apref =  apref + lead.con
+            stemseg.seg = apref + stemseg.seg
+            continue
+        }
+
         if (pref == lastpref && lead.con) scheme.unshift({seg: lead.con, type: 'con'})
         scheme.unshift({seg: pref, type: 'pref'})
     }
     scheme.push({seg: term, type: 'term'})
     ss('_scheme', pdict, scheme)
+    // log('_scheme', pdict, scheme)
     return scheme
 }
 
@@ -509,6 +511,7 @@ function parseHeadTail(stub, term) {
 }
 
 async function parseDAG(wf) {
+
     let dag = new Map();
     dag.wf = wf
     let cwf = oxia(comb(wf))

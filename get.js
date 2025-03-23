@@ -12,7 +12,7 @@ stem = comb(stem)
 
 let dname = process.argv.slice(3)[0] || 'wkt'
 
-// let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
+let verbose = process.argv.slice(4)[0] //  nest
 
 log('_STEM', stem) // γανακτ ; δεικν ;
 // let heads = [stem]
@@ -40,6 +40,9 @@ async function getDicts(stem) {
             // if (doc.rdict != 'νύξ') continue
             if (doc.ckeys) doc.ckeys = doc.ckeys.length // indecls have no ckeys
             // log('_get_doc_', doc)
+            if (verbose) {
+                log('_cdicts', doc.cdicts)
+            }
         }
     } catch (err) {
         console.log('_not_found');
