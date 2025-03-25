@@ -35,13 +35,12 @@ async function getDicts(stem) {
     try {
         let doc = await db.get(stem, {include_docs: true});
         log('_doc_', doc)
-        let docs = doc.docs
-        for (let doc of docs) {
+        for (let dict of doc.docs) {
             // if (doc.rdict != 'νύξ') continue
-            if (doc.ckeys) doc.ckeys = doc.ckeys.length // indecls have no ckeys
+            if (dict.ckeys) dictdoc.ckeys = dict.ckeys.length // indecls have no ckeys
             // log('_get_doc_', doc)
             if (verbose) {
-                log('_cdicts', doc.cdicts)
+                log('_cdicts', dict)
             }
         }
     } catch (err) {

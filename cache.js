@@ -1,22 +1,21 @@
 //
 
 import _  from 'lodash'
-import { anthrax } from './index.js'
 import { cleanString } from './lib/utils.js'
 import {oxia, comb, plain, strip} from 'orthos'
 import fse from 'fs-extra'
 import path  from 'path'
 
-
 import Debug from 'debug'
 const d = Debug('dicts')
 
 const currentdir = process.cwd()
-const dbpath = path.resolve(currentdir, '../pouch-anthrax')
+// const dbpath = path.resolve(currentdir, '../pouch-anthrax')
 
-import { createDBs } from './lib/remote.js'
+// import { createDBs } from './lib/remote.js'
 
-import { cacheAnthrax } from '@mbykov/anthrax/remote';
+// import { cacheAnthrax } from '@mbykov/anthrax/remote';
+import { anthrax } from './anthrax.js'
 
 let wf = process.argv.slice(2)[0] //  'ἀργυρῷ'
 // let nocache = !!process.env.NO_CACHE
@@ -26,18 +25,28 @@ const log = console.log
 
 // check greek TODO:
 if (!wf) log('no wordform')
-else runGetCache(wf)
+// else runGetCache(wf)
+else run(verbose)
 
+
+async function run(verbose) {
+    // проверка на greek - хоть один символ
+    wf = cleanString(wf)
+
+    let cwf = comb(wf)
+
+    let conts = await anthrax(cwf)
+    log('____conts', conts)
+
+    if (!conts.length) {
+        log('no result conts')
+        return
+    }
+
+}
 
 // indecl - ἕνεκα
 // noun - βάρακος
-
-// const cacheIpath = path.resolve(dbpath, 'cacheI')
-// const cacheApath = path.resolve(dbpath, 'cacheA')
-// const cacheDpath = path.resolve(dbpath, 'cacheD')
-// fse.emptyDirSync(cacheIpath)
-// fse.emptyDirSync(cacheApath)
-// fse.emptyDirSync(cacheDpath)
 
 console.time("dbcache");
 

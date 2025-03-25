@@ -1,22 +1,25 @@
 //
 
 import _  from 'lodash'
+
 import { anthrax } from './index.js'
+// import { anthrax } from './anthrax.js'
+
 import { cleanString } from './lib/utils.js'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import Debug from 'debug'
 const d = Debug('dicts')
 
-import { createDBs, getFlexes, getCacheD, getCacheI } from './lib/remote.js'
+// import { createDBs } from './lib/remote.js'
 
-let wordform = process.argv.slice(2)[0] //  'ἀργυρῷ'
+let wf = process.argv.slice(2)[0] //  'ἀργυρῷ'
 let verbose = process.argv.slice(3)[0] //  'ἀργυρῷ'
 
 const log = console.log
 
 // check greek TODO:
-if (!wordform) log('no wordform')
+if (!wf) log('no wordform')
 else run(verbose)
 
 let nocache = !!process.env.NO_CACHE
@@ -25,16 +28,13 @@ let nocache = !!process.env.NO_CACHE
 //  rm -rf ../pouch-anthrax/cacheI
 
 async function run(verbose) {
-    await createDBs()
+    // await createDBs()
     // проверка на greek - хоть один символ
-    wordform = cleanString(wordform)
-
-    let cwf = comb(wordform)
-    // let indecls = await getCacheI(cwf)
-    // log('______________________________________indecls', indecls)
+    wf = cleanString(wf)
+    let cwf = comb(wf)
 
     // TODO: отдельно - сначала indecl-DB
-    let conts = await anthrax(wordform)
+    let conts = await anthrax(cwf)
     // log('____conts', conts)
 
     if (!conts.length) {
@@ -56,17 +56,6 @@ async function run(verbose) {
         }
     }
 
-    if (verbose == 'cache') {
-        // console.log('____run_CDICTS', _.flatten(conts.map(cont=> cont.cdicts)))
-        let dictkeys = _.flatten(conts.map(cont=> cont.cdicts.map(cdict=> cdict.dict)))
-        dictkeys = _.uniq(dictkeys)
-        console.log('____run_dictkeys', dictkeys)
-
-        let cachedicts = await getCacheD(dictkeys)
-        console.log('____run_cachedicts', cachedicts)
-        let rcacheDs = cachedicts.map(cdict=> cdict.rdict)
-        console.log('____run_rcacheDs', rcacheDs)
-    }
 }
 
 function posByCdict(cdict) {

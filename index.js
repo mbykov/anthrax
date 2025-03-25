@@ -5,7 +5,9 @@ import _  from 'lodash'
 import {oxia, comb, plain, strip} from 'orthos'
 
 import { scrape, vowels, getStress, parseAug, stresses, checkOddStress } from './lib/utils.js'
-import { getFlexes, getNests, getIndecls } from './lib/remote.js'
+
+// import { getFlexes, getNests, getIndecls } from './lib/remote.js'
+
 // import { enclitic } from './lib/enclitic.js'
 import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
@@ -51,7 +53,7 @@ function parseLeads(pcwf) {
     return leads
 }
 
-export async function anthrax(wf) {
+export async function anthrax(wf, idicts) {
     if (!wf) return []
     // log('_ANTHRAX WF', wf)
     // wf = wf.split('?')[0]
@@ -60,12 +62,10 @@ export async function anthrax(wf) {
     let dag = await parseDAG(wf)
 
     // неизменяемые, indecl, включая irregs, уже имеют trns, в отличие от nests
-    let testdnames = ['wkt', 'dvr', 'lsj']
-    let idicts = await getIndecls(dag.cwf, testdnames)
-    // log('_IDICTS_I', idicts)
-    if (idicts.length) {
-        dag.idicts = idicts.length
-    }
+    // let idicts = await getIndecls(dag.cwf)
+    // if (idicts.length) {
+        // dag.idicts = idicts.length
+    // }
 
     // ======================== ἀνακύκλωσις
     // pref - есть, а в WKT слово - νακυκλ -без префикса
@@ -84,18 +84,16 @@ export async function anthrax(wf) {
     // BEST: еще раз (?) могут они появиться, если br.head ограничен? Проверить br.tail
     // отбросить короткие стемы ; ἡμέρα ;  τοῦ
     if (conts.length > 1) {
-        // conts = conts.filter(cont=> cont.indecl || cont.stem.length > 1)
-        if (conts.length > 1) {
-            // log('_TOO_MANY_CONTS', wf)
-            // throw new Error()
-        }
+        // ??
     }
+
+    // return []
+    return conts
 
     // TODO: == объединить, когда обнаружу indecl в гнездах
     // TODO: совсем убрать, но зачем группа?
     if (idicts.length) {
         let igroups = _.groupBy(idicts, 'dict')
-        let cidicts = []
         for (let dict in igroups) { // str
             let cdict = {dict, trns: []}
             // trns из разных dname
@@ -212,7 +210,6 @@ async function main(dag, lead) {
         }
 
         // log('__container', container.cdicts) // SHOW
-        // ddd
         brconts.push(container)
     }
 
@@ -245,8 +242,8 @@ function proxyByLead(lead, maindicts) {
     let proxies = []
     for (let cdict of maindicts) {
         // if (cdict.stem != 'διοτ') continue
-        // if (cdict.rdict != 'Ἄγαρος') continue // βάρακος // BIG FILTER LEAD ; Αἰγαῖος
-        // log('_proxy by lead', cdict.rdict, cdict.pos)
+        // if (cdict.rdict != 'σός') continue // βάρακος // BIG FILTER LEAD ; Αἰγαῖος
+        // log('_proxy by lead', cdict.rdict, cdict)
 
         if (!cdict.ckeys) {
             cdict.ckeys = nameKey[cdict.stype]
@@ -259,7 +256,8 @@ function proxyByLead(lead, maindicts) {
             // log('_proxy by lead aug', cdict.aug,  lead.aug)
             if (lead.pref) {
                 if (lead.pref == cdict.prefix?.pref) cdict.proxy = true
-                else if (!cdict.prefix && !cdict.aug) cdict.proxy = true //
+                // else if (!cdict.prefix && !cdict.aug) cdict.proxy = true //
+                else if (!cdict.prefix && !cdict.aug && cdict.stem.length > 1) cdict.proxy = true // много странных результатов, малоправдоподобных
                 // if (cdict.proxy) log('_pref', cdict.rdict, cdict.stem, 'l_pref', lead.pref, 'c_pref', cdict.prefix?.pref)
             } else if (cdict.aug === lead.aug) {
                 cdict.proxy = true
@@ -458,14 +456,19 @@ async function parseDictBreaks(headtails) {
     psblstems.push(...headtails.map(ht=> ht.head))
     psblstems.push(...headtails.map(ht=> ht.tail))
     psblstems = _.uniq(_.compact(psblstems))
+    // log('_dicts_psblstems', psblstems)
 
-    let dicts = await getNests(psblstems)
+    // let nests = await getNests(psblstems)
     // log('_dicts_psblstems', dicts.length)
+    let nest_url = 'http://localhost:5174/grc?wf=' + psblstems + '&cache=nest'
+    let nestresp = await fetch(nest_url)
+    let nests = await nestresp.json()
+    log('_INDEX nests', nests.length)
 
     let real_headtails = []
     for (let ht of headtails) {
-        let headdicts = dicts.filter(dict=> dict.stem == ht.head)
-        let taildicts = dicts.filter(dict=> dict.stem == ht.tail)
+        let headdicts = nests.filter(dict=> dict.stem == ht.head)
+        let taildicts = nests.filter(dict=> dict.stem == ht.tail)
         ht.headdicts = headdicts
         ht.taildicts = taildicts
         ht.hsize = headdicts.length
@@ -527,8 +530,13 @@ async function parseDAG(wf) {
     let tails = flakes.map(flake=> flake.tail)
     // log('_flakes_tails', tails)
 
-    let idfls = await getFlexes(tails)
-    let fls = _.flatten(idfls.map(idflex=> idflex.docs))
+    // let idfls = await getFlexes(tails)
+    // let fls = _.flatten(idfls.map(idflex=> idflex.docs))
+    let fls_url = 'http://localhost:5174/grc?wf=' + tails + '&cache=flex'
+    let flsresp = await fetch(fls_url)
+    let fls = await flsresp.json()
+    log('_INDEX flsdocs', fls.length)
+
     // STRESS - как сказывается на префиксах?
     fls = fls.filter(flex=> flex.stress == stress && flex.stressidx == stressidx)
     dag.fls = fls
