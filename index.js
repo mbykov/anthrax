@@ -17,7 +17,7 @@ import { nameKey } from './wkt-keys/key-name.js'
 import { verbKey } from './wkt-keys/key-verb.js'
 
 import { preflist } from './lib/prefix/preflist.js'
-import { prefDocList } from '../prefslist/dst/prefDocList.js'
+// import { prefDocList } from '../prefslist/dst/prefDocList.js'
 
 const dd = Debug('lead')
 const pp = Debug('proxy')
