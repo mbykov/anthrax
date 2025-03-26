@@ -13,8 +13,8 @@ import { prettyName, prettyVerb, guessPrefix } from './lib/utils.js'
 import Debug from 'debug'
 
 // KEYS
-import { nameKey } from '../parse-dicts/WKT/wkt-keys/key-name.js'
-import { verbKey } from '../parse-dicts/WKT/wkt-keys/key-verb.js'
+import { nameKey } from './wkt-keys/key-name.js'
+import { verbKey } from './wkt-keys/key-verb.js'
 
 import { preflist } from './lib/prefix/preflist.js'
 import { prefDocList } from '../prefslist/dst/prefDocList.js'
